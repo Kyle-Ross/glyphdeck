@@ -1,5 +1,3 @@
-# Moved this to https://github.com/Kyle-Ross/elastic-llm-nlp - 2023-11-19
-
 import pandas as pd
 from typing import Union, Optional, List, Dict, Any
 

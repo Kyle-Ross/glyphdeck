@@ -1,5 +1,3 @@
-# Moved this to https://github.com/Kyle-Ross/elastic-llm-nlp - 2023-11-19
-
 from typing import Union, Tuple, List, Dict, Any
 from icecream import ic
 import pprint
