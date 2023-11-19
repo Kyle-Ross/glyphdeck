@@ -1,3 +1,10 @@
+secrets.json
+scratch/
+
+# -------------------------------------------------
+# Below are defaults added by the github template
+# -------------------------------------------------
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
