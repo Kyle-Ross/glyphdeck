@@ -1,5 +1,7 @@
 from typing import Union, Tuple, List, Dict, Any
+from custom_types import Data
 from icecream import ic
+import pandas as pd
 import pprint
 import re
 
@@ -183,9 +185,9 @@ class RegexSanitiser:
         return groups
 
     def __init__(self,
-                 input_string: str) -> None:
-        self.input_string: str = input_string
-        self.output_string: str = input_string  # Will be changed by processes below
+                 input_data: Data) -> None:
+        self.input_data: Data = input_data
+        self.output_data: Data = input_data  # Will be changed by processes below
         self.overall_run_state = False
         self.all_groups: List = self.update_group(self.patterns)
         self.active_groups: List = self.update_group(self.patterns, [True])
@@ -232,7 +234,7 @@ class RegexSanitiser:
         return self
 
     def select_groups(self, selection: List) -> 'RegexSanitiser':
-        """Function to select specific patterns to run, updating the 'active' attribute in the instance."""
+        """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
         # Check that each pattern exists
         for x in selection:
             if x not in self.all_groups:
@@ -280,24 +282,51 @@ class RegexSanitiser:
         self.update_groups()  # Update selected groups lists
 
     def sanitise(self):
-        """Run all selected patterns in order, updating the 'output_string'"""
+        """Run all selected patterns in order, updating the 'output_data'.
+
+        Run every selected regex pattern for every item, in every list, in every key, in the self.output_data dict.
+
+        Successive regex patterns recursively act on the output of the previous regex,
+        in the order defined at the class level.
+        """
         self.placeholder_check(self.patterns)  # Check placeholders
-        for key, value in self.patterns.items():
-            value['matches'] = 0  # Resetting the count
-            if value['active']:
-                result: Tuple[str, int] = value['pattern'].subn(value['placeholder'], self.output_string)
-                self.output_string = result[0]  # New string
-                value['matches'] += result[1]  # Number of matches
-        self.overall_run_state = True
-        self.update_match_counts()  # Updates match counts
+        for pattern_key, pattern_dict in self.patterns.items():
+            pattern_dict['matches'] = 0  # Resetting the per pattern count
+            for data_key, data_list in self.output_data.items():
+                for index, list_item in enumerate(data_list):
+                    if pattern_dict['active']:
+                        if pd.notna(self.output_data[data_key][index]):  # Check that the data is not NaN
+                            result: Tuple[str, int] = re.subn(pattern_dict['pattern'],
+                                                              pattern_dict['placeholder'],
+                                                              self.output_data[data_key][index])
+                        self.output_data[data_key][index] = result[0]  # Replacing the item in the output
+                        pattern_dict['matches'] += result[1]  # Number of matches
+                self.overall_run_state = True  # Shows regex has been run at least once
+                self.update_match_counts()  # Updates match counts
         return self
 
 
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
-    santiser_obj = RegexSanitiser(r"I like apple bottom jeans 15619878, 11/10/2020, kylerossau@gmail.com")
+    data_example: Data = \
+        {
+            1: [
+                r"I like apple bottom jeans 15619878, 11/10/2020, jimbo@gmail.com",
+                'My birthday is 11/10/2021',
+                'Product info: https://t.co/KNkANrdypk \r\r\nTo order'],
+            2: [
+                'Nothing wrong with this',
+                'My email is jeff@babe.com',
+                'Go to this website: www.website.com.au'],
+            3: [
+                'Big number is 1896987',
+                'I like blue jeans',
+                'I was born 15/12/1990'
+            ]
+        }
+    santiser_obj = RegexSanitiser(data_example)
     # Select to only run certain groups
-    santiser_obj.select_groups(['email', 'date'])
+    santiser_obj.select_groups(['number', 'date', 'email'])
     # Replace placeholders
     santiser_obj.set_placeholders({'email': 'EMAILS>>', 'date': '<DA>TES>'})
     # Add a new pattern
@@ -311,7 +340,10 @@ if __name__ == "__main__":
     # Show match counts
     ic(santiser_obj.group_matches)
     ic(santiser_obj.total_matches)
-    # 'output_string' contains the result after 'sanitise()' is run
-    ic(santiser_obj.output_string)
+    # 'output_data' contains the result after 'sanitise()' is run
+    ic(santiser_obj.output_data)
 
-# TODO Modify __init__ and sanitise to accept a list of strings avoid inefficiency
+# TODO add hashtag regex
+# TODO add @someone regex
+# TODO fix URL regex against test data, doesn't seem to work for anything
+# TODO Make some way to only run the regex on certain columns

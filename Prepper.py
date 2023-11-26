@@ -11,7 +11,7 @@ class Prepper:
         self.df = pd.DataFrame()
         self.id_column: str = ""
         self.data_columns: List[str] = []
-        self.data_dict: Data = {}
+        self.output_data: Data = {}
 
     def load_data(self, file_path: str, file_type: str, encoding: str = "utf-8") -> 'Prepper':
         """Load data from a file into a dataframe."""
@@ -46,7 +46,7 @@ class Prepper:
     def set_data_dict(self) -> 'Prepper':
         """Sets the data dict where keys are ids and values are lists of selected data column values."""
         for _, row in self.df.iterrows():
-            self.data_dict[row[self.id_column]] = [row[column] for column in self.data_columns]
+            self.output_data[row[self.id_column]] = [row[column] for column in self.data_columns]
         return self
 
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
                  .set_id_column('UserName')
                  .set_data_columns(['OriginalTweet', 'Location'])
                  .set_data_dict())
-    print(processor.data_dict)
+    print(processor.output_data)
     ic(processor.df)
     ic(processor.id_column)
     ic(processor.data_columns)

@@ -274,3 +274,5 @@ if __name__ == "__main__":
     ic(chain.record('Example2'))
     ic(chain.data('Example2'))
     ic(chain.title_key('Example2'))
+
+# TODO Chain level NaN handling? Causes errors in lots of functions
