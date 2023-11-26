@@ -176,7 +176,7 @@ class RegexSanitiser:
 
     @staticmethod
     def update_group(patterns_dict: 'patterns', active_type: Union[list, set] = (True, False)):
-        """Returns a list of groups, with particular bool values in the 'active' key. Used to update
+        """Returns a list of groups, with particular bool values in the 'active' record_identifier. Used to update
         reference attributes"""
         groups: List = [value['group'] for key, value in patterns_dict.items() if value['active'] in active_type]
         groups = list(set(groups))  # Remove duplicates
@@ -206,10 +206,10 @@ class RegexSanitiser:
         # Clear existing counts
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
-        # Prepare key for each active group with zero
+        # Prepare record_identifier for each active group with zero
         for group in self.active_groups:
             self.group_matches[group] = 0
-        # Add each result to that key in the dictionary
+        # Add each result to that record_identifier in the dictionary
         for key, value in self.patterns.items():
             if value['group'] in self.active_groups:
                 self.group_matches[value['group']] += value['matches']

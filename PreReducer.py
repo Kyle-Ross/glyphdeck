@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import Union, Optional, List, Dict, Any
+from icecream import ic
 
 
 class PreReducer:
@@ -9,7 +10,7 @@ class PreReducer:
     def __init__(self,
                  id_col: str,
                  text_col: Union[str, List],
-                 rename=True) -> None:
+                 rename=False) -> None:
         self.id_col: str = id_col
         self.text_col: Union[str, List] = text_col
         self.rename: bool = rename
@@ -26,7 +27,7 @@ class PreReducer:
 
     def reduce(self, df: pd.DataFrame) -> List[Dict[str, Any]]:
         """Filters a dataframe and renames columns the same way for any dataframe.
-        Renaming is optional but on by default."""
+        Renaming is optional but off by default."""
         # Defining the basis of the new column names
         id_col_name = 'id'
         text_col_prefix = 'text'
@@ -56,7 +57,7 @@ class PreReducer:
 
     def original_names(self):
         """For each pair in the list of dicts,
-        replace the key with the value from the matching pair in the reference"""
+        replace the record_identifier with the value from the matching pair in the reference"""
         if self.name_status == 'new':
             self.reduced_input = [{self.name_ref.get(k): v for k, v in d.items()} for d in self.reduced_input]
             return self
@@ -84,16 +85,26 @@ class PreReducer:
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
     # Set the file path
-    input_file_path = "../datasets/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
+    input_file_path = "scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
     # Create the object, with id in first arg and 1 or more columns in the second
     # Use the csv method to get the data and run everything else in the background
     # Can pass a string or list to the second arg
-    reduction_obj = PreReducer("UserName", ["OriginalTweet", "Location"]).csv(input_file_path, "ISO-8859-1")
+    reduction = PreReducer("UserName", ["OriginalTweet", "Location"]).csv(input_file_path, "ISO-8859-1")
     # Arguments you can use to swap the field names back and forth to new and old as you like
     # input_data_obj.original_names()
     # input_data_obj.new_names()
+    # print(reduction.reduced_input)
+    ic(reduction.id_col)
+    ic(reduction.text_col)
+    ic(reduction.rename)
+    ic(reduction.raw_input)
+    ic(reduction.keep_cols)
+    ic(reduction.new_cols)
+    ic(reduction.name_ref)
+    ic(reduction.name_status)
+
     # The final output which is a list of dictionaries
-    print(reduction_obj.reduced_input)
+    # ic(reduction.reduced_input)
 
 # TODO
 # add comment sanitiser logic in here? or connected in a diff class.
