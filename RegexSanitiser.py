@@ -43,7 +43,7 @@ class RegexSanitiser:
     url_regex: str = r"(?i)\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)" \
                      r"(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]" \
                      r"+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    url_pattern: re.Pattern[str] = re.compile(file_path_regex)
+    url_pattern: re.Pattern[str] = re.compile(url_regex)
 
     # Dates in the form dd-mm-yyyy
     date_regex1: str = r"\d{2}[- /.]\d{2}[- /.]\d{,4}"
@@ -343,7 +343,6 @@ if __name__ == "__main__":
     # 'output_data' contains the result after 'sanitise()' is run
     ic(santiser_obj.output_data)
 
-# TODO add hashtag regex
-# TODO add @someone regex
-# TODO fix URL regex against test data, doesn't seem to work for anything
-# TODO Make some way to only run the regex on certain columns
+# TODO Make some way to only run the regex on certain columns - maybe
+#  optional column name or number input in santitise method
+# TODO Review date regex matching on decimals of numbers

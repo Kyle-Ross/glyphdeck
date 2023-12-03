@@ -19,9 +19,9 @@ chain = Chain()
 chain.append(title='prepared data', data=prepared_data.output_data, table=prepared_data.df)
 
 # Running the regex sanitiser
-sanitised = RegexSanitiser(chain.latest_data)
-sanitised.select_groups(['ip', 'card', 'date', 'email', 'path', 'url', 'number'])
-sanitised.sanitise()
+sanitised = RegexSanitiser(chain.latest_data)\
+            .select_groups(['ip', 'card', 'date', 'email', 'path', 'url', 'number'])\
+            .sanitise()
 
 # Leaving out table means the previous one is referenced
 chain.append(title='sanitised data', data=sanitised.output_data)

@@ -63,3 +63,5 @@ if __name__ == "__main__":
     ic(processor.df)
     ic(processor.id_column)
     ic(processor.data_columns)
+
+# TODO Better clean up / encoding of dirty csv char type stuff
