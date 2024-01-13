@@ -276,3 +276,4 @@ if __name__ == "__main__":
     ic(chain.title_key('Example2'))
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
+# TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard
