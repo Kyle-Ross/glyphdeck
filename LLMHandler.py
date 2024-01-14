@@ -9,6 +9,7 @@ import asyncio
 from openai import AsyncOpenAI
 import time
 
+
 start_time = None
 
 
@@ -38,7 +39,9 @@ class LLMHandler:
                  request: str) -> None:
 
         self.input_data: Data = input_data
-        self.output_data: Data = input_data  # Will be changed by processes below
+        # output_data keeps keys, replaces with [None, None, ...] lists
+        # Helps to insert output in the correct position later in 'await_tasks'
+        self.output_data: Data = {key: [None] * len(value) for key, value in input_data.items()}
 
         self.parser: str = parser  # The name of the method used to advise output structure
         self.output_structure = output_structure
@@ -52,13 +55,15 @@ class LLMHandler:
         self.check_instance()
 
     async def openai(self,
-                     item_text: str,
+                     input_text: str,
+                     key,
+                     index: int,
                      item_parser: str = None,
                      item_output_structure=None,
                      item_model: str = None,
                      item_api_key: str = None,
                      item_role: str = None,
-                     item_request: str = None) -> None:
+                     item_request: str = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI."""
         # If no arguments are provided, uses the values set in the instance
         # Necessary to do it this way since self is not yet defined in this function definition
@@ -79,7 +84,6 @@ class LLMHandler:
         openai_client = AsyncOpenAI(api_key=item_api_key)
 
         # Sending the request
-        print(f'Open AI start {print_time_since_start()}')
         chat_completion = await openai_client.chat.completions.create(
             model=item_model,
             messages=[
@@ -88,27 +92,64 @@ class LLMHandler:
                  "content": item_role},
 
                 {"role": "user",
-                 "content": item_request + ' ' + item_text}
+                 "content": item_request + ' ' + input_text}
             ]
         )
-        print(f'Open AI end {print_time_since_start()}')
 
         # Storing the response
         response = chat_completion.choices[0].message.content
 
-        # Returning the response
-        return response
+        # Returning the response as a tuple (shorthand syntax)
+        return response, key, index
 
-    async def run_tasks(self, func):
+    async def create_coroutine(self, func):
         """Runs the provided function on every value in the data"""
-        for key, list_value in self.input_data.items():
-            print(f'List {key} start {print_time_since_start()}')
-            tasks = [func(item_value) for item_value in list_value]
-            # Gather returns a future object, which is awaited until all the tasks are done
-            result_list = await asyncio.gather(*tasks)  # * syntax unpacks the list as individual args to the func
-            self.output_data[key] = result_list
-            print(f'List {key} end {print_time_since_start()}')
+        # Create and store the tasks across the whole data in a list
+        coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
+                      for key, list_value in self.input_data.items()  # For every key in the input_data dict
+                      for index, item_value in enumerate(list_value)]  # For every item in every list
+        return coroutines
+
+    async def await_coroutines(self, func):
+        coroutines = await self.create_coroutine(func)
+        # get results as coroutines are completed
+        for coroutine in asyncio.as_completed(coroutines):
+            # Returns the results from the next completed coroutine in whatever order that is
+            result = await coroutine
+            response = result[0]
+            key = result[1]
+            index = result[2]
+            print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
+            self.output_data[key][index] = response
+
         print(self.output_data)
+
+        # for key, coro, index in tasks:
+        #     print(f'Task: Key {key}, Index {index}, START | {print_time_since_start()}')
+        #     result = await coro
+        #     self.output_data[key][index] = result  # Replaces the value at the stored index position
+        #     print(f'Task: Key {key}, Index {index}, END | {print_time_since_start()}')
+        #
+        # print(self.output_data)
+
+    # async def await_tasks(self, func):
+    #     """Runs the provided function on every value in the data"""
+    #     # Create and store the tasks across the whole data in a list
+    #     tasks = [(key, asyncio.create_task(func(item_value)), index)  # (Key, Task, Index) as a tuple
+    #              for key, list_value in self.input_data.items()  # For every key in the input_data dict
+    #              for index, item_value in enumerate(list_value)]  # For every item in every list
+    #
+    #     # Start all tasks and await their results
+    #     for key, task, index in tasks:
+    #         print(f'Task: Key {key}, Index {index}, START | {print_time_since_start()}')
+    #
+    #     results = await asyncio.gather(*[task for _, task, _ in tasks])
+    #
+    #     for (key, _, index), result in zip(tasks, results):
+    #         self.output_data[key][index] = result  # Replaces the value at the stored index position
+    #         print(f'Task: Key {key}, Index {index}, END | {print_time_since_start()}')
+    #
+    #     print(self.output_data)
 
 
 if __name__ == "__main__":
@@ -161,6 +202,6 @@ if __name__ == "__main__":
                                  "of each category. There may not always be 5 categories."
                          )
 
-    asyncio.run(handler.run_tasks(handler.openai))
+    asyncio.run(handler.await_coroutines(handler.openai))
 
 # TODO - https://github.com/openai/openai-python - has async built in!
