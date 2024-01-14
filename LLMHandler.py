@@ -7,6 +7,17 @@ import pandas as pd
 import os
 import asyncio
 from openai import AsyncOpenAI
+import time
+
+start_time = None
+
+
+def print_time_since_start():
+    global start_time
+    if start_time is None:
+        start_time = time.time()
+    elapsed_time = time.time() - start_time
+    return f'Time since start: {elapsed_time} seconds'
 
 
 class LLMHandler:
@@ -40,15 +51,15 @@ class LLMHandler:
         # Check that the class attribute is the correct type
         self.check_instance()
 
-    def run_openai(self,
-                   item_text: str,
-                   item_parser: str = None,
-                   item_output_structure=None,
-                   item_model: str = None,
-                   item_api_key: str = None,
-                   item_role: str = None,
-                   item_request: str = None):
-        """Per-item I/O with OpenAI."""
+    async def openai(self,
+                     item_text: str,
+                     item_parser: str = None,
+                     item_output_structure=None,
+                     item_model: str = None,
+                     item_api_key: str = None,
+                     item_role: str = None,
+                     item_request: str = None) -> None:
+        """Asynchronous Per-item coroutine generation with OpenAI."""
         # If no arguments are provided, uses the values set in the instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_parser is None:
@@ -65,10 +76,11 @@ class LLMHandler:
             item_request = self.request
 
         # Initialising the client
-        openai_client = OpenAI(api_key=item_api_key)
+        openai_client = AsyncOpenAI(api_key=item_api_key)
 
         # Sending the request
-        chat_completion = openai_client.chat.completions.create(
+        print(f'Open AI start {print_time_since_start()}')
+        chat_completion = await openai_client.chat.completions.create(
             model=item_model,
             messages=[
 
@@ -79,24 +91,23 @@ class LLMHandler:
                  "content": item_request + ' ' + item_text}
             ]
         )
+        print(f'Open AI end {print_time_since_start()}')
 
         # Storing the response
         response = chat_completion.choices[0].message.content
 
-        # Returning the output
+        # Returning the response
         return response
 
-    def run_test(self):
+    async def run_tasks(self, func):
+        """Runs the provided function on every value in the data"""
         for key, list_value in self.input_data.items():
-            print(f'List {key} start')
-            result_list = []
-            for item_value in list_value:
-                print(f'List {key} - Item x start')
-                response = self.run_openai(item_value)
-                result_list.append(response)
-                print(f'List {key} - Item x end')
+            print(f'List {key} start {print_time_since_start()}')
+            tasks = [func(item_value) for item_value in list_value]
+            # Gather returns a future object, which is awaited until all the tasks are done
+            result_list = await asyncio.gather(*tasks)  # * syntax unpacks the list as individual args to the func
             self.output_data[key] = result_list
-            print(f'List {key} end')
+            print(f'List {key} end {print_time_since_start()}')
         print(self.output_data)
 
 
@@ -150,6 +161,6 @@ if __name__ == "__main__":
                                  "of each category. There may not always be 5 categories."
                          )
 
-    handler.run_test()
+    asyncio.run(handler.run_tasks(handler.openai))
 
 # TODO - https://github.com/openai/openai-python - has async built in!
