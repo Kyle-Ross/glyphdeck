@@ -4,7 +4,7 @@
 from pydantic import BaseModel, Field, conset, constr, field_validator
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program
-# Used to assert and advise the expected output from llm calls
+# Used to assert and advise the expected output from provider calls
 
 
 # ---BASE MODELS---

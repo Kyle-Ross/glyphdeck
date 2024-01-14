@@ -9,7 +9,6 @@ import asyncio
 from openai import AsyncOpenAI
 import time
 
-
 start_time = None
 
 
@@ -33,6 +32,7 @@ class LLMHandler:
                  input_data: Data,
                  parser: str,
                  output_structure,
+                 provider: str,
                  model: str,
                  api_key: str,
                  role: str,
@@ -45,6 +45,13 @@ class LLMHandler:
 
         self.parser: str = parser  # The name of the method used to advise output structure
         self.output_structure = output_structure
+
+        self.available_providers: tuple = ("openai",)
+        self.provider: str = provider
+        self.provider_clean: str = self.provider.strip().lower().replace(' ', '')
+        assert self.provider_clean in self.available_providers, f"{self.provider} is not in the list of " \
+                                                                f"available providers:" \
+                                                                f"\n{self.available_providers}"
 
         self.model: str = model
         self.api_key: str = api_key
@@ -102,7 +109,7 @@ class LLMHandler:
         # Returning the response as a tuple (shorthand syntax)
         return response, key, index
 
-    async def create_coroutine(self, func):
+    async def create_coroutines(self, func):
         """Runs the provided function on every value in the data"""
         # Create and store the tasks across the whole data in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
@@ -111,7 +118,7 @@ class LLMHandler:
         return coroutines
 
     async def await_coroutines(self, func):
-        coroutines = await self.create_coroutine(func)
+        coroutines = await self.create_coroutines(func)
         # get results as coroutines are completed
         for coroutine in asyncio.as_completed(coroutines):
             # Returns the results from the next completed coroutine in whatever order that is
@@ -122,34 +129,11 @@ class LLMHandler:
             print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
             self.output_data[key][index] = response
 
-        print(self.output_data)
-
-        # for key, coro, index in tasks:
-        #     print(f'Task: Key {key}, Index {index}, START | {print_time_since_start()}')
-        #     result = await coro
-        #     self.output_data[key][index] = result  # Replaces the value at the stored index position
-        #     print(f'Task: Key {key}, Index {index}, END | {print_time_since_start()}')
-        #
-        # print(self.output_data)
-
-    # async def await_tasks(self, func):
-    #     """Runs the provided function on every value in the data"""
-    #     # Create and store the tasks across the whole data in a list
-    #     tasks = [(key, asyncio.create_task(func(item_value)), index)  # (Key, Task, Index) as a tuple
-    #              for key, list_value in self.input_data.items()  # For every key in the input_data dict
-    #              for index, item_value in enumerate(list_value)]  # For every item in every list
-    #
-    #     # Start all tasks and await their results
-    #     for key, task, index in tasks:
-    #         print(f'Task: Key {key}, Index {index}, START | {print_time_since_start()}')
-    #
-    #     results = await asyncio.gather(*[task for _, task, _ in tasks])
-    #
-    #     for (key, _, index), result in zip(tasks, results):
-    #         self.output_data[key][index] = result  # Replaces the value at the stored index position
-    #         print(f'Task: Key {key}, Index {index}, END | {print_time_since_start()}')
-    #
-    #     print(self.output_data)
+    def run(self):
+        """Asynchronously query the selected LLM across the whole data and save results to the output"""
+        if self.provider_clean == "openai":
+            asyncio.run(self.await_coroutines(self.openai))
+        return self
 
 
 if __name__ == "__main__":
@@ -178,7 +162,8 @@ if __name__ == "__main__":
                 'I have found 3 pennies in my pasta 4 times in a row, they hurt my mouth but make me feel a '
                 'little richer every time',
                 'It has taken me 3 years of living in the area to finally discover this amazing local pizza place! '
-                'Tasty with fresh ingredients and not too greasy, I would recommend.'
+                'Tasty with fresh ingredients and not too greasy, I would recommend.',
+                'The bread was good'
             ]
         }
 
@@ -194,6 +179,7 @@ if __name__ == "__main__":
     handler = LLMHandler(data_example,
                          parser="pydantic",
                          output_structure=pydantic_model_instance,
+                         provider="OpenAI",
                          model="gpt-3.5-turbo",
                          api_key=my_api_key,
                          role="An expert nlp comment analysis system, trained to accurately categorise " \
@@ -202,6 +188,15 @@ if __name__ == "__main__":
                                  "of each category. There may not always be 5 categories."
                          )
 
-    asyncio.run(handler.await_coroutines(handler.openai))
+    handler.run()
+    ic(handler.output_data)
 
-# TODO - https://github.com/openai/openai-python - has async built in!
+# https://superfastpython.com/asyncio-as_completed/#Example_of_as_completed_with_Coroutines
+# TODO - Add Error checking
+# TODO - Token Rate limit monitor / catching
+# TODO - Max active calls monitor / catching
+# TODO - Get structured output happening using the pydantic classes
+# TODO - Add retry loops on incorrect output
+# TODO - Add re-query response correction on incorrect output format
+# TODO - test chain integration
+# TODO - Add more useful methods and stuff
