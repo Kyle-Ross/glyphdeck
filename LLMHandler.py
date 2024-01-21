@@ -1,13 +1,14 @@
 from pydantic import BaseModel
-from openai import OpenAI
+import openai
 from custom_types import Data
+from typing import Union, List
 import llm_output_structures
 from icecream import ic
 import pandas as pd
 import os
 import asyncio
-from openai import AsyncOpenAI
 import time
+import backoff  # for exponential backoff
 
 start_time = None
 
@@ -20,11 +21,27 @@ def print_time_since_start():
     return f'Time since start: {elapsed_time} seconds'
 
 
+def decorator_attributes(attribute_name: str) -> Union[List]:
+    """A wrapper for a setting self attributes, which allows them to both be set in __init__ and used in a
+    decorator function. This is necessary since decorators are used at runtime, before __init__ is run
+    and self attributes are set."""
+    # Coroutine runtime_attributes are allowed to be retried inside each individual coroutine
+    # Event Loop runtime_attributes are handled by and delay the whole event loop using the semaphore
+    # Blockers should end a coroutine or eventloop and record the error
+    dictionary: dict = {'openai_coroutine_exceptions': [openai.APITimeoutError, openai.ConflictError,
+                                                        openai.InternalServerError, openai.UnprocessableEntityError],
+                        'openai_coroutine_blockers': [openai.BadRequestError, openai.NotFoundError],
+                        'event_loop_exceptions': [openai.APIConnectionError, openai.RateLimitError],
+                        'event_loop_blockers': [openai.PermissionDeniedError]}
+    return_value = dictionary if attribute_name.lower().strip() == 'all' else dictionary[attribute_name]
+    return return_value
+
+
 class LLMHandler:
     """Write your docstring for the class here."""
 
     def check_instance(self):
-        """Checks that the provided variable is an instance or inheritance of the Pydantic BaseModel class."""
+        """Checks that the provided attribute_name is an instance or inheritance of the Pydantic BaseModel class."""
         check: bool = isinstance(self.output_structure, BaseModel)
         assert check, f'{self.output_structure} is not an instance of, or inherited from the Pydantic BaseModel class'
 
@@ -61,6 +78,17 @@ class LLMHandler:
         # Check that the class attribute is the correct type
         self.check_instance()
 
+        # Exceptions allowed in the exponential backoff retries
+        # Class methods won't use the new value if you update this attribute
+        self.runtime_attributes = decorator_attributes('all')
+
+        # Semaphore is initialized with 1, meaning only one coroutine can acquire it at a time.
+        # Other coroutines trying to acquire it will be blocked until it's released.
+        # A semaphore is a synchronization primitive used to control access to a common resource
+        # by multiple processes in a concurrent system
+        self.semaphore = asyncio.Semaphore(1)
+
+    @backoff.on_exception(backoff.expo, decorator_attributes('openai_coroutine_exceptions'), max_tries=10)
     async def openai(self,
                      input_text: str,
                      key,
@@ -71,7 +99,7 @@ class LLMHandler:
                      item_api_key: str = None,
                      item_role: str = None,
                      item_request: str = None) -> tuple:
-        """Asynchronous Per-item coroutine generation with OpenAI."""
+        """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
         # If no arguments are provided, uses the values set in the instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_parser is None:
@@ -88,7 +116,7 @@ class LLMHandler:
             item_request = self.request
 
         # Initialising the client
-        openai_client = AsyncOpenAI(api_key=item_api_key)
+        openai_client = openai.AsyncOpenAI(api_key=item_api_key)
 
         # Sending the request
         chat_completion = await openai_client.chat.completions.create(
@@ -117,17 +145,32 @@ class LLMHandler:
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
+    @backoff.on_exception(backoff.expo, decorator_attributes('event_loop_exceptions'), max_tries=10)
+    async def event_loop_backoff(self, coroutine):
+        """Execute a coroutine, save results and handle exceptions with exponential backoff."""
+        result = await coroutine
+        response = result[0]
+        key = result[1]
+        index = result[2]
+        print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
+        self.output_data[key][index] = response
+
     async def await_coroutines(self, func):
+        """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
+        only one coroutine is being retried at a time. When a coroutine encounters an exception and needs to be
+        retried, it first acquires the semaphore. This causes any other coroutines that encounter an exception to
+        wait until the semaphore is released before they can proceed. This effectively pauses the loop until the
+        current coroutine has been successfully retried. """
         coroutines = await self.create_coroutines(func)
         # get results as coroutines are completed
-        for coroutine in asyncio.as_completed(coroutines):
-            # Returns the results from the next completed coroutine in whatever order that is
-            result = await coroutine
-            response = result[0]
-            key = result[1]
-            index = result[2]
-            print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
-            self.output_data[key][index] = response
+        for future in asyncio.as_completed(coroutines):
+            # Acquire semaphore
+            await self.semaphore.acquire()
+            try:
+                await self.event_loop_backoff(future)
+            finally:
+                # Release semaphore
+                self.semaphore.release()
 
     def run(self):
         """Asynchronously query the selected LLM across the whole data and save results to the output"""
@@ -193,8 +236,6 @@ if __name__ == "__main__":
 
 # https://superfastpython.com/asyncio-as_completed/#Example_of_as_completed_with_Coroutines
 # TODO - Add Error checking
-# TODO - Token Rate limit monitor / catching
-# TODO - Max active calls monitor / catching
 # TODO - Get structured output happening using the pydantic classes
 # TODO - Add retry loops on incorrect output
 # TODO - Add re-query response correction on incorrect output format
