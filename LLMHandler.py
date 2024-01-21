@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 import openai
 from custom_types import Data
-from typing import Union, List
+from typing import Union, List, Dict
 import llm_output_structures
 from icecream import ic
-import pandas as pd
-import os
 import asyncio
 import time
-import backoff  # for exponential backoff
+import backoff
+import itertools
 
 start_time = None
 
@@ -21,27 +20,69 @@ def print_time_since_start():
     return f'Time since start: {elapsed_time} seconds'
 
 
-def decorator_attributes(attribute_name: str) -> Union[List]:
-    """A wrapper for a setting self attributes, which allows them to both be set in __init__ and used in a
+def runtime_exception_attributes(provider: str = 'openai', attribute: str = 'all') -> Union[List, Dict]:
+    """A wrapper for a setting exception attributes, which allows them to both be set in __init__ and used in a
     decorator function. This is necessary since decorators are used at runtime, before __init__ is run
-    and self attributes are set."""
-    # Coroutine runtime_attributes are allowed to be retried inside each individual coroutine
-    # Event Loop runtime_attributes are handled by and delay the whole event loop using the semaphore
-    # Blockers should end a coroutine or eventloop and record the error
-    dictionary: dict = {'openai_coroutine_exceptions': [openai.APITimeoutError, openai.ConflictError,
-                                                        openai.InternalServerError, openai.UnprocessableEntityError],
-                        'openai_coroutine_blockers': [openai.BadRequestError, openai.NotFoundError],
-                        'event_loop_exceptions': [openai.APIConnectionError, openai.RateLimitError],
-                        'event_loop_blockers': [openai.PermissionDeniedError]}
-    return_value = dictionary if attribute_name.lower().strip() == 'all' else dictionary[attribute_name]
-    return return_value
+    and self attributes are set. Features logic to simplify function calls."""
+    # The names of the categories of exceptions and blockers
+    all_values: str = 'all'
+    coroutine_backoff: str = 'coroutine_backoff'
+    coroutine_exceptions: str = 'coroutine_exceptions'
+    event_loop_backoff: str = 'event_loop_backoff'
+    event_loop_exceptions: str = 'event_loop_exceptions'
+
+    # Coroutine backoff exceptions are allowed to be retried inside each individual coroutine
+    # Event Loop backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
+    # Exceptions end a coroutine or eventloop and record the error without ending code execution
+    dictionary: dict = {'openai': {coroutine_backoff: [openai.APITimeoutError, openai.ConflictError,
+                                                       openai.InternalServerError,
+                                                       openai.UnprocessableEntityError],
+                                   coroutine_exceptions: [openai.BadRequestError, openai.NotFoundError],
+                                   event_loop_backoff: [openai.APIConnectionError, openai.RateLimitError],
+                                   event_loop_exceptions: [openai.PermissionDeniedError]}}
+
+    def get_all_exceptions(name: str):
+        """Gets a combined list of all lists with the matching name across the whole dict"""
+        list_of_lists: list = []
+        for key, value in dictionary.items():
+            if name in value:
+                list_of_lists.append(value[name])
+        merged_list = list(itertools.chain(*list_of_lists))
+        return merged_list
+
+    # Clean version of the attribute argument for cross-checking
+    attribute_clean = attribute.lower().strip()
+
+    # Lists of providers and attributes
+    all_providers = [key for key, item in dictionary.items()]
+    all_attributes = [key for key, item in dictionary[provider].items()] + [all_values]
+
+    # Error messages to return if requested values are not available in the dictionary
+    if provider not in all_providers:
+        raise ValueError(f"Provider {provider} is not available in the runtime_exception_attributes() dict.")
+    if attribute_clean not in all_attributes:
+        raise ValueError(f"Attribute Name {attribute_clean} is not available in the {provider} "
+                         f"runtime_exception_attributes() dict.")
+
+    # Providing 'all' gives the entire dictionary, which is later set as the self.exceptions_dictionary
+    if attribute_clean == all_values:
+        return dictionary
+    # Get all event loop backoff exceptions from the whole dict
+    elif attribute_clean == event_loop_backoff:
+        return get_all_exceptions(attribute_clean)
+    # Get all event loop exceptions from the whole dict
+    elif attribute_clean == event_loop_exceptions:
+        return get_all_exceptions(attribute_clean)
+    # Otherwise, return the specified list of exceptions
+    else:
+        return dictionary[provider][attribute_clean]
 
 
 class LLMHandler:
     """Write your docstring for the class here."""
 
     def check_instance(self):
-        """Checks that the provided attribute_name is an instance or inheritance of the Pydantic BaseModel class."""
+        """Checks that the provided attribute is an instance or inheritance of the Pydantic BaseModel class."""
         check: bool = isinstance(self.output_structure, BaseModel)
         assert check, f'{self.output_structure} is not an instance of, or inherited from the Pydantic BaseModel class'
 
@@ -79,8 +120,8 @@ class LLMHandler:
         self.check_instance()
 
         # Exceptions allowed in the exponential backoff retries
-        # Class methods won't use the new value if you update this attribute
-        self.runtime_attributes = decorator_attributes('all')
+        # Class methods with exponential backoff decorators don't use self.exceptions_dict so won't get any updates
+        self.exceptions_dictionary: dict = runtime_exception_attributes(attribute='all')
 
         # Semaphore is initialized with 1, meaning only one coroutine can acquire it at a time.
         # Other coroutines trying to acquire it will be blocked until it's released.
@@ -88,7 +129,9 @@ class LLMHandler:
         # by multiple processes in a concurrent system
         self.semaphore = asyncio.Semaphore(1)
 
-    @backoff.on_exception(backoff.expo, decorator_attributes('openai_coroutine_exceptions'), max_tries=10)
+    @backoff.on_exception(backoff.expo,
+                          runtime_exception_attributes(provider='openai', attribute='coroutine_backoff'),
+                          max_tries=10)
     async def openai(self,
                      input_text: str,
                      key,
@@ -138,22 +181,27 @@ class LLMHandler:
         return response, key, index
 
     async def create_coroutines(self, func):
-        """Runs the provided function on every value in the data"""
+        """Runs the provided function on every value in the data.
+        If you wanted to have different per response settings for the prompt, you would set them on func here."""
         # Create and store the tasks across the whole data in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
-    @backoff.on_exception(backoff.expo, decorator_attributes('event_loop_exceptions'), max_tries=10)
+    @backoff.on_exception(backoff.expo, runtime_exception_attributes(attribute='event_loop_backoff'), max_tries=10)
     async def event_loop_backoff(self, coroutine):
-        """Execute a coroutine, save results and handle exceptions with exponential backoff."""
-        result = await coroutine
-        response = result[0]
-        key = result[1]
-        index = result[2]
-        print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
-        self.output_data[key][index] = response
+        """Execute a coroutine, save results and handle exceptions with exponential backoff.
+        Replaces the output with an error name under certain conditions."""
+        try:
+            result = await coroutine
+            response = result[0]
+            key = result[1]
+            index = result[2]
+            print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
+            self.output_data[key][index] = response
+        except self.exceptions_dictionary['openai_coroutine_blockers'] as error:
+            self.output_data[key][index] = type(error).__name__
 
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
