@@ -8,6 +8,7 @@ import asyncio
 import time
 import backoff
 import itertools
+import functools
 
 start_time = None
 
@@ -17,13 +18,11 @@ def print_time_since_start():
     if start_time is None:
         start_time = time.time()
     elapsed_time = time.time() - start_time
-    return f'Time since start: {elapsed_time} seconds'
+    return f'Start Delta: {elapsed_time} seconds'
 
 
 def runtime_exception_attributes(provider: str = 'openai', attribute: str = 'all') -> Union[List, Dict]:
-    """A wrapper for a setting exception attributes, which allows them to both be set in __init__ and used in a
-    decorator function. This is necessary since decorators are used at runtime, before __init__ is run
-    and self attributes are set. Features logic to simplify function calls."""
+    """A function for getting lists of exceptions"""
     # The names of the categories of exceptions and blockers
     all_values: str = 'all'
     coroutine_backoff: str = 'coroutine_backoff'
@@ -31,9 +30,10 @@ def runtime_exception_attributes(provider: str = 'openai', attribute: str = 'all
     event_loop_backoff: str = 'event_loop_backoff'
     event_loop_exceptions: str = 'event_loop_exceptions'
 
-    # Coroutine backoff exceptions are allowed to be retried inside each individual coroutine
-    # Event Loop backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
-    # Exceptions end a coroutine or eventloop and record the error without ending code execution
+    # coroutine_backoff exceptions are allowed to be retried inside each individual coroutine
+    # coroutine_exceptions end a coroutine and record the error without ending code execution
+    # event_loop_backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
+    # event_loop_exceptions should completely stop the script
     dictionary: dict = {'openai': {coroutine_backoff: [openai.APITimeoutError, openai.ConflictError,
                                                        openai.InternalServerError,
                                                        openai.UnprocessableEntityError],
@@ -94,7 +94,9 @@ class LLMHandler:
                  model: str,
                  api_key: str,
                  role: str,
-                 request: str) -> None:
+                 request: str,
+                 max_coroutine_retries: int = 10,
+                 max_event_loop_retries: int = 10) -> None:
 
         self.input_data: Data = input_data
         # output_data keeps keys, replaces with [None, None, ...] lists
@@ -129,9 +131,34 @@ class LLMHandler:
         # by multiple processes in a concurrent system
         self.semaphore = asyncio.Semaphore(1)
 
-    @backoff.on_exception(backoff.expo,
-                          runtime_exception_attributes(provider='openai', attribute='coroutine_backoff'),
-                          max_tries=10)
+        # Max retries for backoff wrappers applied to either coroutine or event loop
+        self.max_coroutine_retries = max_coroutine_retries
+        self.max_event_loop_retries = max_event_loop_retries
+
+    def coroutine_backoff_wrapper(self, func):
+        """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't
+        usually possible for decorators since they are defined before __init__"""
+        @functools.wraps(func)  # Maintains the original name of the func
+        @backoff.on_exception(backoff.expo,
+                              runtime_exception_attributes(provider=func.__name__, attribute='coroutine_backoff'),
+                              max_tries=self.max_coroutine_retries)
+        async def wrapper(*args, **kwargs):
+            return await func(*args, **kwargs)
+
+        return wrapper
+
+    def event_loop_backoff_wrapper(self, func):
+        """Wrapper for the backoff decorator used with pausing event loops, allowing use of self attributes
+        which isn't usually possible for decorators since they are defined before __init__"""
+        @functools.wraps(func)  # Maintains the original name of the func
+        @backoff.on_exception(backoff.expo,
+                              runtime_exception_attributes(provider=func.__name__, attribute='event_loop_backoff'),
+                              max_tries=self.max_event_loop_retries)
+        async def wrapper(*args, **kwargs):
+            return await func(*args, **kwargs)
+
+        return wrapper
+
     async def openai(self,
                      input_text: str,
                      key,
@@ -180,16 +207,17 @@ class LLMHandler:
         # Returning the response as a tuple (shorthand syntax)
         return response, key, index
 
-    async def create_coroutines(self, func):
-        """Runs the provided function on every value in the data.
+    async def create_coroutines(self, func) -> list:
+        """Creates individual coroutines for running the provided function on every value in the data.
         If you wanted to have different per response settings for the prompt, you would set them on func here."""
+        # Applying the backoff wrapper to the func
+        func = self.coroutine_backoff_wrapper(func)
         # Create and store the tasks across the whole data in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
-    @backoff.on_exception(backoff.expo, runtime_exception_attributes(attribute='event_loop_backoff'), max_tries=10)
     async def event_loop_backoff(self, coroutine):
         """Execute a coroutine, save results and handle exceptions with exponential backoff.
         Replaces the output with an error name under certain conditions."""
@@ -198,10 +226,11 @@ class LLMHandler:
             response = result[0]
             key = result[1]
             index = result[2]
-            print(f'FINISH | Key: {key} | Index: {index} | {print_time_since_start()}')
+            print(f'SUCCESS | Key: {key} | Index: {index} | | {print_time_since_start()}')
             self.output_data[key][index] = response
-        except self.exceptions_dictionary['openai_coroutine_blockers'] as error:
+        except self.exceptions_dictionary['openai_coroutine_exceptions'] as error:
             self.output_data[key][index] = type(error).__name__
+            print(f'FAILURE | Key: {key} | Index: {index} | Error: {type(error).__name_} | {print_time_since_start()}')
 
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
@@ -209,6 +238,9 @@ class LLMHandler:
         retried, it first acquires the semaphore. This causes any other coroutines that encounter an exception to
         wait until the semaphore is released before they can proceed. This effectively pauses the loop until the
         current coroutine has been successfully retried. """
+        # Applying the backoff wrapper to the func
+        func = self.event_loop_backoff_wrapper(func)
+        # Awaits the list of coroutines provided by self.create_coroutines
         coroutines = await self.create_coroutines(func)
         # get results as coroutines are completed
         for future in asyncio.as_completed(coroutines):
@@ -222,9 +254,13 @@ class LLMHandler:
 
     def run(self):
         """Asynchronously query the selected LLM across the whole data and save results to the output"""
-        if self.provider_clean == "openai":
-            asyncio.run(self.await_coroutines(self.openai))
-        return self
+        try:
+            if self.provider_clean == "openai":
+                asyncio.run(self.await_coroutines(self.openai))
+            return self
+        except self.exceptions_dictionary['event_loop_exceptions'] as error:
+            print(f"Known Blocking Error: {type(error).__name_} | Stopping execution:")
+            raise  # re-raises the last message that was active in the current scope and terminates the program
 
 
 if __name__ == "__main__":
@@ -276,7 +312,9 @@ if __name__ == "__main__":
                          role="An expert nlp comment analysis system, trained to accurately categorise " \
                               "customer feedback",
                          request="Provide the top 5 most relevant categories for the comment. Just provide the title"
-                                 "of each category. There may not always be 5 categories."
+                                 "of each category. There may not always be 5 categories.",
+                         max_coroutine_retries=10,
+                         max_event_loop_retries=10
                          )
 
     handler.run()
