@@ -128,8 +128,6 @@ class LLMHandler:
 
     async def openai(self,
                      input_text: str,
-                     key,
-                     index: int,
                      item_parser: str = None,
                      item_output_structure=None,
                      item_model: str = None,
@@ -156,23 +154,27 @@ class LLMHandler:
         openai_client = openai.AsyncOpenAI(api_key=item_api_key)
 
         # Sending the request
-        chat_completion = await openai_client.chat.completions.create(
-            model=item_model,
-            messages=[
+        try:
+            chat_completion = await openai_client.chat.completions.create(
+                model=item_model,
+                messages=[
 
-                {"role": "system",
-                 "content": item_role},
+                    {"role": "system",
+                     "content": item_role},
 
-                {"role": "user",
-                 "content": item_request + ' ' + input_text}
-            ]
-        )
+                    {"role": "user",
+                     "content": item_request + ' ' + input_text}
+                ]
+            )
 
-        # Storing the response
-        response = chat_completion.choices[0].message.content
+            # Storing the response
+            response = (chat_completion.choices[0].message.content, "No Error")
+
+        except self.coroutine_exceptions as error:
+            response = (None, type(error).__name__)
 
         # Returning the response as a tuple (shorthand syntax)
-        return response, key, index
+        return response
 
     async def create_coroutines(self, func) -> list:
         """Creates individual coroutines for running the provided function on every value in the data.
@@ -180,24 +182,24 @@ class LLMHandler:
         # Applying the backoff wrapper to the func
         func = self.coroutine_backoff_wrapper(func)
         # Create and store the tasks across the whole data in a list
-        coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
+        coroutines = [(func(input_text=item_value), key, index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
-    async def event_loop_backoff(self, coroutine):
+    async def event_loop_backoff(self, coroutine, key, index):
         """Execute a coroutine, save results and handle exceptions with exponential backoff.
         Replaces the output with an error attribute under certain conditions."""
-        try:
-            result = await coroutine
+        result = await coroutine
+        error: str = result[1]
+        if error == "No Error":
+            status = "SUCCESS"
             response = result[0]
-            key = result[1]
-            index = result[2]
-            print(f'SUCCESS | Key: {key} | Index: {index} | | {print_time_since_start()}')
-            self.output_data[key][index] = response
-        except self.coroutine_exceptions as error:
-            self.output_data[key][index] = type(error).__name__  # TODO - Get key and index working here
-            print(f'FAILURE | Key: {key} | Index: {index} | Error: {type(error).__name_} | {print_time_since_start()}')
+        else:
+            status = "FAILURE"
+            response = error
+        print(f'{status} | Key: {key} | Index: {index} | | {print_time_since_start()}')
+        self.output_data[key][index] = response
 
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
