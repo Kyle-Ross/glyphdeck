@@ -87,18 +87,18 @@ class LLMHandler:
         # Once you have other providers just add their errors into the appropriate list
 
         # coroutine_backoff exceptions are allowed to be retried inside each individual coroutine
-        self.coroutine_backoff = [openai.APITimeoutError,
-                                  openai.ConflictError,
-                                  openai.InternalServerError,
-                                  openai.UnprocessableEntityError]
+        self.coroutine_backoff: tuple = (openai.APITimeoutError,
+                                         openai.ConflictError,
+                                         openai.InternalServerError,
+                                         openai.UnprocessableEntityError)
         # coroutine_exceptions end a coroutine and record the error without ending code execution
-        self.coroutine_exceptions = [openai.BadRequestError,
-                                     openai.NotFoundError]
+        self.coroutine_exceptions: tuple = (openai.BadRequestError,
+                                            openai.NotFoundError)
         # loop_backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
-        self.loop_backoff = [openai.APIConnectionError,
-                             openai.RateLimitError]
+        self.loop_backoff: tuple = (openai.APIConnectionError,
+                                    openai.RateLimitError)
         # loop_exceptions should completely stop the script
-        self.loop_exceptions = [openai.PermissionDeniedError]
+        self.loop_exceptions: tuple = (openai.PermissionDeniedError,)
 
     def coroutine_backoff_wrapper(self, func):
         """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't
@@ -128,6 +128,8 @@ class LLMHandler:
 
     async def openai(self,
                      input_text: str,
+                     key,
+                     index: int,
                      item_parser: str = None,
                      item_output_structure=None,
                      item_model: str = None,
@@ -154,27 +156,23 @@ class LLMHandler:
         openai_client = openai.AsyncOpenAI(api_key=item_api_key)
 
         # Sending the request
-        try:
-            chat_completion = await openai_client.chat.completions.create(
-                model=item_model,
-                messages=[
+        chat_completion = await openai_client.chat.completions.create(
+            model=item_model,
+            messages=[
 
-                    {"role": "system",
-                     "content": item_role},
+                {"role": "system",
+                 "content": item_role},
 
-                    {"role": "user",
-                     "content": item_request + ' ' + input_text}
-                ]
-            )
+                {"role": "user",
+                 "content": item_request + ' ' + input_text}
+            ]
+        )
 
-            # Storing the response
-            response = (chat_completion.choices[0].message.content, "No Error")
-
-        except self.coroutine_exceptions as error:
-            response = (None, type(error).__name__)
+        # Storing the response
+        response = chat_completion.choices[0].message.content
 
         # Returning the response as a tuple (shorthand syntax)
-        return response
+        return response, key, index
 
     async def create_coroutines(self, func) -> list:
         """Creates individual coroutines for running the provided function on every value in the data.
@@ -182,24 +180,28 @@ class LLMHandler:
         # Applying the backoff wrapper to the func
         func = self.coroutine_backoff_wrapper(func)
         # Create and store the tasks across the whole data in a list
-        coroutines = [(func(input_text=item_value), key, index)  # List of coroutines
+        coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
-    async def event_loop_backoff(self, coroutine, key, index):
+    async def event_loop_backoff(self, coroutine):
         """Execute a coroutine, save results and handle exceptions with exponential backoff.
         Replaces the output with an error attribute under certain conditions."""
-        result = await coroutine
-        error: str = result[1]
-        if error == "No Error":
-            status = "SUCCESS"
+        try:
+            result = await coroutine
             response = result[0]
-        else:
-            status = "FAILURE"
-            response = error
-        print(f'{status} | Key: {key} | Index: {index} | | {print_time_since_start()}')
-        self.output_data[key][index] = response
+            key = result[1]
+            index = result[2]
+            print(f'SUCCESS | Key: {key} | Index: {index} | | {print_time_since_start()}')
+            self.output_data[key][index] = response
+        except self.coroutine_exceptions as error:
+            print(f'FAILURE | Key: Unknown | Index: Unknown | '
+                  f'Error: {type(error).__name_} | {print_time_since_start()}')
+            raise  # re-raises the last message and terminates the program
+            # TODO - Get key and index working here (very hard!)
+            # self.output_data[key][index] = type(error).__name__
+            # print(f'FAILURE | Key: {key} | Index: {index} | Error: {type(error).__name_} |{print_time_since_start()}')
 
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
@@ -296,3 +298,6 @@ if __name__ == "__main__":
 # TODO - Get structured output happening using the pydantic classes - see openai functions (saved medium article)
 # TODO - Add retry loops on incorrect output, re-query response correction on incorrect output format?
 # TODO - test chain integration
+# TODO - test error catching
+# TODO - Fix - Error catching may be prone to TypeError: catching classes that do not inherit from
+#  BaseException is not allowed. But Maybe just occurring in testing?
