@@ -325,7 +325,7 @@ class LLMHandler:
             if self.provider_clean == "openai":
                 asyncio.run(self.await_coroutines(self.openai))
             return self
-        except self.exceptions_dictionary['event_loop_exceptions'] as error:
+        except self.get_exceptions(provider="openai", attribute=self.event_loop_exceptions_name) as error:
             print(f"Known Blocking Error: {type(error).__name_} | Stopping execution:")
             raise  # re-raises the last message that was active in the current scope and terminates the program
 
