@@ -1,22 +1,18 @@
 from pydantic import BaseModel
 import openai
 from custom_types import Data
-from typing import Union, List, Dict
 import llm_output_structures
 from icecream import ic
 import asyncio
 import time
 import backoff
-import itertools
 import functools
 
-start_time = None
+start_time = time.time()
 
 
 def print_time_since_start():
     global start_time
-    if start_time is None:
-        start_time = time.time()
     elapsed_time = time.time() - start_time
     return f'Delta: {elapsed_time} sec'
 
@@ -98,7 +94,8 @@ class LLMHandler:
         self.loop_backoff: tuple = (openai.APIConnectionError,
                                     openai.RateLimitError)
         # loop_exceptions should completely stop the script
-        self.loop_exceptions: tuple = (openai.PermissionDeniedError,)
+        self.loop_exceptions: tuple = (openai.PermissionDeniedError,
+                                       openai.AuthenticationError)
 
     def coroutine_backoff_wrapper(self, func):
         """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't

@@ -8,70 +8,122 @@ from pydantic import BaseModel, Field, conset, constr, field_validator
 
 
 # ---BASE MODELS---
-class DecimalValidatorModel(BaseModel):
-    """Adds decimal place validation to the base item_model. Only checks 'sentiment_score'"""
-    @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
+# Add field names to the field_validator arguments if you want them to be validated by a method
+class BaseValidatorModel(BaseModel):
+    """Adds field validators to the resulting BaseValidatorModel class, which are used if columns match the arguments.
+    Multiple validators can apply to a single field if the column name is in multiple validators."""
+    @field_validator('score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
         if isinstance(v, float):
             assert round(v, 2) == v, 'value has more than 2 decimal places'
         return v
 
+    @field_validator('score', check_fields=False)
+    def float_in_range(cls, v):
+        if isinstance(v, float):
+            minimum: float = -1.00
+            maximum: float = 1.00
+            assert minimum <= v <= maximum, f'float is not between {minimum} to {maximum}'
+        return v
 
-# ---TYPES---
-# Custom data types used in pydantic fields below
-category_constr_type = constr(strip_whitespace=True, to_lower=True, min_length=3, max_length=30)
-sub_categories_type = conset(item_type=category_constr_type, min_length=1)
-top_5_sub_categories_type = conset(item_type=category_constr_type, min_length=1, max_length=5)
+    @field_validator('top_categories', check_fields=False)
+    def list_1_to_5(cls, v):
+        if isinstance(v, list):
+            minimum: int = 1
+            maximum: int = 5
+            assert minimum <= len(v) <= maximum, f'list does not contain between {minimum} to {maximum} entries'
+        return v
+
+    @field_validator('sub_categories', check_fields=False)
+    def list_1_to_30(cls, v):
+        if isinstance(v, list):
+            minimum: int = 1
+            maximum: int = 30
+            assert minimum <= len(v) <= maximum, f'list does not contain between {minimum} to {maximum} entries'
+        return v
+
+    @field_validator('primary_category', check_fields=False)
+    def string_3_to_20(cls, v):
+        if isinstance(v, str):
+            minimum: int = 3
+            maximum: int = 20
+            assert minimum <= len(v) <= maximum, f'string is not between {minimum} to {maximum} characters'
+        return v
+
+    @field_validator('top_categories', 'sub_categories', check_fields=False)
+    def strings_in_list_3_to_20(cls, v):
+        if isinstance(v, list):
+            for x in v:
+                assert type(x) == str, f'{x} is not a string'
+                minimum: int = 3
+                maximum: int = 20
+                assert minimum <= len(x) <= maximum, f'string "{x}" is not between {minimum} to {maximum} characters'
+        return v
+
 
 # ---FIELDS---
-# Common Fields to be added to pydantic models below, using generic python types and types defined above
-main_category_field: category_constr_type = Field(
+# Field() can customise the pydantic JSON schema
+# Used here to add a description to each field
+# Defined separately to avoid repetition in similar classes below
+primary_category: str = Field(
     description="The primary category identified in the comment"
 )
 
-categories_field: sub_categories_type = Field(
-    description="The sub-categories identified in the comment in order of relevance"
-)
-
-top_5_sub_categories_field: top_5_sub_categories_type = Field(
+top_5_categories: list = Field(
     description="The top 1 to 5 sub-categories identified in the comment in order of relevance"
 )
 
-sentiment_score_field: float = \
+categories_1_to_30: list = Field(
+    description="sub-categories identified in the comment in order of relevance"
+)
+
+sentiment_score: float = \
     Field(
         description="Decimal value that represents sentiment of a comment. Ranges from -1 (negative sentiment) to 1 "
-                    "(positive sentiment), with 0 indicating neutral sentiment",
-        ge=-1,  # Greater than or equal to
-        le=1  # Less than or equal to
+                    "(positive sentiment), with 0 indicating neutral sentiment"
     )
 
 # ---CLASSES---
-# Common classes to be imported and used elsewhere, combining the Fields defined above
-# Unfortunately the type annotations need to be repeated, but use the above as a reference.
+# Classes use the common fields above
+# Validated according to @field_validator methods defined in the BaseValidatorModel if the field name matches
+# Type annotations need to be repeated, but use the above as a reference.
 
 
-class SentimentScore(DecimalValidatorModel):
-    sentiment_score: float = sentiment_score_field
+class SentimentScore(BaseValidatorModel):
+    sentiment_score: float = sentiment_score
 
 
-class CategoryList(BaseModel):
-    categories: sub_categories_type = categories_field
+class PrimaryCategory(BaseValidatorModel):
+    primary_category: str = primary_category
 
 
-class CategoryListAndSentiment(DecimalValidatorModel):
-    categories: sub_categories_type = categories_field
-    sentiment_score: float = sentiment_score_field
+class Top5Categories(BaseValidatorModel):
+    top_categories: list = top_5_categories
 
 
-class TopCategoriesListAndSentiment(DecimalValidatorModel):
-    categories: top_5_sub_categories_type = top_5_sub_categories_field
-    sentiment_score: float = sentiment_score_field
+class SubCategories(BaseValidatorModel):
+    sub_categories: list = categories_1_to_30
 
 
-class CategoryListHierarchyAndSentiment(DecimalValidatorModel):
-    main_category: category_constr_type = main_category_field
-    sub_categories: top_5_sub_categories_type = top_5_sub_categories_field
-    sentiment_score: float = sentiment_score_field
+class PrimaryCategoryAndSentiment(BaseValidatorModel):
+    primary_category: str = primary_category
+    sentiment_score: float = sentiment_score
+
+
+class SubCategoriesAndSentiment(BaseValidatorModel):
+    sub_categories: list = categories_1_to_30
+    sentiment_score: float = sentiment_score
+
+
+class TopCategoriesAndSentiment(BaseValidatorModel):
+    top_categories: list = top_5_categories
+    sentiment_score: float = sentiment_score
+
+
+class CategoryHierarchyAndSentiment(BaseValidatorModel):
+    primary_category: str = primary_category
+    sub_categories: list = categories_1_to_30
+    sentiment_score: float = sentiment_score
 
 
 if __name__ == "__main__":
