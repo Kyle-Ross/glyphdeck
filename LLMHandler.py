@@ -1,12 +1,12 @@
-from pydantic import BaseModel
-import openai
 from custom_types import Data
-import llm_output_structures
 from icecream import ic
+import llm_output_structures
+import instructor
+import functools
 import asyncio
 import time
 import backoff
-import functools
+import openai
 
 start_time = time.time()
 
@@ -25,31 +25,28 @@ def string_cleaner(input_str: str) -> str:
 class LLMHandler:
     """Write your docstring for the class here."""
 
-    def check_instance(self):
-        """Checks that the provided attribute is an instance or inheritance of the Pydantic BaseModel class."""
-        check: bool = isinstance(self.output_structure, BaseModel)
-        assert check, f'{self.output_structure} is not an instance of, or inherited from the Pydantic BaseModel class'
+    def check_validation_model(self):
+        """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
+        check: bool = issubclass(self.validation_model, llm_output_structures.BaseValidatorModel)
+        assert check, f'{self.validation_model.__name__} is not a subclass of the Pydantic BaseValidatorModel class'
 
     def __init__(self,
-                 input_data: Data,
-                 parser: str,
-                 output_structure,
-                 provider: str,
-                 model: str,
-                 api_key: str,
-                 role: str,
-                 request: str,
-                 max_coroutine_retries: int = 10,
-                 max_event_loop_retries: int = 10) -> None:
+                 input_data: Data,  # Input data of the custom 'Data' type
+                 provider: str,  # The provider of the llm
+                 model: str,  # The model of the llm
+                 api_key: str,  # The api key to be used
+                 role: str,  # The role to provide the llm in the prompts
+                 request: str,  # The request to make to the llm
+                 validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
+                 max_validation_retries: int = 2,  # Max times the request can retry on the basis of failed validation
+                 max_coroutine_retries: int = 10,  # Max retries for coroutine blocking errors
+                 max_event_loop_retries: int = 10) -> None:  # Max retries for event loop pausing errors
 
-        # Storing the input data, of the 'Data' type as delivered by a 'Chain' object
+        # Storing the input data, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
         # output_data keeps keys, replaces with [None, None, ...] lists
         # Helps to insert output in the correct position later in 'await_tasks'
         self.output_data: Data = {key: [None] * len(value) for key, value in input_data.items()}
-
-        self.parser: str = parser  # The attribute of the method used to advise output structure
-        self.output_structure = output_structure
 
         # Storing and Checking available providers against a list
         self.available_providers: tuple = ("openai",)
@@ -64,9 +61,11 @@ class LLMHandler:
         self.api_key: str = api_key
         self.role: str = role
         self.request: str = request
+        self.validation_model = validation_model
+        self.max_validation_retries = max_validation_retries
 
-        # Check that the class attribute is the correct type
-        self.check_instance()
+        # Check that the provided pydantic validation class is built on the BaseValidatorModel class
+        self.check_validation_model()
 
         # A semaphore is a synchronization primitive used to control access to a common resource
         # by multiple processes in a concurrent system
@@ -127,19 +126,15 @@ class LLMHandler:
                      input_text: str,
                      key,
                      index: int,
-                     item_parser: str = None,
-                     item_output_structure=None,
                      item_model: str = None,
                      item_api_key: str = None,
                      item_role: str = None,
-                     item_request: str = None) -> tuple:
+                     item_request: str = None,
+                     item_validation_model=None,
+                     item_max_validation_retries: int = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
-        # If no arguments are provided, uses the values set in the instance
+        # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
-        if item_parser is None:
-            item_parser = self.parser
-        if item_output_structure is None:
-            item_output_structure = self.output_structure
         if item_model is None:
             item_model = self.model
         if item_api_key is None:
@@ -148,13 +143,21 @@ class LLMHandler:
             item_role = self.role
         if item_request is None:
             item_request = self.request
+        if item_validation_model is None:
+            item_validation_model = self.validation_model
+        if item_max_validation_retries is None:
+            item_max_validation_retries = self.max_validation_retries
 
         # Initialising the client
-        openai_client = openai.AsyncOpenAI(api_key=item_api_key)
+        # instructor patches in data validation via pydantic with the response_model and max_retries attributes
+        openai_client = instructor.apatch(openai.AsyncOpenAI(api_key=item_api_key))
 
         # Sending the request
-        chat_completion = await openai_client.chat.completions.create(
+        # This changes the response object - response information is now accessed like item_validation_model.field_name
+        instructor_model = await openai_client.chat.completions.create(
             model=item_model,
+            response_model=item_validation_model,
+            max_retries=item_max_validation_retries,
             messages=[
 
                 {"role": "system",
@@ -165,8 +168,8 @@ class LLMHandler:
             ]
         )
 
-        # Storing the response
-        response = chat_completion.choices[0].message.content
+        # Storing the response object (as made by the patched openai_client)
+        response = instructor_model.sentiment_score
 
         # Returning the response as a tuple (shorthand syntax)
         return response, key, index
@@ -268,19 +271,14 @@ if __name__ == "__main__":
     with open("secrets.json") as file:
         my_api_key = json.load(file)["openai_api_key"]
 
-    # Example model instance
-    pydantic_model_instance = llm_output_structures.SentimentScore(sentiment_score=0.55)
-
     handler = LLMHandler(data_example,
-                         parser="pydantic",
-                         output_structure=pydantic_model_instance,
                          provider="OpenAI",
                          model="gpt-3.5-turbo",
                          api_key=my_api_key,
-                         role="An expert nlp comment analysis system, trained to accurately categorise " \
-                              "customer feedback",
-                         request="Provide the top 5 most relevant categories for the comment. Just provide the title"
-                                 "of each category. There may not always be 5 categories.",
+                         role="",
+                         request="Return the sentiment score",
+                         validation_model=llm_output_structures.SentimentScore,
+                         max_validation_retries=2,
                          max_coroutine_retries=10,
                          max_event_loop_retries=10
                          )
