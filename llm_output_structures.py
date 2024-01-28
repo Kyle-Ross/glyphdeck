@@ -12,13 +12,13 @@ from pydantic import BaseModel, Field, conset, constr, field_validator
 class BaseValidatorModel(BaseModel):
     """Adds field validators to the resulting BaseValidatorModel class, which are used if columns match the arguments.
     Multiple validators can apply to a single field if the column name is in multiple validators."""
-    @field_validator('score', check_fields=False)  # Check fields uses since the item_model inherits from base
+    @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
         if isinstance(v, float):
             assert round(v, 2) == v, 'value has more than 2 decimal places'
         return v
 
-    @field_validator('score', check_fields=False)
+    @field_validator('sentiment_score', check_fields=False)
     def float_in_range(cls, v):
         if isinstance(v, float):
             minimum: float = -1.00
@@ -57,7 +57,7 @@ class BaseValidatorModel(BaseModel):
                 assert type(x) == str, f'{x} is not a string'
                 minimum: int = 3
                 maximum: int = 20
-                assert minimum <= len(x) <= maximum, f'string is not between {minimum} to {maximum} characters'
+                assert minimum <= len(x) <= maximum, f'string "{x}" is not between {minimum} to {maximum} characters'
         return v
 
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     def print_sub_title(title, prefix=f'{"-" * 20}\n'):
         print(f'{prefix}\nCLASS | {title}\n')
 
-    really_long_string = "A really long string that is over 20 characters ok"
+    really_long_string = "A really long string that is over 20 characters"
 
     print(f'{"-"*30}\nVALIDATION TEST RESULTS\n{"-"*30}\n')
 
@@ -170,44 +170,53 @@ if __name__ == "__main__":
     test_validation(SentimentScore, {'sentiment_score': 0.5}, True)
     test_validation(SentimentScore, {'sentiment_score': 1.5}, False)
     test_validation(SentimentScore, {'sentiment_score': 0.555}, False)
+    test_validation(SentimentScore, {'sentiment_score': 'not a float'}, False)
 
     print_sub_title('PrimaryCategory')
     test_validation(PrimaryCategory, {'primary_category': "Test"}, True)
     test_validation(PrimaryCategory, {'primary_category': "T"}, False)
     test_validation(PrimaryCategory, {'primary_category': really_long_string}, False)
+    test_validation(PrimaryCategory, {'primary_category': 123}, False)
 
     print_sub_title('Top5Categories')
     test_validation(Top5Categories, {'top_categories': ["Test1", "Test2"]}, True)
     test_validation(Top5Categories, {'top_categories': ["T", "Test2"]}, False)
     test_validation(Top5Categories, {'top_categories': ["Test1", "Test2", really_long_string]}, False)
+    test_validation(Top5Categories, {'top_categories': 'not a list'}, False)
 
     print_sub_title('SubCategories')
     test_validation(SubCategories, {'sub_categories': ["Test1"] * 10}, True)
     test_validation(SubCategories, {'sub_categories': ["T"] * 31}, False)
-    test_validation(SubCategories, {'sub_categories': ["Test1"] * 10 + [really_long_string]}, True)
+    test_validation(SubCategories, {'sub_categories': ["Test1"] * 10 + [really_long_string]}, False)
+    test_validation(SubCategories, {'sub_categories': 0.55}, False)
 
     print_sub_title('PrimaryCategoryAndSentiment')
     test_validation(PrimaryCategoryAndSentiment, {'primary_category': "Test", 'sentiment_score': 0.5}, True)
-    test_validation(PrimaryCategoryAndSentiment, {'primary_category': "T", 'sentiment_score': 1.5}, False)
-    test_validation(PrimaryCategoryAndSentiment, {'primary_category': really_long_string, 'sentiment_score': 0.5}, True)
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': "T", 'sentiment_score': 0.5}, False)
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': "Test", 'sentiment_score': 0.555}, False)
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': really_long_string,
+                                                  'sentiment_score': 0.5}, False)
 
     print_sub_title('SubCategoriesAndSentiment')
     test_validation(SubCategoriesAndSentiment, {'sub_categories': ["Test1"] * 10, 'sentiment_score': 0.5}, True)
-    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["T"] * 31, 'sentiment_score': 1.5}, False)
+    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["T"] * 31, 'sentiment_score': 0.5}, False)
+    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["T"] * 10, 'sentiment_score': -1.5}, False)
     test_validation(SubCategoriesAndSentiment, {'sub_categories': ["Test1"] * 10 + [really_long_string],
-                                                'sentiment_score': 0.5}, True)
+                                                'sentiment_score': 0.5}, False)
 
     print_sub_title('TopCategoriesAndSentiment')
     test_validation(TopCategoriesAndSentiment, {'top_categories': ["Test1", "Test2"], 'sentiment_score': 0.5}, True)
     test_validation(TopCategoriesAndSentiment, {'top_categories': ["T", "Test2"], 'sentiment_score': 1.5}, False)
     test_validation(TopCategoriesAndSentiment, {'top_categories': ["Test1", "Test2", really_long_string],
-                                                'sentiment_score': 0.5}, True)
+                                                'sentiment_score': 0.5}, False)
 
     print_sub_title('CategoryHierarchyAndSentiment')
     test_validation(CategoryHierarchyAndSentiment,
                     {'primary_category': "Test", 'sub_categories': ["Test1"] * 10, 'sentiment_score': 0.5}, True)
     test_validation(CategoryHierarchyAndSentiment,
-                    {'primary_category': "T", 'sub_categories': ["T"] * 31, 'sentiment_score': 1.5}, False)
+                    {'primary_category': "T", 'sub_categories': ["T"] * 31, 'sentiment_score': 0.5}, False)
+    test_validation(CategoryHierarchyAndSentiment,
+                    {'primary_category': "T", 'sub_categories': ["T"] * 10, 'sentiment_score': 0.555}, False)
     test_validation(CategoryHierarchyAndSentiment,
                     {'primary_category': "Test", 'sub_categories': ["Test1"] * 10 + [really_long_string],
-                     'sentiment_score': 0.5}, True)
+                     'sentiment_score': 0.5}, False)
