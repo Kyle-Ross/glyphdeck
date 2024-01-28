@@ -170,6 +170,7 @@ class LLMHandler:
 
         # Storing the response object (as made by the patched openai_client)
         response = instructor_model.sentiment_score
+        # TODO - Get this working dynamically independent of the used item_validation_model - think about output too
 
         # Returning the response as a tuple (shorthand syntax)
         return response, key, index
@@ -199,9 +200,7 @@ class LLMHandler:
             print(f'FAILURE | Key: Unknown | Index: Unknown | '
                   f'Error: {type(error).__name_} | {print_time_since_start()}')
             raise  # re-raises the last message and terminates the program
-            # TODO - Get key and index working here (very hard!)
-            # self.output_data[key][index] = type(error).__name__
-            # print(f'FAILURE | Key: {key} | Index: {index} | Error: {type(error).__name_} |{print_time_since_start()}')
+            # TODO - Get key and index working here (very hard!) - or maybe logging?
 
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
@@ -286,13 +285,8 @@ if __name__ == "__main__":
     handler.run()
     ic(handler.output_data)
 
-# https://superfastpython.com/asyncio-as_completed/#Example_of_as_completed_with_Coroutines
-# TODO - Test backoff system somehow, coroutine and event loop level
-# TODO - Print messages for different excepted errors, logging etc
-# TODO - Add coroutine timeout condition to avoid hangs
-# TODO - Get structured output happening using the pydantic classes - see openai functions (saved medium article)
-# TODO - Add retry loops on incorrect output, re-query response correction on incorrect output format?
-# TODO - test chain integration
-# TODO - test error catching
-# TODO - Fix - Error catching may be prone to TypeError: catching classes that do not inherit from
-#  BaseException is not allowed. But Maybe just occurring in testing?
+# TODO - Test backoff system
+# TODO - Test errors
+# TODO - Logging for backoffs
+# TODO - Logging for exceptions
+# TODO - Add Coroutine timeout
