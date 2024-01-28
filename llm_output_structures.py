@@ -57,7 +57,7 @@ class BaseValidatorModel(BaseModel):
                 assert type(x) == str, f'{x} is not a string'
                 minimum: int = 3
                 maximum: int = 20
-                assert minimum <= len(x) <= maximum, f'string "{x}" is not between {minimum} to {maximum} characters'
+                assert minimum <= len(x) <= maximum, f'string is not between {minimum} to {maximum} characters'
         return v
 
 
@@ -127,13 +127,87 @@ class CategoryHierarchyAndSentiment(BaseValidatorModel):
 
 
 if __name__ == "__main__":
-    from icecream import ic
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
-    # Creating an instance and checking if it is from BaseModel
-    pydantic_model_instance = SentimentScore(sentiment_score=0.55)
-    float_variable = 0.666
-    ic(pydantic_model_instance)
-    ic(float_variable)
-    ic(type(pydantic_model_instance))
-    ic(isinstance(pydantic_model_instance, BaseModel))
-    ic(isinstance(float_variable, BaseModel))
+    from pydantic import ValidationError
+    import pprint
+
+    # ------------------------------------
+    # Test cases written by ChatGPT
+    # Examples of passes and failures for each
+    # ------------------------------------
+
+    def test_validation(cls, args, should_pass):
+        try:
+            instance = cls(**args)
+        except ValidationError as error:  # All Validation errors
+            if should_pass:
+                print(f"FAILURE | Unexpected ValidationError for {cls.__name__} with args:")
+                pprint.pprint(args, indent=4)
+                print(f'Error Description:\n{error}')
+            else:
+                print(f"SUCCESS | Expected ValidationError for {cls.__name__} with args:")
+                pprint.pprint(args, indent=4)
+                print(f'Error Description:\n{error}')
+        else:  # All validation non-errors (i.e the data validated)
+            if should_pass:
+                print(f"SUCCESS | Expected Validation: {cls.__name__} with args:")
+                pprint.pprint(args, indent=4)
+            else:
+                print(f"FAILURE | Unexpected Validation: {cls.__name__} with args:")
+                pprint.pprint(args, indent=4)
+        print('\n')
+
+
+    def print_sub_title(title, prefix=f'{"-" * 20}\n'):
+        print(f'{prefix}\nCLASS | {title}\n')
+
+    really_long_string = "A really long string that is over 20 characters ok"
+
+    print(f'{"-"*30}\nVALIDATION TEST RESULTS\n{"-"*30}\n')
+
+    # Now you can use this function to perform your tests
+    print('CLASS | SentimentScore\n')
+    test_validation(SentimentScore, {'sentiment_score': 0.5}, True)
+    test_validation(SentimentScore, {'sentiment_score': 1.5}, False)
+    test_validation(SentimentScore, {'sentiment_score': 0.555}, False)
+
+    print_sub_title('PrimaryCategory')
+    test_validation(PrimaryCategory, {'primary_category': "Test"}, True)
+    test_validation(PrimaryCategory, {'primary_category': "T"}, False)
+    test_validation(PrimaryCategory, {'primary_category': really_long_string}, False)
+
+    print_sub_title('Top5Categories')
+    test_validation(Top5Categories, {'top_categories': ["Test1", "Test2"]}, True)
+    test_validation(Top5Categories, {'top_categories': ["T", "Test2"]}, False)
+    test_validation(Top5Categories, {'top_categories': ["Test1", "Test2", really_long_string]}, False)
+
+    print_sub_title('SubCategories')
+    test_validation(SubCategories, {'sub_categories': ["Test1"] * 10}, True)
+    test_validation(SubCategories, {'sub_categories': ["T"] * 31}, False)
+    test_validation(SubCategories, {'sub_categories': ["Test1"] * 10 + [really_long_string]}, True)
+
+    print_sub_title('PrimaryCategoryAndSentiment')
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': "Test", 'sentiment_score': 0.5}, True)
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': "T", 'sentiment_score': 1.5}, False)
+    test_validation(PrimaryCategoryAndSentiment, {'primary_category': really_long_string, 'sentiment_score': 0.5}, True)
+
+    print_sub_title('SubCategoriesAndSentiment')
+    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["Test1"] * 10, 'sentiment_score': 0.5}, True)
+    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["T"] * 31, 'sentiment_score': 1.5}, False)
+    test_validation(SubCategoriesAndSentiment, {'sub_categories': ["Test1"] * 10 + [really_long_string],
+                                                'sentiment_score': 0.5}, True)
+
+    print_sub_title('TopCategoriesAndSentiment')
+    test_validation(TopCategoriesAndSentiment, {'top_categories': ["Test1", "Test2"], 'sentiment_score': 0.5}, True)
+    test_validation(TopCategoriesAndSentiment, {'top_categories': ["T", "Test2"], 'sentiment_score': 1.5}, False)
+    test_validation(TopCategoriesAndSentiment, {'top_categories': ["Test1", "Test2", really_long_string],
+                                                'sentiment_score': 0.5}, True)
+
+    print_sub_title('CategoryHierarchyAndSentiment')
+    test_validation(CategoryHierarchyAndSentiment,
+                    {'primary_category': "Test", 'sub_categories': ["Test1"] * 10, 'sentiment_score': 0.5}, True)
+    test_validation(CategoryHierarchyAndSentiment,
+                    {'primary_category': "T", 'sub_categories': ["T"] * 31, 'sentiment_score': 1.5}, False)
+    test_validation(CategoryHierarchyAndSentiment,
+                    {'primary_category': "Test", 'sub_categories': ["Test1"] * 10 + [really_long_string],
+                     'sentiment_score': 0.5}, True)
