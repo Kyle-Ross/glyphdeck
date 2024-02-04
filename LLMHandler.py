@@ -1,4 +1,4 @@
-from custom_types import Data
+from custom_types import Data, assert_custom_type
 from icecream import ic
 import llm_output_structures
 import instructor
@@ -31,18 +31,32 @@ class LLMHandler:
         assert check, f'{self.validation_model.__name__} is not a subclass of the Pydantic BaseValidatorModel class'
 
     def __init__(self,
-                 input_data: Data,  # Input data of the custom 'Data' type
+                 input_data: Data,  # Input variable of the custom 'Data' type
                  provider: str,  # The provider of the llm
                  model: str,  # The model of the llm
                  api_key: str,  # The api key to be used
                  role: str,  # The role to provide the llm in the prompts
                  request: str,  # The request to make to the llm
                  validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
+                 temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
                  max_validation_retries: int = 2,  # Max times the request can retry on the basis of failed validation
                  max_coroutine_retries: int = 10,  # Max retries for coroutine blocking errors
                  max_event_loop_retries: int = 10) -> None:  # Max retries for event loop pausing errors
 
-        # Storing the input data, of the 'Data' type as typically delivered by a 'Chain' object
+        # Assert the variable type of the provided arguments
+        assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
+        assert isinstance(provider, str), "'provider' argument must be type 'str'"
+        assert isinstance(model, str), "'model' argument must be type 'str'"
+        assert isinstance(api_key, str), "'api_key' argument must be type 'str'"
+        assert isinstance(role, str), "'role' argument must be type 'str'"
+        assert isinstance(request, str), "'request' argument must be type 'str'"
+        # Validation model is checked below, after assignment to self
+        assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
+        assert isinstance(max_validation_retries, int), "'max_validation_retries' argument must be type 'int'"
+        assert isinstance(max_coroutine_retries, int), "'max_coroutine_retries' argument must be type 'int'"
+        assert isinstance(max_event_loop_retries, int), "'max_event_loop_retries' argument must be type 'int'"
+
+        # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
         # output_data keeps keys, replaces with [None, None, ...] lists
         # Helps to insert output in the correct position later in 'await_tasks'
@@ -62,9 +76,10 @@ class LLMHandler:
         self.role: str = role
         self.request: str = request
         self.validation_model = validation_model
+        self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
 
-        # Check that the provided pydantic validation class is built on the BaseValidatorModel class
+        # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
 
         # A semaphore is a synchronization primitive used to control access to a common resource
@@ -131,6 +146,7 @@ class LLMHandler:
                      item_role: str = None,
                      item_request: str = None,
                      item_validation_model=None,
+                     item_temperature: float = None,
                      item_max_validation_retries: int = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
         # If no arguments are provided, uses the values set in the handler class instance
@@ -145,11 +161,16 @@ class LLMHandler:
             item_request = self.request
         if item_validation_model is None:
             item_validation_model = self.validation_model
+        if item_temperature is None:
+            item_temperature = self.temperature
         if item_max_validation_retries is None:
             item_max_validation_retries = self.max_validation_retries
 
+        # Asserting value limitations specific to OpenAI
+        assert 0 <= item_temperature <= 1, "For OpenAI, temperature must be between 0 and 1"
+
         # Initialising the client
-        # instructor patches in data validation via pydantic with the response_model and max_retries attributes
+        # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
         openai_client = instructor.apatch(openai.AsyncOpenAI(api_key=item_api_key))
 
         # Sending the request
@@ -158,6 +179,7 @@ class LLMHandler:
             model=item_model,
             response_model=item_validation_model,
             max_retries=item_max_validation_retries,
+            temperature=item_temperature,
             messages=[
 
                 {"role": "system",
@@ -169,18 +191,18 @@ class LLMHandler:
         )
 
         # Storing the response object (as made by the patched openai_client)
-        response = instructor_model.sentiment_score
-        # TODO - Get this working dynamically independent of the used item_validation_model - think about output too
+        # Extracting a dict of the fields using the pydantic basemodel
+        response = dict(instructor_model)
 
         # Returning the response as a tuple (shorthand syntax)
         return response, key, index
 
     async def create_coroutines(self, func) -> list:
-        """Creates individual coroutines for running the provided function on every value in the data.
+        """Creates individual coroutines for running the provided function on every value in the variable.
         If you wanted to have different per response settings for the prompt, you would set them on func here."""
         # Applying the backoff wrapper to the func
         func = self.coroutine_backoff_wrapper(func)
-        # Create and store the tasks across the whole data in a list
+        # Create and store the tasks across the whole variable in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
@@ -223,7 +245,7 @@ class LLMHandler:
                 self.semaphore.release()
 
     def run(self):
-        """Asynchronously query the selected LLM across the whole data and save results to the output"""
+        """Asynchronously query the selected LLM across the whole variable and save results to the output"""
         try:
             if self.provider_clean == "openai":
                 asyncio.run(self.await_coroutines(self.openai))
@@ -274,9 +296,9 @@ if __name__ == "__main__":
                          provider="OpenAI",
                          model="gpt-3.5-turbo",
                          api_key=my_api_key,
-                         role="",
-                         request="Return the sentiment score",
-                         validation_model=llm_output_structures.SentimentScore,
+                         role="An expert customer feedback analyst system",
+                         request="Analyse the feedback and return results in the format",
+                         validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
                          max_validation_retries=2,
                          max_coroutine_retries=10,
                          max_event_loop_retries=10
