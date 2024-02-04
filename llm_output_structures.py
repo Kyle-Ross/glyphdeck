@@ -74,13 +74,14 @@ top_5_categories: list = Field(
 )
 
 categories_1_to_30: list = Field(
-    description="sub-categories identified in the comment in order of relevance"
+    description="All sub-categories identified in the comment in order of relevance, "
+                "making sure to capture all the topics"
 )
 
 sentiment_score: float = \
     Field(
-        description="Decimal value that represents sentiment of a comment. Ranges from -1 (negative sentiment) to 1 "
-                    "(positive sentiment), with 0 indicating neutral sentiment"
+        description="Decimal value that represents sentiment of a comment. Ranges from -1 (max negative sentiment) to 1"
+                    "(max positive sentiment), with 0 indicating neutral sentiment"
     )
 
 # ---CLASSES---
@@ -108,6 +109,11 @@ class SubCategories(BaseValidatorModel):
 class PrimaryCategoryAndSentiment(BaseValidatorModel):
     primary_category: str = primary_category
     sentiment_score: float = sentiment_score
+
+
+class PrimaryCategoryAndSubCategory(BaseValidatorModel):
+    primary_category: str = primary_category
+    sub_categories: list = categories_1_to_30
 
 
 class SubCategoriesAndSentiment(BaseValidatorModel):
@@ -148,7 +154,7 @@ if __name__ == "__main__":
                 print(f"SUCCESS | Expected ValidationError for {cls.__name__} with args:")
                 pprint.pprint(args, indent=4)
                 print(f'Error Description:\n{error}')
-        else:  # All validation non-errors (i.e the data validated)
+        else:  # All validation non-errors (i.e the variable validated)
             if should_pass:
                 print(f"SUCCESS | Expected Validation: {cls.__name__} with args:")
                 pprint.pprint(args, indent=4)
