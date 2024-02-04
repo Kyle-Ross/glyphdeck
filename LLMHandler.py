@@ -297,8 +297,9 @@ if __name__ == "__main__":
                          model="gpt-3.5-turbo",
                          api_key=my_api_key,
                          role="An expert customer feedback analyst system",
-                         request="Analyse the feedback and return results in the format",
+                         request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
+                         temperature=0.2,
                          max_validation_retries=2,
                          max_coroutine_retries=10,
                          max_event_loop_retries=10
