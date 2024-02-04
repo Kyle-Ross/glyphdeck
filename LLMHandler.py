@@ -50,7 +50,7 @@ class LLMHandler:
         assert isinstance(api_key, str), "'api_key' argument must be type 'str'"
         assert isinstance(role, str), "'role' argument must be type 'str'"
         assert isinstance(request, str), "'request' argument must be type 'str'"
-        # Validation model is checked below, after assignment to self
+        # Placeholder - Validation model is checked below, after assignment to self
         assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
         assert isinstance(max_validation_retries, int), "'max_validation_retries' argument must be type 'int'"
         assert isinstance(max_coroutine_retries, int), "'max_coroutine_retries' argument must be type 'int'"
@@ -296,11 +296,11 @@ if __name__ == "__main__":
                          provider="OpenAI",
                          model="gpt-3.5-turbo",
                          api_key=my_api_key,
-                         role="An expert customer feedback analyst system",
+                         role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
                          temperature=0.2,
-                         max_validation_retries=2,
+                         max_validation_retries=3,
                          max_coroutine_retries=10,
                          max_event_loop_retries=10
                          )
