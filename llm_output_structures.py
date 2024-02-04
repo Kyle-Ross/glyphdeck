@@ -66,22 +66,24 @@ class BaseValidatorModel(BaseModel):
 # Used here to add a description to each field
 # Defined separately to avoid repetition in similar classes below
 primary_category: str = Field(
-    description="The primary category identified in the comment"
+    description="The primary category identified in the comment. The category must be between 3 - 20 characters long"
 )
 
 top_5_categories: list = Field(
-    description="The top 1 to 5 sub-categories identified in the comment in order of relevance"
+    description="The top 1 to 5 sub-categories identified in the comment in order of relevance. Each category must be "
+                "between 3 - 20 characters long"
 )
 
 categories_1_to_30: list = Field(
     description="All sub-categories identified in the comment in order of relevance, making sure to capture all the "
-                "topics, with least 1 and no more than 30 categories"
+                "topics, with least 1 and no more than 30 categories. Each category must be between 3 - 20 characters"
+                "long"
 )
 
 sentiment_score: float = \
     Field(
         description="Decimal value that represents sentiment of a comment. Ranges from -1 (max negative sentiment) to 1"
-                    "(max positive sentiment), with 0 indicating neutral sentiment"
+                    "(max positive sentiment), with 0 indicating neutral sentiment. It must be between -1 and 1"
     )
 
 # ---CLASSES---
