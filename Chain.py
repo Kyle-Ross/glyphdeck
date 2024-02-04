@@ -4,14 +4,14 @@ from datetime import datetime, timedelta
 
 class Chain:
     def __init__(self):
-        """Common object for storing and passing the chained results of data processing."""
+        """Common object for storing and passing the chained results of variable processing."""
         self.expected_len = 0
         self.records: Records = {
             0: {
                 'title': 'initialisation',
                 'dt': datetime.now(),
                 'delta': None,
-                'data': {},
+                'variable': {},
                 'table': None
             }
         }
@@ -42,11 +42,11 @@ class Chain:
         return self.record(key)['dt']
 
     def data(self, key: IntStr) -> Data:
-        """Returns the data dictionary corresponding to the provided record_identifier number."""
-        return self.record(key)['data']
+        """Returns the variable dictionary corresponding to the provided record_identifier number."""
+        return self.record(key)['variable']
 
     def table(self, key: IntStr) -> dFrame:
-        """Returns the data dictionary corresponding to the provided record_identifier number."""
+        """Returns the variable dictionary corresponding to the provided record_identifier number."""
         return self.record(key)['table']
 
     def record_delta(self, key: IntStr) -> timedelta:
@@ -75,7 +75,7 @@ class Chain:
 
     @property
     def latest_data(self) -> Data:
-        """Returns the latest 'data' from the latest 'record' in 'records'."""
+        """Returns the latest 'variable' from the latest 'record' in 'records'."""
         return self.data(self.latest_key)
 
     @property
@@ -107,7 +107,7 @@ class Chain:
 
     @property
     def initial_data(self) -> Data:
-        """Returns the initial 'data' from the latest 'record' in 'records'."""
+        """Returns the initial 'variable' from the latest 'record' in 'records'."""
         return self.data(self.initial_key)
 
     @property
@@ -121,7 +121,7 @@ class Chain:
         return self.latest_dt - self.dt(0)
 
     def set_expected_len(self, value: int):
-        """Updates the number of values expected for each list in the records data"""
+        """Updates the number of values expected for each list in the records variable"""
         self.expected_len = value
         return self
 
@@ -162,7 +162,7 @@ class Chain:
             raise ValueError(key_validator_message)
 
     def data_validator(self, target_key: int):
-        """Checks that each list in the data of the target record has the expected length."""
+        """Checks that each list in the variable of the target record has the expected length."""
         target_data: Data = self.data(target_key)
         target_title: str = self.title(target_key)
         bad_keys: IntList = []
@@ -196,11 +196,11 @@ class Chain:
                ):
         """Adds a new record to the 'records' dictionary."""
         if self.latest_key == 0:
-            # Set expected len if this is the first entry, using the len of the first list in the data dict
+            # Set expected len if this is the first entry, using the len of the first list in the variable dict
             self.set_expected_len(len(data[next(iter(data))]))
         if update_expected_len:
             # Set expected len if update_expected_len is True
-            # Uses the len of the first data list from the most recent record
+            # Uses the len of the first variable list from the most recent record
             self.set_expected_len(len(self.latest_data[next(iter(self.latest_data))]))
 
         now: datetime = datetime.now()
@@ -210,7 +210,7 @@ class Chain:
             'title': title,
             'dt': now,
             'delta': delta,
-            'data': data,
+            'variable': data,
             'table': self.latest_table if table is None else table  # References previous table if no table provided
         }
         self.key_validator(new_key)
@@ -276,4 +276,4 @@ if __name__ == "__main__":
     ic(chain.title_key('Example2'))
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
-# TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard
+# TODO Convert to validating variable with Pydantic, might be easier and clearer? Seems to be industry standard
