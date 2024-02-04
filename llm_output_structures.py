@@ -74,8 +74,8 @@ top_5_categories: list = Field(
 )
 
 categories_1_to_30: list = Field(
-    description="All sub-categories identified in the comment in order of relevance, "
-                "making sure to capture all the topics"
+    description="All sub-categories identified in the comment in order of relevance, making sure to capture all the "
+                "topics, with least 1 and no more than 30 categories"
 )
 
 sentiment_score: float = \
