@@ -1,6 +1,7 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-from utility import print_time_since_start, string_cleaner
+from utility import time_since_start, string_cleaner
 from custom_types import Data, assert_custom_type
+from lru_cache import lru_cache
 from icecream import ic
 import llm_output_structures
 import instructor
@@ -24,6 +25,7 @@ class LLMHandler:
                  role: str,  # The role to provide the llm in the prompts
                  request: str,  # The request to make to the llm
                  validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
+                 cache_identifier: str,  # A Unique string used to identify discrete jobs and avoid cache mixing
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
                  max_validation_retries: int = 2):  # Max times the request can retry on the basis of failed validation
         """__init__ func which is run when the object is initialised."""
@@ -34,6 +36,7 @@ class LLMHandler:
         assert isinstance(model, str), "'model' argument must be type 'str'"
         assert isinstance(role, str), "'role' argument must be type 'str'"
         assert isinstance(request, str), "'request' argument must be type 'str'"
+        assert isinstance(cache_identifier, str), "'cache_identifier' argument must be type 'str'"
         assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
         assert isinstance(max_validation_retries, int), "'max_validation_retries' argument must be type 'int'"
 
@@ -56,6 +59,7 @@ class LLMHandler:
         self.role: str = role
         self.request: str = request
         self.validation_model = validation_model
+        self.cache_identifier: str = cache_identifier  # Referenced in lru_cache by accessing self
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
 
@@ -75,6 +79,7 @@ class LLMHandler:
         # Waits for (sec) 0.9375, 1.875, 3.75, 7.5, 15, 30, 60 (max)
         wait=wait_exponential(multiplier=2, min=0.9375, max=60),
         stop=stop_after_attempt(300))  # About 5 hours of retries!
+    @lru_cache('async_openai_cache', parent_dir='caches', use_cache=True, max_mb_size=200)
     async def async_openai(self,
                            input_text: str,
                            key,
@@ -124,7 +129,7 @@ class LLMHandler:
                 {"role": "user", "content": item_request + ' ' + input_text}
             ]
         }
-        # Accessing parameters via dict unpack
+        # Defining the model and accessing parameters via dict unpack
         instructor_model = await openai_client.chat.completions.create(**chat_params)
 
         # Storing the response object (as made by the patched openai_client)
@@ -145,19 +150,12 @@ class LLMHandler:
     async def await_coroutines(self, func):
         """Await coroutines,  returning results in the order of completion, not the order they are run."""
         coroutines = await self.create_coroutines(func)
-        completions = 0
-        total_coroutines_str_len = len(str(len(coroutines)))
         # Loop over the futures
         for future in asyncio.as_completed(coroutines):
             result = await future
             response = result[0]
             key = result[1]
             index = result[2]
-            # Print a string to track progress while script is running
-            completions += 1
-            completions_str = str(completions)
-            completions_string = ((total_coroutines_str_len - len(completions_str)) * '0') + str(completions)
-            print(f'({print_time_since_start()}) {completions_string} | SUCCESS | Key: {key} | Index: {index}')
             self.output_data[key][index] = response
 
     def run(self):
@@ -204,6 +202,7 @@ if __name__ == "__main__":
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
+                         cache_identifier='NLP-Categorise-TestData',
                          temperature=0.2,
                          max_validation_retries=3
                          )

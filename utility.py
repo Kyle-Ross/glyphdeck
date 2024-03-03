@@ -3,7 +3,7 @@ import time
 start_time = time.time()
 
 
-def print_time_since_start(active=True):
+def time_since_start(active=True):
     """Returns string representing sec delta since script start. Start time is initialised in the function source .py.
     Can be turned on and off using the 'active' variable."""
     global start_time
