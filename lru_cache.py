@@ -5,7 +5,7 @@ import os
 
 
 # Define the decorator with max_mb_size parameter
-def lru_cache(cache_dir, parent_dir='caches', use_cache=True, max_mb_size: int = 200):
+def lru_cache(cache_dir, parent_dir='caches', use_cache=True, max_mb_size: int = 1000):
     """Allows caching when used as a function decorator, up to a specified limit.
     Will attempt to get the result from the cache instead of the function if it is available.
     Once the max size is reached the least recent use (lru) records will be culled.

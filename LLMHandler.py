@@ -79,7 +79,7 @@ class LLMHandler:
         # Waits for (sec) 0.9375, 1.875, 3.75, 7.5, 15, 30, 60 (max)
         wait=wait_exponential(multiplier=2, min=0.9375, max=60),
         stop=stop_after_attempt(300))  # About 5 hours of retries!
-    @lru_cache('async_openai_cache', parent_dir='caches', use_cache=True, max_mb_size=200)
+    @lru_cache('async_openai_cache')  # Can overwrite other args here which otherwise use default values
     async def async_openai(self,
                            input_text: str,
                            key,
@@ -210,5 +210,4 @@ if __name__ == "__main__":
     handler.run()
     ic(handler.output_data)
 
-# TODO - Caching
 # TODO - Logging
