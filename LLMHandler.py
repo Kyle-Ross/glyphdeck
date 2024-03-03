@@ -96,58 +96,65 @@ class LLMHandler:
         # Storing lists of exceptions for different uses
         # Once you have other providers just add their errors into the appropriate list
 
-        # coroutine_backoff exceptions are allowed to be retried inside each individual coroutine
-        self.coroutine_backoff: tuple = (openai.APITimeoutError,
-                                         openai.ConflictError,
-                                         openai.InternalServerError,
-                                         openai.UnprocessableEntityError)
+        # # coroutine_backoff exceptions are allowed to be retried inside each individual coroutine
+        # self.coroutine_backoff: tuple = (openai.APITimeoutError,
+        #                                  openai.ConflictError,
+        #                                  openai.InternalServerError,
+        #                                  openai.UnprocessableEntityError)
         # coroutine_exceptions end a coroutine and record the error without ending code execution
         self.coroutine_exceptions: tuple = (openai.BadRequestError,
                                             openai.NotFoundError)
         # loop_backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
-        self.loop_backoff: tuple = (openai.APIConnectionError,
-                                    openai.RateLimitError)
+        # self.loop_backoff: tuple = (openai.APIConnectionError,
+        #                             openai.RateLimitError)
         # loop_exceptions should completely stop the script
         self.loop_exceptions: tuple = (openai.PermissionDeniedError,
                                        openai.AuthenticationError)
 
-    def coroutine_backoff_wrapper(self, func):
-        """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't
-        usually possible for decorators since they are defined before __init__"""
+    # def coroutine_backoff_wrapper(self, func):
+    #     """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't
+    #     usually possible for decorators since they are defined before __init__"""
+    #
+    #     @functools.wraps(func)  # Maintains the original attribute of the func
+    #     @backoff.on_exception(backoff.expo,
+    #                           self.coroutine_backoff,
+    #                           max_tries=self.max_coroutine_retries)
+    #     async def wrapper(*args, **kwargs):
+    #         return await func(*args, **kwargs)
+    #
+    #     return wrapper
 
-        @functools.wraps(func)  # Maintains the original attribute of the func
-        @backoff.on_exception(backoff.expo,
-                              self.coroutine_backoff,
-                              max_tries=self.max_coroutine_retries)
-        async def wrapper(*args, **kwargs):
-            return await func(*args, **kwargs)
+    # def event_loop_backoff_wrapper(self, func):
+    #     """Wrapper for the backoff decorator used with pausing event loops, allowing use of self attributes
+    #     which isn't usually possible for decorators since they are defined before __init__"""
+    #
+    #     @functools.wraps(func)  # Maintains the original attribute of the func
+    #     @backoff.on_exception(backoff.expo,
+    #                           self.event_loop_backoff,
+    #                           max_tries=self.max_event_loop_retries)
+    #     async def wrapper(*args, **kwargs):
+    #         return await func(*args, **kwargs)
+    #
+    #     return wrapper
 
-        return wrapper
-
-    def event_loop_backoff_wrapper(self, func):
-        """Wrapper for the backoff decorator used with pausing event loops, allowing use of self attributes
-        which isn't usually possible for decorators since they are defined before __init__"""
-
-        @functools.wraps(func)  # Maintains the original attribute of the func
-        @backoff.on_exception(backoff.expo,
-                              self.event_loop_backoff,
-                              max_tries=self.max_event_loop_retries)
-        async def wrapper(*args, **kwargs):
-            return await func(*args, **kwargs)
-
-        return wrapper
-
-    async def openai(self,
-                     input_text: str,
-                     key,
-                     index: int,
-                     item_model: str = None,
-                     item_api_key: str = None,
-                     item_role: str = None,
-                     item_request: str = None,
-                     item_validation_model=None,
-                     item_temperature: float = None,
-                     item_max_validation_retries: int = None) -> tuple:
+    # Backoff within coroutines
+    @backoff.on_exception(backoff.expo,
+                          (openai.APITimeoutError,
+                           openai.ConflictError,
+                           openai.InternalServerError,
+                           openai.UnprocessableEntityError),
+                          max_tries=10)
+    async def openai_coro_backoff(self,
+                                  input_text: str,
+                                  key,
+                                  index: int,
+                                  item_model: str = None,
+                                  item_api_key: str = None,
+                                  item_role: str = None,
+                                  item_request: str = None,
+                                  item_validation_model=None,
+                                  item_temperature: float = None,
+                                  item_max_validation_retries: int = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
@@ -200,8 +207,8 @@ class LLMHandler:
     async def create_coroutines(self, func) -> list:
         """Creates individual coroutines for running the provided function on every value in the variable.
         If you wanted to have different per response settings for the prompt, you would set them on func here."""
-        # Applying the backoff wrapper to the func
-        func = self.coroutine_backoff_wrapper(func)
+        # # Applying the backoff wrapper to the func
+        # func = self.coroutine_backoff_wrapper(func)
         # Create and store the tasks across the whole variable in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
@@ -224,6 +231,10 @@ class LLMHandler:
             raise  # re-raises the last message and terminates the program
             # TODO - Get key and index working here (very hard!) - or maybe logging?
 
+    @backoff.on_exception(backoff.expo,
+                          (openai.APIConnectionError,
+                           openai.RateLimitError),
+                          max_tries=10)
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
         only one coroutine is being retried at a time. When a coroutine encounters an exception and needs to be
@@ -231,7 +242,7 @@ class LLMHandler:
         wait until the semaphore is released before they can proceed. This effectively pauses the loop until the
         current coroutine has been successfully retried. """
         # Applying the backoff wrapper to the func
-        func = self.event_loop_backoff_wrapper(func)
+        # func = self.event_loop_backoff_wrapper(func)
         # Awaits the list of coroutines provided by self.create_coroutines
         coroutines = await self.create_coroutines(func)
         # get results as coroutines are completed
@@ -248,7 +259,7 @@ class LLMHandler:
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
         try:
             if self.provider_clean == "openai":
-                asyncio.run(self.await_coroutines(self.openai))
+                asyncio.run(self.await_coroutines(self.openai_coro_backoff))
             return self
         except self.loop_exceptions as error:
             print(f"Known Blocking Error: {type(error).__name_} | Stopping execution:")
