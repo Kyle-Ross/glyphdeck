@@ -160,7 +160,7 @@ class LLMHandler:
             completions += 1
             completions_str = str(completions)
             completions_string = ((total_coroutines_str_len - len(completions_str)) * '0') + str(completions)
-            print(f'{completions_string} | SUCCESS | Key: {key} | Index: {index} | {print_time_since_start()}')
+            print(f'({print_time_since_start()}) {completions_string} | SUCCESS | Key: {key} | Index: {index}')
             self.output_data[key][index] = response
 
     def run(self):
@@ -221,8 +221,5 @@ if __name__ == "__main__":
     handler.run()
     ic(handler.output_data)
 
-# TODO - Test backoff system
-# TODO - Test errors
-# TODO - Logging for backoffs
-# TODO - Logging for exceptions
-# TODO - Add Coroutine timeout
+# TODO - Caching
+# TODO - Logging
