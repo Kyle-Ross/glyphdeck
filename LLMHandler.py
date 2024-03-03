@@ -1,11 +1,10 @@
-from custom_types import Data, assert_custom_type
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 from utility import print_time_since_start, string_cleaner
+from custom_types import Data, assert_custom_type
 from icecream import ic
 import llm_output_structures
 import instructor
-from openlimit import ChatRateLimiter
 import asyncio
-import backoff
 import openai
 
 
@@ -65,6 +64,19 @@ class LLMHandler:
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
 
+    # Tenacity retry decorator for the following errors with exponential backoff
+    @retry(
+        retry=retry_if_exception_type(
+            (openai.APITimeoutError,
+             openai.ConflictError,
+             openai.InternalServerError,
+             openai.UnprocessableEntityError,
+             openai.APIConnectionError,
+             openai.RateLimitError)
+        ),
+        # Waits for (sec) 0.9375, 1.875, 3.75, 7.5, 15, 30, 60 (max)
+        wait=wait_exponential(multiplier=2, min=0.9375, max=60),
+        stop=stop_after_attempt(300))  # About 5 hours of retries!
     async def async_openai(self,
                            input_text: str,
                            key,
@@ -75,13 +87,8 @@ class LLMHandler:
                            item_request: str = None,
                            item_validation_model=None,
                            item_temperature: float = None,
-                           item_max_validation_retries: int = None,
-                           request_limit=3500,
-                           token_limit=80000) -> tuple:
+                           item_max_validation_retries: int = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
-
-        # Set values for the Open AI Rate limiter which is used to prevent rate limit errors
-        rate_limiter = ChatRateLimiter(request_limit=request_limit, token_limit=token_limit)
 
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
@@ -120,9 +127,8 @@ class LLMHandler:
                 {"role": "user", "content": item_request + ' ' + input_text}
             ]
         }
-        # The parameters applied here need to match, so we store them above and access them via dict unpack
-        async with rate_limiter.limit(**chat_params):
-            instructor_model = await openai_client.chat.completions.create(**chat_params)
+        # Accessing parameters via dict unpack
+        instructor_model = await openai_client.chat.completions.create(**chat_params)
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel

@@ -82,7 +82,7 @@ chain.append(title='llm output', data=handler.output_data)
 prog_print("Finished appending llm output")
 
 prog_print("Printing results")
-# Printing the resultd
+# Printing the results
 print(chain.latest_key)
 print(chain.latest_title)
 print(chain.record_delta(chain.latest_key))
