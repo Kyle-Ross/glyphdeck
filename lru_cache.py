@@ -5,7 +5,7 @@ import os
 
 
 # Define the decorator with max_mb_size parameter
-def lru_cache(cache_dir, parent_dir='caches', use_cache=True, max_mb_size: int = 1000):
+def lru_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
     """Allows caching when used as a function decorator, up to a specified limit.
     Will attempt to get the result from the cache instead of the function if it is available.
     Once the max size is reached the least recent use (lru) records will be culled.
@@ -30,6 +30,7 @@ def lru_cache(cache_dir, parent_dir='caches', use_cache=True, max_mb_size: int =
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used
             self_cache_identifier = self.cache_identifier
+            self_use_cache = self.use_cache
             self_provider = self.provider
             self_model = self.model
             self_role = self.role
@@ -49,7 +50,7 @@ def lru_cache(cache_dir, parent_dir='caches', use_cache=True, max_mb_size: int =
             key = hash_object.hexdigest()
 
             # If 'use_cache' is true, and the key is in the cache, return the cached result
-            if use_cache:
+            if self_use_cache:
                 if key in cache:
                     completions += 1
                     print(f"({time_since_start()}) CACHE \u2713 | Key: {key_arg} | Index: {index_arg} | "

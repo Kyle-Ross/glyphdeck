@@ -26,6 +26,7 @@ class LLMHandler:
                  request: str,  # The request to make to the llm
                  validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
                  cache_identifier: str,  # A Unique string used to identify discrete jobs and avoid cache mixing
+                 use_cache: bool = True,  # Set whether to check the cache for values or not
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
                  max_validation_retries: int = 2):  # Max times the request can retry on the basis of failed validation
         """__init__ func which is run when the object is initialised."""
@@ -37,6 +38,7 @@ class LLMHandler:
         assert isinstance(role, str), "'role' argument must be type 'str'"
         assert isinstance(request, str), "'request' argument must be type 'str'"
         assert isinstance(cache_identifier, str), "'cache_identifier' argument must be type 'str'"
+        assert isinstance(use_cache, bool), "'use_cache' argument must be type 'str'"
         assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
         assert isinstance(max_validation_retries, int), "'max_validation_retries' argument must be type 'int'"
 
@@ -60,6 +62,7 @@ class LLMHandler:
         self.request: str = request
         self.validation_model = validation_model
         self.cache_identifier: str = cache_identifier  # Referenced in lru_cache by accessing self
+        self.use_cache: bool = use_cache  # Referenced in lru_cache by accessing sel
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
 
@@ -203,6 +206,7 @@ if __name__ == "__main__":
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
                          cache_identifier='NLP-Categorise-TestData',
+                         use_cache=True,
                          temperature=0.2,
                          max_validation_retries=3
                          )
@@ -210,4 +214,6 @@ if __name__ == "__main__":
     handler.run()
     ic(handler.output_data)
 
+# TODO - Optimise cache size - should be smaller, likely due to storing the whole python obj, just need output
+# TODO - Ability to check target file for existing results (pre-cache)
 # TODO - Logging

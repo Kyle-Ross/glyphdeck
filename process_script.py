@@ -65,6 +65,7 @@ handler = LLMHandler(chain.latest_data,
                      request="Analyse the feedback and return results in the correct format",
                      validation_model=llm_output_structures.SentimentScore,
                      cache_identifier='NLP_SentimentScore_Twitter',
+                     use_cache=True,
                      temperature=0.2,
                      max_validation_retries=3
                      )
