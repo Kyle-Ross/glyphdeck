@@ -1,9 +1,7 @@
 secrets.json
-caches/
 scratch/
 todo.txt
-.gitignore
-
+caches/
 # -------------------------------------------------
 # Below are defaults added by the github template
 # -------------------------------------------------
