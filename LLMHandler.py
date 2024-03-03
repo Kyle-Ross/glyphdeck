@@ -2,13 +2,16 @@ from custom_types import Data, assert_custom_type
 from icecream import ic
 import llm_output_structures
 import instructor
-import functools
+# import functools
+from openlimit import ChatRateLimiter
 import asyncio
 import time
 import backoff
 import openai
 
 start_time = time.time()
+
+rate_limiter = ChatRateLimiter(request_limit=3500, token_limit=40000)
 
 
 def print_time_since_start():
@@ -138,12 +141,12 @@ class LLMHandler:
     #     return wrapper
 
     # Backoff within coroutines
-    @backoff.on_exception(backoff.expo,
-                          (openai.APITimeoutError,
-                           openai.ConflictError,
-                           openai.InternalServerError,
-                           openai.UnprocessableEntityError),
-                          max_tries=10)
+    # @backoff.on_exception(backoff.expo,
+    #                       (openai.APITimeoutError,
+    #                        openai.ConflictError,
+    #                        openai.InternalServerError,
+    #                        openai.UnprocessableEntityError),
+    #                       max_tries=10)
     async def openai_coro_backoff(self,
                                   input_text: str,
                                   key,
@@ -182,20 +185,18 @@ class LLMHandler:
 
         # Sending the request
         # This changes the response object - response information is now accessed like item_validation_model.field_name
-        instructor_model = await openai_client.chat.completions.create(
-            model=item_model,
-            response_model=item_validation_model,
-            max_retries=item_max_validation_retries,
-            temperature=item_temperature,
-            messages=[
-
-                {"role": "system",
-                 "content": item_role},
-
-                {"role": "user",
-                 "content": item_request + ' ' + input_text}
+        chat_params = {
+            'model': item_model,
+            'response_model': item_validation_model,
+            'max_retries': item_max_validation_retries,
+            'temperature': item_temperature,
+            'messages': [
+                {"role": "system", "content": item_role},
+                {"role": "user", "content": item_request + ' ' + input_text}
             ]
-        )
+        }
+        async with rate_limiter.limit(**chat_params):
+            instructor_model = await openai_client.chat.completions.create(**chat_params)
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel
@@ -231,10 +232,10 @@ class LLMHandler:
             raise  # re-raises the last message and terminates the program
             # TODO - Get key and index working here (very hard!) - or maybe logging?
 
-    @backoff.on_exception(backoff.expo,
-                          (openai.APIConnectionError,
-                           openai.RateLimitError),
-                          max_tries=10)
+    # @backoff.on_exception(backoff.expo,
+    #                       (openai.APIConnectionError,
+    #                        openai.RateLimitError),
+    #                       max_tries=10)
     async def await_coroutines(self, func):
         """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
         only one coroutine is being retried at a time. When a coroutine encounters an exception and needs to be
