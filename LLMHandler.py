@@ -6,6 +6,7 @@ import llm_output_structures
 import instructor
 import asyncio
 import openai
+import os
 
 
 class LLMHandler:
@@ -20,7 +21,6 @@ class LLMHandler:
                  input_data: Data,  # Input variable of the custom 'Data' type
                  provider: str,  # The provider of the llm
                  model: str,  # The model of the llm
-                 api_key: str,  # The api key to be used
                  role: str,  # The role to provide the llm in the prompts
                  request: str,  # The request to make to the llm
                  validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
@@ -32,7 +32,6 @@ class LLMHandler:
         assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
         assert isinstance(provider, str), "'provider' argument must be type 'str'"
         assert isinstance(model, str), "'model' argument must be type 'str'"
-        assert isinstance(api_key, str), "'api_key' argument must be type 'str'"
         assert isinstance(role, str), "'role' argument must be type 'str'"
         assert isinstance(request, str), "'request' argument must be type 'str'"
         assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
@@ -54,7 +53,6 @@ class LLMHandler:
 
         # Object level llm information that serves as the default value if functions don't specify customisations
         self.model: str = model
-        self.api_key: str = api_key
         self.role: str = role
         self.request: str = request
         self.validation_model = validation_model
@@ -82,7 +80,6 @@ class LLMHandler:
                            key,
                            index: int,
                            item_model: str = None,
-                           item_api_key: str = None,
                            item_role: str = None,
                            item_request: str = None,
                            item_validation_model=None,
@@ -94,8 +91,6 @@ class LLMHandler:
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
             item_model = self.model
-        if item_api_key is None:
-            item_api_key = self.api_key
         if item_role is None:
             item_role = self.role
         if item_request is None:
@@ -110,9 +105,11 @@ class LLMHandler:
         # Asserting value limitations specific to OpenAI
         assert 0 <= item_temperature <= 1, "For OpenAI, temperature must be between 0 and 1"
 
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+
         # Initialising the client
         # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
-        openai_client = instructor.apatch(openai.AsyncOpenAI(api_key=item_api_key))
+        openai_client = instructor.apatch(openai.AsyncOpenAI())
 
         # Sending the request
         # Having patched with instructor changes the response object...
@@ -201,16 +198,9 @@ if __name__ == "__main__":
             ]
         }
 
-    import json
-
-    # Access the API key from the local secrets file
-    with open("secrets.json") as file:
-        my_api_key = json.load(file)["openai_api_key"]
-
     handler = LLMHandler(data_example,
                          provider="OpenAI",
                          model="gpt-3.5-turbo",
-                         api_key=my_api_key,
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,

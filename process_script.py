@@ -62,7 +62,6 @@ prog_print("Starting initialisation of LLMHandler class")
 handler = LLMHandler(chain.latest_data,
                      provider="OpenAI",
                      model="gpt-3.5-turbo",
-                     api_key=my_api_key,
                      role="An expert customer feedback analyst nlp system",
                      request="Analyse the feedback and return results in the correct format",
                      validation_model=llm_output_structures.SentimentScore,
