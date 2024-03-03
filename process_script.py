@@ -1,3 +1,4 @@
+from utility import print_time_since_start
 from RegexSanitiser import RegexSanitiser
 from LLMHandler import LLMHandler
 import llm_output_structures
@@ -8,14 +9,13 @@ import json
 import time
 
 print_progress = True
-start_time = time.time()
 
 
 def prog_print(message: str):
     """Prints a message if a variable is true"""
     if print_progress:
-        delta_time = time.time() - start_time
-        print(f"(Delta: {delta_time}) {message} ")
+        delta_time = print_time_since_start()
+        print(f"({delta_time}) {message} ")
 
 
 prog_print("Started Script")
@@ -67,9 +67,7 @@ handler = LLMHandler(chain.latest_data,
                      request="Analyse the feedback and return results in the correct format",
                      validation_model=llm_output_structures.SentimentScore,
                      temperature=0.2,
-                     max_validation_retries=3,
-                     max_coroutine_retries=10,
-                     max_event_loop_retries=10
+                     max_validation_retries=3
                      )
 prog_print("Finished initialisation of LLMHandler class")
 

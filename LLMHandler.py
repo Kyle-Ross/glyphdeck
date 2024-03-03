@@ -1,28 +1,12 @@
 from custom_types import Data, assert_custom_type
+from utility import print_time_since_start, string_cleaner
 from icecream import ic
 import llm_output_structures
 import instructor
-# import functools
 from openlimit import ChatRateLimiter
 import asyncio
-import time
 import backoff
 import openai
-
-start_time = time.time()
-
-rate_limiter = ChatRateLimiter(request_limit=3500, token_limit=40000)
-
-
-def print_time_since_start():
-    global start_time
-    elapsed_time = time.time() - start_time
-    return f'Delta: {elapsed_time} sec'
-
-
-# Basic function clean input strings
-def string_cleaner(input_str: str) -> str:
-    return input_str.strip().lower().replace(' ', '')
 
 
 class LLMHandler:
@@ -42,9 +26,8 @@ class LLMHandler:
                  request: str,  # The request to make to the llm
                  validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
-                 max_validation_retries: int = 2,  # Max times the request can retry on the basis of failed validation
-                 max_coroutine_retries: int = 10,  # Max retries for coroutine blocking errors
-                 max_event_loop_retries: int = 10) -> None:  # Max retries for event loop pausing errors
+                 max_validation_retries: int = 2):  # Max times the request can retry on the basis of failed validation
+        """__init__ func which is run when the object is initialised."""
 
         # Assert the variable type of the provided arguments
         assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
@@ -53,11 +36,8 @@ class LLMHandler:
         assert isinstance(api_key, str), "'api_key' argument must be type 'str'"
         assert isinstance(role, str), "'role' argument must be type 'str'"
         assert isinstance(request, str), "'request' argument must be type 'str'"
-        # Placeholder - Validation model is checked below, after assignment to self
         assert isinstance(temperature, float), "'temperature' argument must be type 'float'"
         assert isinstance(max_validation_retries, int), "'max_validation_retries' argument must be type 'int'"
-        assert isinstance(max_coroutine_retries, int), "'max_coroutine_retries' argument must be type 'int'"
-        assert isinstance(max_event_loop_retries, int), "'max_event_loop_retries' argument must be type 'int'"
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
@@ -85,80 +65,24 @@ class LLMHandler:
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
 
-        # A semaphore is a synchronization primitive used to control access to a common resource
-        # by multiple processes in a concurrent system
-        # The Semaphore is initialized with 1, meaning only one coroutine can acquire it at a time.
-        # Other coroutines trying to acquire it will be blocked until it's released.
-        # This is used later to force certain backoff exceptions to stop running any other new coroutines
-        self.semaphore = asyncio.Semaphore(1)
-
-        # Max retries for backoff wrappers applied to either coroutine or event loop
-        self.max_coroutine_retries = max_coroutine_retries
-        self.max_event_loop_retries = max_event_loop_retries
-
-        # Storing lists of exceptions for different uses
-        # Once you have other providers just add their errors into the appropriate list
-
-        # # coroutine_backoff exceptions are allowed to be retried inside each individual coroutine
-        # self.coroutine_backoff: tuple = (openai.APITimeoutError,
-        #                                  openai.ConflictError,
-        #                                  openai.InternalServerError,
-        #                                  openai.UnprocessableEntityError)
-        # coroutine_exceptions end a coroutine and record the error without ending code execution
-        self.coroutine_exceptions: tuple = (openai.BadRequestError,
-                                            openai.NotFoundError)
-        # loop_backoff exceptions retry a single coroutine but delay the whole event loop using the semaphore
-        # self.loop_backoff: tuple = (openai.APIConnectionError,
-        #                             openai.RateLimitError)
-        # loop_exceptions should completely stop the script
-        self.loop_exceptions: tuple = (openai.PermissionDeniedError,
-                                       openai.AuthenticationError)
-
-    # def coroutine_backoff_wrapper(self, func):
-    #     """Wrapper for the backoff decorator used with coroutines, allowing use of self attributes which isn't
-    #     usually possible for decorators since they are defined before __init__"""
-    #
-    #     @functools.wraps(func)  # Maintains the original attribute of the func
-    #     @backoff.on_exception(backoff.expo,
-    #                           self.coroutine_backoff,
-    #                           max_tries=self.max_coroutine_retries)
-    #     async def wrapper(*args, **kwargs):
-    #         return await func(*args, **kwargs)
-    #
-    #     return wrapper
-
-    # def event_loop_backoff_wrapper(self, func):
-    #     """Wrapper for the backoff decorator used with pausing event loops, allowing use of self attributes
-    #     which isn't usually possible for decorators since they are defined before __init__"""
-    #
-    #     @functools.wraps(func)  # Maintains the original attribute of the func
-    #     @backoff.on_exception(backoff.expo,
-    #                           self.event_loop_backoff,
-    #                           max_tries=self.max_event_loop_retries)
-    #     async def wrapper(*args, **kwargs):
-    #         return await func(*args, **kwargs)
-    #
-    #     return wrapper
-
-    # Backoff within coroutines
-    # @backoff.on_exception(backoff.expo,
-    #                       (openai.APITimeoutError,
-    #                        openai.ConflictError,
-    #                        openai.InternalServerError,
-    #                        openai.UnprocessableEntityError),
-    #                       max_tries=10)
-    async def openai_coro_backoff(self,
-                                  input_text: str,
-                                  key,
-                                  index: int,
-                                  item_model: str = None,
-                                  item_api_key: str = None,
-                                  item_role: str = None,
-                                  item_request: str = None,
-                                  item_validation_model=None,
-                                  item_temperature: float = None,
-                                  item_max_validation_retries: int = None) -> tuple:
+    async def async_openai(self,
+                           input_text: str,
+                           key,
+                           index: int,
+                           item_model: str = None,
+                           item_api_key: str = None,
+                           item_role: str = None,
+                           item_request: str = None,
+                           item_validation_model=None,
+                           item_temperature: float = None,
+                           item_max_validation_retries: int = None,
+                           request_limit=3500,
+                           token_limit=80000) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
+
+        # Set values for the Open AI Rate limiter which is used to prevent rate limit errors
+        rate_limiter = ChatRateLimiter(request_limit=request_limit, token_limit=token_limit)
+
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
@@ -184,7 +108,8 @@ class LLMHandler:
         openai_client = instructor.apatch(openai.AsyncOpenAI(api_key=item_api_key))
 
         # Sending the request
-        # This changes the response object - response information is now accessed like item_validation_model.field_name
+        # Having patched with instructor changes the response object...
+        # response information is now accessed like item_validation_model.field_name
         chat_params = {
             'model': item_model,
             'response_model': item_validation_model,
@@ -195,6 +120,7 @@ class LLMHandler:
                 {"role": "user", "content": item_request + ' ' + input_text}
             ]
         }
+        # The parameters applied here need to match, so we store them above and access them via dict unpack
         async with rate_limiter.limit(**chat_params):
             instructor_model = await openai_client.chat.completions.create(**chat_params)
 
@@ -206,65 +132,36 @@ class LLMHandler:
         return response, key, index
 
     async def create_coroutines(self, func) -> list:
-        """Creates individual coroutines for running the provided function on every value in the variable.
-        If you wanted to have different per response settings for the prompt, you would set them on func here."""
-        # # Applying the backoff wrapper to the func
-        # func = self.coroutine_backoff_wrapper(func)
+        """Creates coroutines for the provided input data, using the specified LLM function."""
         # Create and store the tasks across the whole variable in a list
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
         return coroutines
 
-    async def event_loop_backoff(self, coroutine):
-        """Execute a coroutine, save results and handle exceptions with exponential backoff.
-        Replaces the output with an error attribute under certain conditions."""
-        try:
-            result = await coroutine
+    async def await_coroutines(self, func):
+        """Await coroutines,  returning results in the order of completion, not the order they are run."""
+        coroutines = await self.create_coroutines(func)
+        completions = 0
+        total_coroutines_str_len = len(str(len(coroutines)))
+        # Loop over the futures
+        for future in asyncio.as_completed(coroutines):
+            result = await future
             response = result[0]
             key = result[1]
             index = result[2]
-            print(f'SUCCESS | Key: {key} | Index: {index} | | {print_time_since_start()}')
+            # Print a string to track progress while script is running
+            completions += 1
+            completions_str = str(completions)
+            completions_string = ((total_coroutines_str_len - len(completions_str)) * '0') + str(completions)
+            print(f'{completions_string} | SUCCESS | Key: {key} | Index: {index} | {print_time_since_start()}')
             self.output_data[key][index] = response
-        except self.coroutine_exceptions as error:
-            print(f'FAILURE | Key: Unknown | Index: Unknown | '
-                  f'Error: {type(error).__name_} | {print_time_since_start()}')
-            raise  # re-raises the last message and terminates the program
-            # TODO - Get key and index working here (very hard!) - or maybe logging?
-
-    # @backoff.on_exception(backoff.expo,
-    #                       (openai.APIConnectionError,
-    #                        openai.RateLimitError),
-    #                       max_tries=10)
-    async def await_coroutines(self, func):
-        """Create and manage coroutines using the function passed as an argument. A semaphore is used to ensure that
-        only one coroutine is being retried at a time. When a coroutine encounters an exception and needs to be
-        retried, it first acquires the semaphore. This causes any other coroutines that encounter an exception to
-        wait until the semaphore is released before they can proceed. This effectively pauses the loop until the
-        current coroutine has been successfully retried. """
-        # Applying the backoff wrapper to the func
-        # func = self.event_loop_backoff_wrapper(func)
-        # Awaits the list of coroutines provided by self.create_coroutines
-        coroutines = await self.create_coroutines(func)
-        # get results as coroutines are completed
-        for future in asyncio.as_completed(coroutines):
-            # Acquire semaphore
-            await self.semaphore.acquire()
-            try:
-                await self.event_loop_backoff(future)
-            finally:
-                # Release semaphore
-                self.semaphore.release()
 
     def run(self):
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
-        try:
-            if self.provider_clean == "openai":
-                asyncio.run(self.await_coroutines(self.openai_coro_backoff))
-            return self
-        except self.loop_exceptions as error:
-            print(f"Known Blocking Error: {type(error).__name_} | Stopping execution:")
-            raise  # re-raises the last message that was active in the current scope and terminates the program
+        if self.provider_clean == "openai":
+            asyncio.run(self.await_coroutines(self.async_openai))
+        return self
 
 
 if __name__ == "__main__":
@@ -312,9 +209,7 @@ if __name__ == "__main__":
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
                          temperature=0.2,
-                         max_validation_retries=3,
-                         max_coroutine_retries=10,
-                         max_event_loop_retries=10
+                         max_validation_retries=3
                          )
 
     handler.run()
