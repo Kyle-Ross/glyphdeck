@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Types that will be used across the project
-Record = Union[str, Union[datetime, None, timedelta, dict]]
+Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 Records = Dict[int, Record]
 IntStr = Union[int, str]
 Data = Dict[IntStr, List]
@@ -13,6 +13,7 @@ dFrame_or_None = Union[dFrame, None]
 IntList = List[int]
 StrList = List[str]
 StrList_or_None = Union[StrList, None]
+List_or_Str = Union[str, list]
 
 
 def assert_custom_type(variable: Data, custom_type: str, var_name: str):

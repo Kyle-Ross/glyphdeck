@@ -1,4 +1,4 @@
-from custom_types import Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList, StrList, StrList_or_None
+from custom_types import Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList, StrList, StrList_or_None, List_or_Str
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -14,7 +14,7 @@ class Chain:
                 'delta': None,
                 'data': {},
                 'table': None,
-                'new_column_names': None  # Names of the columns, in order
+                'column_names': None  # Names of the columns, in order
             }
         }
 
@@ -57,7 +57,7 @@ class Chain:
 
     def column_names(self, key: IntStr) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
-        return self.record(key)['new_column_names']
+        return self.record(key)['column_names']
 
     @property
     def latest_key(self) -> int:
@@ -91,7 +91,7 @@ class Chain:
 
     @property
     def latest_column_names(self) -> StrList:
-        """Returns the latest 'new_column_names' from 'records'."""
+        """Returns the latest 'column_names' from 'records'."""
         return self.column_names(self.latest_key)
 
     @property
@@ -128,7 +128,7 @@ class Chain:
 
     @property
     def initial_column_names(self) -> StrList:
-        """Returns the initial 'new_column_names' from the latest 'record' in 'records'."""
+        """Returns the initial 'column_names' from the latest 'record' in 'records'."""
         return self.column_names(self.initial_key)
 
     @property
@@ -238,28 +238,41 @@ class Chain:
             'delta': delta,
             'data': data,
             'table': self.latest_table if table is None else table,  # References previous values if none
-            'new_column_names': self.latest_column_names if column_names is None else column_names
+            'column_names': self.latest_column_names if column_names is None else column_names
         }
         self.key_validator(new_key)
         self.data_validator(new_key)
         return self
 
-    def output(self, source, column_names: StrList_or_None=None):
-        # , mode, file_type, name, target_folder
-        # Set the output data source
-        raw_output_data = None
-        if source == 'latest':
-            raw_output_data = self.latest_data
-            column_names = self.latest_column_names if column_names is None else column_names
-        else:
-            try:
-                raw_output_data = self.record(source)
-                column_names = self.column_names(source) if column_names is None else column_names
-            except KeyError as e:
-                f"Output source '{source}' does not exist in the chain."
-        column_names_len = len(column_names)
-        assert column_names_len == self.expected_len, f"Column names list is {column_names_len} long, " \
-                                                      f"{self.expected_len} expected."
+    def combiner(self, records: List_or_Str) -> pd.DataFrame:
+        """Combines records into a single dataframe."""
+        # Handling str input
+        if type(records) == str:
+            records = [records]
+        # Add all selected records to a list
+        selected_records = []
+        for record in records:
+            selected_records.append(self.record(record))
+
+        # Looping over selected records and making changes
+        for record in selected_records:
+            # Adding unique suffixes to each list of column names, to assist concatenation
+            record['column_names_suffixed'] = [name + "_" + record['title'] for name in record['column_names']]
+            # Creating dataframes and in each of the records
+            df = pd.DataFrame.from_dict(record['data'])
+            # Renaming columns
+            if len(selected_records) == 1:
+                df.columns = record['column_names']
+            else:
+                df.columns = record['column_names_suffixed']  # Includes suffixes for multiple selections
+            record['output_df'] = df
+
+        # Combining all dataframes on their index (which is the common id column)
+        selected_dfs = [record['output_df'] for record in selected_records]
+        combined_df = pd.concat(selected_dfs)
+
+        # Returning the finished dataframe
+        return combined_df
 
 
 if __name__ == "__main__":
@@ -321,7 +334,7 @@ if __name__ == "__main__":
     ic(chain.record('Example2'))
     ic(chain.data('Example2'))
     ic(chain.title_key('Example2'))
-    chain.output('latest')
+    ic(chain.combiner(['Example2', 'Example3']))
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
 # TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard
