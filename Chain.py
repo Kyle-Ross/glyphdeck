@@ -1,4 +1,9 @@
-from custom_types import Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList, StrList, StrList_or_None, List_or_Str
+from custom_types import (
+    Record, Records, Data, IntStr, dFrame,
+    dFrame_or_None, IntList, StrList,
+    StrList_or_None, List_or_Str, dfList,
+    IntStrNone, RecordList
+)
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -14,6 +19,7 @@ class Chain:
                 'delta': None,
                 'data': {},
                 'table': None,
+                'table_id_column': None,
                 'column_names': None  # Names of the columns, in order
             }
         }
@@ -50,6 +56,10 @@ class Chain:
     def table(self, key: IntStr) -> dFrame:
         """Returns the table corresponding to the provided record_identifier number."""
         return self.record(key)['table']
+
+    def table_id_column(self, key: IntStr) -> IntStrNone:
+        """Returns the table corresponding to the provided record_identifier number."""
+        return self.record(key)['table_id_column']
 
     def record_delta(self, key: IntStr) -> timedelta:
         """Returns the timedelta corresponding to the provided record_identifier number."""
@@ -90,6 +100,11 @@ class Chain:
         return self.table(self.latest_key)
 
     @property
+    def latest_table_id_column(self) -> IntStrNone:
+        """Returns the latest 'table_id_column' from the latest 'record' in 'records'."""
+        return self.table_id_column(self.latest_key)
+
+    @property
     def latest_column_names(self) -> StrList:
         """Returns the latest 'column_names' from 'records'."""
         return self.column_names(self.latest_key)
@@ -125,6 +140,11 @@ class Chain:
     def initial_table(self) -> dFrame_or_None:
         """Returns the initial 'table' from the latest 'record' in 'records'."""
         return self.table(self.initial_key)
+
+    @property
+    def initial_table_id_column(self) -> IntStrNone:
+        """Returns the initial 'table_id_column' from the latest 'record' in 'records'."""
+        return self.table_id_column(self.initial_key)
 
     @property
     def initial_column_names(self) -> StrList:
@@ -208,6 +228,7 @@ class Chain:
                title: str,
                data: Data,
                table: dFrame_or_None = None,
+               table_id_column: IntStrNone = None,
                column_names: StrList_or_None = None,
                update_expected_len: bool = False
                ):
@@ -238,14 +259,15 @@ class Chain:
             'delta': delta,
             'data': data,
             'table': self.latest_table if table is None else table,  # References previous values if none
+            'table_id_column': self.latest_table_id_column if table_id_column is None else table_id_column,
             'column_names': self.latest_column_names if column_names is None else column_names
         }
         self.key_validator(new_key)
         self.data_validator(new_key)
         return self
 
-    def combiner(self, records: List_or_Str) -> pd.DataFrame:
-        """Combines records into a single dataframe."""
+    def selector(self, records: List_or_Str) -> RecordList:
+        """Returns a list of clean DataFrames from the selected records. Adds column names back on."""
         # Handling str input
         if type(records) == str:
             records = [records]
@@ -267,12 +289,52 @@ class Chain:
                 df.columns = record['column_names_suffixed']  # Includes suffixes for multiple selections
             record['output_df'] = df
 
-        # Combining all dataframes on their index (which is the common id column)
+        # Returning the selected records
+        return selected_records
+
+    def combiner(self, records: list) -> RecordList:
+        """Combines records into a single dataframe."""
+        # Grab the dataframes, combining them, and returning them
+        selected_records = self.selector(records)
         selected_dfs = [record['output_df'] for record in selected_records]
         combined_df = pd.concat(selected_dfs)
+        # Building into the record format to be used in the flow with the rest
+        combined_record: RecordList = [{
+                'title': 'combined',
+                'dt': datetime.now(),
+                'delta': datetime.now() - self.latest_dt,
+                'data': {},
+                'table': combined_df,
+                'table_id_column': chain.initial_table_id_column,  # Not really needed
+                'column_names': None  # Not needed here - all different anyway
+            }]
+        return combined_record
 
-        # Returning the finished dataframe
-        return combined_df
+    def output(self,
+               records: List_or_Str,
+               file_type: str,
+               rejoin: bool = True,
+               split: bool = False):
+        # Checking file_type is in allowed list
+        allowed_file_types = ['csv', 'xlsx']
+        assert file_type in allowed_file_types, f"'{file_type}' is not in allowed list {allowed_file_types}."
+        # Use the separate or combined records
+        records: RecordList = self.selector(records) if split else [self.combiner(records)]
+        # Use the dataframes as is, or left join each back onto the initial source
+        if rejoin:
+            for record in records:
+                record['table'] = chain.initial_table.merge(record['table'],
+                                                            how='left',
+                                                            on=chain.initial_table_id_column)
+
+        # Output the dataframes
+        # if file_type == 'csv':
+        #     for i, df in enumerate(dataframes):
+        #         df.to_csv(f'output_{i}.csv', index=False)
+        # elif file_type == 'xlsx':
+        #     with pd.ExcelWriter('output.xlsx') as writer:
+        #         for i, df in enumerate(dataframes):
+        #             df.to_excel(writer, sheet_name=f'Sheet_{i}', index=False)
 
 
 if __name__ == "__main__":
@@ -281,11 +343,7 @@ if __name__ == "__main__":
     from time import sleep
     import pandas as pd
 
-    test_data = {
-        'A': [1, 2, 3, 4, 5],
-        'B': ['a', 'b', 'c', 'd', 'e'],
-        'C': [1.1, 2.2, 3.3, 4.4, 5.5]
-    }
+    test_data = {1: ['door', 'champ', 'slam'], 2: ['blam', 'clam', 'sam'], 3: ['tim', 'tam', 'fam']}
 
     # Create the DataFrame
     test_df = pd.DataFrame(test_data)
@@ -295,21 +353,23 @@ if __name__ == "__main__":
     # The table only needs to be added in the first step, but can be included again to add a new one
     # Otherwise the table will be the last time 'table' was assigned
     chain.append(
-        'Example1',
-        {1: ['potato', 'steak', 'party'], 2: ['carrot', 'party', 'alpha'], 3: ['carrot', 'party', 'alpha']},
-        test_df,
-        ['Food1', 'Food2', 'Food3']
+        title='Example1',
+        data={1: ['potato', 'steak', 'party'], 2: ['carrot', 'party', 'alpha'], 3: ['carrot', 'party', 'alpha']},
+        table=test_df,
+        table_id_column="Word ID",
+        column_names=['Food1', 'Food2', 'Food3']
     )
     sleep(0.5)
     # Since table is not assigned table will just be the last table
     chain.append(
-        'Example2',
-        {1: ['potatoes', 'carrot', 'gary'], 2: ['carrots', 'pizza', 'pasta'], 3: ['bananas', 'beast', 'jeffery']}
+        title='Example2',
+        data={1: ['potatoes', 'carrot', 'gary'], 2: ['carrots', 'pizza', 'pasta'], 3: ['bananas', 'beast', 'jeffery']}
     )
     sleep(0.6)
     chain.append(
-        'Example3',
-        {1: ['keys', 'mud', 'salt'], 2: ['carrot cake', 'car', 'bike'], 3: ['banana sundae', 'icecream', 'intel']},
+        title='Example3',
+        data={1: ['keys', 'mud', 'salt'], 2: ['carrot cake', 'car', 'bike'], 3: ['banana sundae', 'icecream', 'intel']},
+        table_id_column="Word ID2",
         column_names=['Food 1', 'Food 2', 'Food 3']
     )
     sleep(0.2)
@@ -335,6 +395,8 @@ if __name__ == "__main__":
     ic(chain.data('Example2'))
     ic(chain.title_key('Example2'))
     ic(chain.combiner(['Example2', 'Example3']))
+    ic(chain.initial_table)
+    ic(chain.initial_table_id_column)
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
 # TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard

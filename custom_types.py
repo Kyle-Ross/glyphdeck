@@ -6,12 +6,15 @@ import pandas as pd
 Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 Records = Dict[int, Record]
 IntStr = Union[int, str]
+IntStrNone = Union[int, str, None]
 Data = Dict[IntStr, List]
 Data_or_None = Union[Data, None]
 dFrame = pd.DataFrame
 dFrame_or_None = Union[dFrame, None]
 IntList = List[int]
 StrList = List[str]
+dfList = List[pd.DataFrame]
+RecordList = List[Record]
 StrList_or_None = Union[StrList, None]
 List_or_Str = Union[str, list]
 
