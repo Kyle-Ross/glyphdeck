@@ -374,7 +374,7 @@ class Chain:
                 df.to_csv(f"{path}.csv", index=False)
 
         if file_type == 'xlsx':
-            path = make_path(chain.latest_record)  # Argument may not be used in certain conditions
+            path = make_path(self.latest_record)  # Argument may not be used in certain conditions
             with pd.ExcelWriter(f"{path}.xlsx") as writer:
                 for record in records_list:  # Writing each record to its own sheet in the same xlsx file
                     sheet_df = record['output_df']

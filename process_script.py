@@ -41,6 +41,7 @@ chain.append(
     title='prepared data',
     data=prepared_data.output_data,
     table=prepared_data.df,
+    table_id_column=prepared_data.id_column,
     column_names=prepared_data.data_columns)
 prog_print("Finished chain initialisation and appending of prep data")
 
@@ -86,14 +87,17 @@ prog_print("Finished handler data flattening")
 
 prog_print("Starting appending llm output")
 # Appending the llm output
-chain.append(title='llm output', data=handler.output_data, column_names=handler.column_names)
+chain.append(title='llmoutput', data=handler.output_data, column_names=handler.column_names)
 prog_print("Finished appending llm output")
 
-prog_print("Printing results")
-# Printing the results
-ic(chain.latest_key)
-ic(chain.latest_title)
-ic(chain.record_delta(chain.latest_key))
-print(chain.latest_data)
-print(handler.new_output_data)
+prog_print("Starting creating output file(s)")
+ic(chain.initial_table_id_column)
+chain.output(
+    records=[chain.latest_title],
+    file_type='xlsx',
+    name_prefix='Chain Test',
+    rejoin=True,
+    split=True)
+prog_print("Finished creating output file(s)")
+
 prog_print("Finished Script")
