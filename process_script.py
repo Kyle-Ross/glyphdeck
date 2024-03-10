@@ -37,7 +37,11 @@ prog_print("Finished data prepper")
 # Initialising chain instance and appending the prepared data
 prog_print("Starting chain initialisation and appending of prep data")
 chain = Chain()
-chain.append(title='prepared data', data=prepared_data.output_data, table=prepared_data.df)
+chain.append(
+    title='prepared data',
+    data=prepared_data.output_data,
+    table=prepared_data.df,
+    column_names=prepared_data.data_columns)
 prog_print("Finished chain initialisation and appending of prep data")
 
 # Running the regex sanitiser
@@ -76,15 +80,19 @@ prog_print("Starting running handler")
 handler.run()
 prog_print("Finished running handler")
 
+prog_print("Starting handler data flattening")
+handler.flatten_output_data(column_names=chain.latest_column_names)
+prog_print("Finished handler data flattening")
+
 prog_print("Starting appending llm output")
 # Appending the llm output
-chain.append(title='llm output', data=handler.output_data)
+chain.append(title='llm output', data=handler.output_data, column_names=handler.column_names)
 prog_print("Finished appending llm output")
 
 prog_print("Printing results")
 # Printing the results
-print(chain.latest_key)
-print(chain.latest_title)
-print(chain.record_delta(chain.latest_key))
-print(chain.latest_data)
+ic(chain.latest_key)
+ic(chain.latest_title)
+ic(chain.record_delta(chain.latest_key))
+ic(chain.latest_data)
 prog_print("Finished Script")

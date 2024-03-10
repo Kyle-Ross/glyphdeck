@@ -282,9 +282,9 @@ class RegexSanitiser:
         self.update_groups()  # Update selected groups lists
 
     def sanitise(self):
-        """Run all selected patterns in order, updating the 'output_data'.
+        """Run all selected patterns in order, updating the 'raw_output_data'.
 
-        Run every selected regex pattern for every item, in every list, in every key, in the self.output_data dict.
+        Run every selected regex pattern for every item, in every list, in every key, in the self.raw_output_data dict.
 
         Successive regex patterns recursively act on the output of the previous regex,
         in the order defined at the class level.
@@ -340,7 +340,7 @@ if __name__ == "__main__":
     # Show match counts
     ic(santiser_obj.group_matches)
     ic(santiser_obj.total_matches)
-    # 'output_data' contains the result after 'sanitise()' is run
+    # 'raw_output_data' contains the result after 'sanitise()' is run
     ic(santiser_obj.output_data)
 
 # TODO Make some way to only run the regex on certain columns - maybe

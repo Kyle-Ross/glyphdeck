@@ -86,6 +86,16 @@ sentiment_score: float = \
                     "(max positive sentiment), with 0 indicating neutral sentiment. It must be between -1 and 1"
     )
 
+# Additional information on the fields above
+# Cannot sit in the classes or fields due to the way they are accessed by Pydantic, and would increase prompt size
+# Access this later by using the '__name__' attribute of the data classes
+field_schema: dict = {
+    'sentiment_score': {'structure': 'single_value', 'type': 'float'},
+    'primary_category': {'structure': 'single_value', 'type': 'str'},
+    'top_categories': {'structure': 'list', 'type': 'str'},
+    'sub_categories': {'structure': 'list', 'type': 'str'}
+}
+
 # ---CLASSES---
 # Classes use the common fields above
 # Validated according to @field_validator methods defined in the BaseValidatorModel if the field name matches
@@ -132,39 +142,6 @@ class CategoryHierarchyAndSentiment(BaseValidatorModel):
     primary_category: str = primary_category
     sub_categories: list = categories_1_to_30
     sentiment_score: float = sentiment_score
-
-
-# Additional information on the classes above
-# Cannot sit in the classes due to the way they are accessed by Pydantic
-# Look this up later by using the '__name__' attribute of the data classes
-schema: dict = {
-    'SentimentScore': {'sentiment_score': {'structure': 'single_value', 'type': 'float'}},
-    'PrimaryCategory': {'primary_category': {'structure': 'single_value', 'type': 'str'}},
-    'Top5Categories': {'top_categories': {'structure': 'list', 'type': 'str'}},
-    'SubCategories': {'sub_categories': {'structure': 'list', 'type': 'str'}},
-    'PrimaryCategoryAndSentiment': {
-        'primary_category': {'structure': 'single_value', 'type': 'str'},
-        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
-    },
-    'PrimaryCategoryAndSubCategory': {
-        'primary_category': {'structure': 'single_value', 'type': 'str'},
-        'sub_categories': {'structure': 'list', 'type': 'str'}
-    },
-    'SubCategoriesAndSentiment': {
-        'sub_categories': {'structure': 'list', 'type': 'str'},
-        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
-    },
-    'TopCategoriesAndSentiment': {
-        'top_categories': {'structure': 'list', 'type': 'str'},
-        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
-    },
-    'CategoryHierarchyAndSentiment': {
-        'primary_category': {'structure': 'list', 'type': 'str'},
-        'sub_categories': {'structure': 'list', 'type': 'str'},
-        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
-    },
-
-}
 
 
 if __name__ == "__main__":

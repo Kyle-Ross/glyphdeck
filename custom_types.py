@@ -7,6 +7,7 @@ Record = Union[str, Union[datetime, None, timedelta, dict]]
 Records = Dict[int, Record]
 IntStr = Union[int, str]
 Data = Dict[IntStr, List]
+Data_or_None = Union[Data, None]
 dFrame = pd.DataFrame
 dFrame_or_None = Union[dFrame, None]
 IntList = List[int]

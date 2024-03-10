@@ -14,7 +14,7 @@ class Chain:
                 'delta': None,
                 'data': {},
                 'table': None,
-                'column_names': None  # Names of the columns, in order
+                'new_column_names': None  # Names of the columns, in order
             }
         }
 
@@ -57,7 +57,7 @@ class Chain:
 
     def column_names(self, key: IntStr) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
-        return self.record(key)['column_names']
+        return self.record(key)['new_column_names']
 
     @property
     def latest_key(self) -> int:
@@ -91,7 +91,7 @@ class Chain:
 
     @property
     def latest_column_names(self) -> StrList:
-        """Returns the latest 'column_names' from 'records'."""
+        """Returns the latest 'new_column_names' from 'records'."""
         return self.column_names(self.latest_key)
 
     @property
@@ -128,7 +128,7 @@ class Chain:
 
     @property
     def initial_column_names(self) -> StrList:
-        """Returns the initial 'column_names' from the latest 'record' in 'records'."""
+        """Returns the initial 'new_column_names' from the latest 'record' in 'records'."""
         return self.column_names(self.initial_key)
 
     @property
@@ -193,14 +193,14 @@ class Chain:
         data_validator_message = ''
         if good_len == 0:
             data_validator_message = f"All keys in record '{target_title}' " \
-                                      f"contained lists of unexpected length / column count, " \
-                                      f"where expected length was '{self.expected_len}.'"
+                                     f"contained lists of unexpected length / column count, " \
+                                     f"where expected length was '{self.expected_len}.'"
         elif bad_len != 0:
             data_validator_message = f"Some keys in record '{target_title}' " \
-                                      f"contained lists of unexpected length / column count, " \
-                                      f"where expected length was '{self.expected_len}'.\n\n" \
-                                      f"These keys were: \n" \
-                                      f"{bad_keys}"
+                                     f"contained lists of unexpected length / column count, " \
+                                     f"where expected length was '{self.expected_len}'.\n\n" \
+                                     f"These keys were: \n" \
+                                     f"{bad_keys}"
         if bad_len != 0:
             raise ValueError(data_validator_message)
 
@@ -219,6 +219,15 @@ class Chain:
             # Set expected len if update_expected_len is True
             # Uses the len of the first data list from the most recent record
             self.set_expected_len(len(self.latest_data[next(iter(self.latest_data))]))
+        else:
+            # Check if the list of column names is of the correct length
+            if column_names is None:
+                column_names_len = len(self.latest_column_names)  # Uses the latest if none were set
+            else:
+                column_names_len = len(column_names)  # Otherwise, get the length from the provided list
+            assert column_names_len == self.expected_len, \
+                f"{self.expected_len} columns expected, but 'column_names' contains {column_names_len} entries. " \
+                f"If this is expected, set self.append(update_expected_len=True), otherwise review your data."
 
         now: datetime = datetime.now()
         delta: timedelta = now - self.latest_dt
@@ -229,28 +238,28 @@ class Chain:
             'delta': delta,
             'data': data,
             'table': self.latest_table if table is None else table,  # References previous values if none
-            'column_names': self.latest_column_names if column_names is None else column_names
+            'new_column_names': self.latest_column_names if column_names is None else column_names
         }
         self.key_validator(new_key)
         self.data_validator(new_key)
         return self
 
-    def output(self, source):
+    def output(self, source, column_names: StrList_or_None=None):
         # , mode, file_type, name, target_folder
         # Set the output data source
+        raw_output_data = None
         if source == 'latest':
-            output_data = self.latest_data
+            raw_output_data = self.latest_data
+            column_names = self.latest_column_names if column_names is None else column_names
         else:
             try:
-                output_data = self.record(source)
+                raw_output_data = self.record(source)
+                column_names = self.column_names(source) if column_names is None else column_names
             except KeyError as e:
                 f"Output source '{source}' does not exist in the chain."
-
-        # Convert the output data into a dataframe
-        output_df = pd.DataFrame.from_dict(output_data, orient='index')
-        print(output_df)
-
-        return self
+        column_names_len = len(column_names)
+        assert column_names_len == self.expected_len, f"Column names list is {column_names_len} long, " \
+                                                      f"{self.expected_len} expected."
 
 
 if __name__ == "__main__":
