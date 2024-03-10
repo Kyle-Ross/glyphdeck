@@ -1,7 +1,7 @@
 from utility import time_since_start
 from RegexSanitiser import RegexSanitiser
 from LLMHandler import LLMHandler
-import llm_output_structures
+import type_models
 from Prepper import Prepper
 from Chain import Chain
 from icecream import ic
@@ -63,7 +63,7 @@ handler = LLMHandler(chain.latest_data,
                      model="gpt-3.5-turbo",
                      role="An expert customer feedback analyst nlp system",
                      request="Analyse the feedback and return results in the correct format",
-                     validation_model=llm_output_structures.SentimentScore,
+                     validation_model=type_models.SentimentScore,
                      cache_identifier='NLP_SentimentScore_Twitter',
                      use_cache=True,
                      temperature=0.2,
@@ -86,15 +86,5 @@ prog_print("Printing results")
 print(chain.latest_key)
 print(chain.latest_title)
 print(chain.record_delta(chain.latest_key))
-ic(prepared_data.id_column)
-ic(prepared_data.data_columns)
 print(chain.latest_data)
 prog_print("Finished Script")
-
-# TODO - Review all error handling, backoff, and more
-# Exceptions always seem to fail, and may not be triggering the back off
-# When any error is raised, the resulting backoff doesn't occur since that error leads to this error:
-# TypeError: catching classes that do not inherit from BaseException is not allowed
-# When I ran the test on the 1000 row test data, once the token limit error openai.RateLimitError occurred, the...
-# Exception gave the type error so the rate limit event loop pausing stuff never occurred.
-# This seems to be the main common issue with all script ending errors

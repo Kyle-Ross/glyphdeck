@@ -3,7 +3,7 @@ from utility import string_cleaner
 from custom_types import Data, assert_custom_type
 from cache_types import lru_cache
 from icecream import ic
-import llm_output_structures
+import type_models
 import instructor
 import asyncio
 import openai
@@ -15,7 +15,7 @@ class LLMHandler:
 
     def check_validation_model(self):
         """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
-        check: bool = issubclass(self.validation_model, llm_output_structures.BaseValidatorModel)
+        check: bool = issubclass(self.validation_model, type_models.BaseValidatorModel)
         assert check, f'{self.validation_model.__name__} is not a subclass of the Pydantic BaseValidatorModel class'
 
     def __init__(self,
@@ -204,7 +204,7 @@ if __name__ == "__main__":
                          model="gpt-3.5-turbo",
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
-                         validation_model=llm_output_structures.PrimaryCategoryAndSubCategory,
+                         validation_model=type_models.PrimaryCategoryAndSubCategory,
                          cache_identifier='NLP-Categorise-TestData',
                          use_cache=True,
                          temperature=0.2,
@@ -214,6 +214,5 @@ if __name__ == "__main__":
     handler.run()
     ic(handler.output_data)
 
-# TODO - Optimise cache size - should be smaller, likely due to storing the whole python obj, just need output
-# TODO - Ability to check target file for existing results (pre-cache)
 # TODO - Logging
+# TODO - Cache the chain

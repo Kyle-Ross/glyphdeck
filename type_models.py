@@ -134,6 +134,39 @@ class CategoryHierarchyAndSentiment(BaseValidatorModel):
     sentiment_score: float = sentiment_score
 
 
+# Additional information on the classes above
+# Cannot sit in the classes due to the way they are accessed by Pydantic
+# Look this up later by using the '__name__' attribute of the data classes
+schema: dict = {
+    'SentimentScore': {'sentiment_score': {'structure': 'single_value', 'type': 'float'}},
+    'PrimaryCategory': {'primary_category': {'structure': 'single_value', 'type': 'str'}},
+    'Top5Categories': {'top_categories': {'structure': 'list', 'type': 'str'}},
+    'SubCategories': {'sub_categories': {'structure': 'list', 'type': 'str'}},
+    'PrimaryCategoryAndSentiment': {
+        'primary_category': {'structure': 'single_value', 'type': 'str'},
+        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
+    },
+    'PrimaryCategoryAndSubCategory': {
+        'primary_category': {'structure': 'single_value', 'type': 'str'},
+        'sub_categories': {'structure': 'list', 'type': 'str'}
+    },
+    'SubCategoriesAndSentiment': {
+        'sub_categories': {'structure': 'list', 'type': 'str'},
+        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
+    },
+    'TopCategoriesAndSentiment': {
+        'top_categories': {'structure': 'list', 'type': 'str'},
+        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
+    },
+    'CategoryHierarchyAndSentiment': {
+        'primary_category': {'structure': 'list', 'type': 'str'},
+        'sub_categories': {'structure': 'list', 'type': 'str'},
+        'sentiment_score': {'structure': 'single_value', 'type': 'float'}
+    },
+
+}
+
+
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
     from pydantic import ValidationError

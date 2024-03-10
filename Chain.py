@@ -1,5 +1,6 @@
-from custom_types import Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList
+from custom_types import Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList, StrList, StrList_or_None
 from datetime import datetime, timedelta
+import pandas as pd
 
 
 class Chain:
@@ -12,7 +13,8 @@ class Chain:
                 'dt': datetime.now(),
                 'delta': None,
                 'data': {},
-                'table': None
+                'table': None,
+                'column_names': None  # Names of the columns, in order
             }
         }
 
@@ -46,12 +48,16 @@ class Chain:
         return self.record(key)['data']
 
     def table(self, key: IntStr) -> dFrame:
-        """Returns the data dictionary corresponding to the provided record_identifier number."""
+        """Returns the table corresponding to the provided record_identifier number."""
         return self.record(key)['table']
 
     def record_delta(self, key: IntStr) -> timedelta:
         """Returns the timedelta corresponding to the provided record_identifier number."""
         return self.record(key)['delta']
+
+    def column_names(self, key: IntStr) -> StrList:
+        """Returns the list of column names corresponding to the provided record_identifier number."""
+        return self.record(key)['column_names']
 
     @property
     def latest_key(self) -> int:
@@ -84,6 +90,11 @@ class Chain:
         return self.table(self.latest_key)
 
     @property
+    def latest_column_names(self) -> StrList:
+        """Returns the latest 'column_names' from 'records'."""
+        return self.column_names(self.latest_key)
+
+    @property
     def initial_key(self) -> int:
         """Returns 1, but only if record_identifier 1 exists in the records."""
         if 1 not in self.records:
@@ -114,6 +125,11 @@ class Chain:
     def initial_table(self) -> dFrame_or_None:
         """Returns the initial 'table' from the latest 'record' in 'records'."""
         return self.table(self.initial_key)
+
+    @property
+    def initial_column_names(self) -> StrList:
+        """Returns the initial 'column_names' from the latest 'record' in 'records'."""
+        return self.column_names(self.initial_key)
 
     @property
     def delta(self) -> timedelta:
@@ -192,6 +208,7 @@ class Chain:
                title: str,
                data: Data,
                table: dFrame_or_None = None,
+               column_names: StrList_or_None = None,
                update_expected_len: bool = False
                ):
         """Adds a new record to the 'records' dictionary."""
@@ -211,10 +228,28 @@ class Chain:
             'dt': now,
             'delta': delta,
             'data': data,
-            'table': self.latest_table if table is None else table  # References previous table if no table provided
+            'table': self.latest_table if table is None else table,  # References previous values if none
+            'column_names': self.latest_column_names if column_names is None else column_names
         }
         self.key_validator(new_key)
         self.data_validator(new_key)
+        return self
+
+    def output(self, source):
+        # , mode, file_type, name, target_folder
+        # Set the output data source
+        if source == 'latest':
+            output_data = self.latest_data
+        else:
+            try:
+                output_data = self.record(source)
+            except KeyError as e:
+                f"Output source '{source}' does not exist in the chain."
+
+        # Convert the output data into a dataframe
+        output_df = pd.DataFrame.from_dict(output_data, orient='index')
+        print(output_df)
+
         return self
 
 
@@ -240,7 +275,8 @@ if __name__ == "__main__":
     chain.append(
         'Example1',
         {1: ['potato', 'steak', 'party'], 2: ['carrot', 'party', 'alpha'], 3: ['carrot', 'party', 'alpha']},
-        test_df
+        test_df,
+        ['Food1', 'Food2', 'Food3']
     )
     sleep(0.5)
     # Since table is not assigned table will just be the last table
@@ -251,7 +287,8 @@ if __name__ == "__main__":
     sleep(0.6)
     chain.append(
         'Example3',
-        {1: ['keys', 'mud', 'salt'], 2: ['carrot cake', 'car', 'bike'], 3: ['banana sundae', 'icecream', 'intel']}
+        {1: ['keys', 'mud', 'salt'], 2: ['carrot cake', 'car', 'bike'], 3: ['banana sundae', 'icecream', 'intel']},
+        column_names=['Food 1', 'Food 2', 'Food 3']
     )
     sleep(0.2)
     ic(chain.records)
@@ -265,6 +302,7 @@ if __name__ == "__main__":
     ic(chain.latest_title)
     ic(chain.latest_dt)
     ic(chain.latest_data)
+    ic(chain.latest_column_names)
     ic(chain.title(2))
     ic(chain.record_delta(1))
     ic(chain.record_delta(2))
@@ -274,6 +312,7 @@ if __name__ == "__main__":
     ic(chain.record('Example2'))
     ic(chain.data('Example2'))
     ic(chain.title_key('Example2'))
+    chain.output('latest')
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
 # TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard

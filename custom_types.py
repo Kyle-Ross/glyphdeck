@@ -10,6 +10,8 @@ Data = Dict[IntStr, List]
 dFrame = pd.DataFrame
 dFrame_or_None = Union[dFrame, None]
 IntList = List[int]
+StrList = List[str]
+StrList_or_None = Union[StrList, None]
 
 
 def assert_custom_type(variable: Data, custom_type: str, var_name: str):
