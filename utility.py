@@ -1,3 +1,4 @@
+from datetime import timedelta
 import time
 
 start_time = time.time()
@@ -18,3 +19,13 @@ def time_since_start(active=True):
 def string_cleaner(input_str: str) -> str:
     """Basic function to clean input strings."""
     return input_str.strip().lower().replace(' ', '')
+
+
+def timedelta_to_string(td: timedelta) -> str:
+    """Takes a TimeDelta object and turns it into a nice string like '05h30m45s'"""
+    total_seconds = td.total_seconds()
+    hours = int(total_seconds // 3600)
+    minutes = int((total_seconds % 3600) // 60)
+    seconds = int(total_seconds % 60)
+    result = f"{hours:02d}h{minutes:02d}m{seconds:02d}s"
+    return result

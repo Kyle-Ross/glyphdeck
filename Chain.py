@@ -1,10 +1,12 @@
 from custom_types import (
     Record, Records, Data, IntStr, dFrame,
     dFrame_or_None, IntList, StrList,
-    StrList_or_None, List_or_Str, dfList,
-    IntStrNone, RecordList
+    StrList_or_None, List_or_Str, IntStrNone,
+    RecordList
 )
 from datetime import datetime, timedelta
+from utility import timedelta_to_string
+from functools import reduce
 import pandas as pd
 
 
@@ -266,87 +268,105 @@ class Chain:
         self.data_validator(new_key)
         return self
 
-    def selector(self, records: List_or_Str) -> RecordList:
+    def selector(self, records: List_or_Str, use_suffix: bool) -> RecordList:
         """Returns a list of clean DataFrames from the selected records. Adds column names back on."""
         # Handling str input
         if type(records) == str:
             records = [records]
-        # Add all selected records to a list
-        selected_records = []
-        for record in records:
-            selected_records.append(self.record(record))
+        # Add only selected records to a list
+        selected_records = [self.record(record) for record in records]
 
         # Looping over selected records and making changes
         for record in selected_records:
-            # Adding unique suffixes to each list of column names, to assist concatenation
-            record['column_names_suffixed'] = [name + "_" + record['title'] for name in record['column_names']]
             # Creating dataframes and in each of the records
             df = pd.DataFrame.from_dict(record['data'])
             # Renaming columns
-            if len(selected_records) == 1:
-                df.columns = record['column_names']
+            if use_suffix:  # Includes suffixes when there are multiple selections to avoid concatenation errors
+                df.columns = [name + "_" + record['title'] for name in record['column_names']]
             else:
-                df.columns = record['column_names_suffixed']  # Includes suffixes for multiple selections
+                df.columns = record['column_names']
+            # Record the new df
             record['output_df'] = df
 
         # Returning the selected records
+        ic('FINAL OUTPUT OF SELECTOR')
+        ic(selected_records)
         return selected_records
 
     def combiner(self, records: list) -> RecordList:
         """Combines records into a single dataframe."""
         # Grab the dataframes, combining them, and returning them
-        selected_records = self.selector(records)
+        selected_records = self.selector(records, use_suffix=True)
         selected_dfs = [record['output_df'] for record in selected_records]
-        combined_df = pd.concat(selected_dfs)
+        # Using reduce to merge all DataFrames in selected_dfs on their indices
+        combined_df = reduce(lambda x, y: pd.merge(x, y, left_index=True, right_index=True), selected_dfs)
         # Building into the record format to be used in the flow with the rest
         combined_record: RecordList = [{
-                'title': 'combined',
-                'dt': datetime.now(),
-                'delta': datetime.now() - self.latest_dt,
-                'data': {},
-                'table': combined_df,
-                'table_id_column': chain.initial_table_id_column,  # Not really needed
-                'column_names': None  # Not needed here - all different anyway
-            }]
+            'title': 'combined',
+            'dt': datetime.now(),
+            'delta': datetime.now() - self.latest_dt,
+            'data': {},
+            'table': selected_records[0],
+            'output_df': combined_df,
+            'table_id_column': self.initial_table_id_column,  # Not really needed
+            'column_names': None  # Not needed here - all different anyway
+        }]
         return combined_record
 
     def output(self,
                records: List_or_Str,
                file_type: str,
+               name_prefix: str,
+               output_directory: str = r'output',
                rejoin: bool = True,
                split: bool = False):
         # Checking file_type is in allowed list
         allowed_file_types = ['csv', 'xlsx']
         assert file_type in allowed_file_types, f"'{file_type}' is not in allowed list {allowed_file_types}."
         # Use the separate or combined records
-        records: RecordList = self.selector(records) if split else [self.combiner(records)]
+        if split:
+            records_list: RecordList = self.selector(records, use_suffix=False)
+        else:
+            records_list: RecordList = self.combiner(records)
         # Use the dataframes as is, or left join each back onto the initial source
         if rejoin:
-            for record in records:
-                record['table'] = chain.initial_table.merge(record['table'],
-                                                            how='left',
-                                                            on=chain.initial_table_id_column)
+            for record in records_list:
+                record['output_df'] = self.initial_table.merge(record['output_df'],
+                                                               how='left',
+                                                               left_on=self.initial_table_id_column,
+                                                               right_index=True)
+
+        def make_path(source_record: Record) -> str:
+            """Function to generate file paths for records. Does not include file type."""
+            formatted_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
+            title = source_record['title']
+            runtime = timedelta_to_string(source_record['delta'])
+            name = f"{name_prefix} - {title} - {runtime} - {formatted_time}"
+            new_path = output_directory + "\\" + name
+            return new_path
 
         # Output the dataframes
-        # if file_type == 'csv':
-        #     for i, df in enumerate(dataframes):
-        #         df.to_csv(f'output_{i}.csv', index=False)
-        # elif file_type == 'xlsx':
-        #     with pd.ExcelWriter('output.xlsx') as writer:
-        #         for i, df in enumerate(dataframes):
-        #             df.to_excel(writer, sheet_name=f'Sheet_{i}', index=False)
+        for record in records_list:
+            df = record['output_df']
+            path = make_path(record)
+            if file_type == 'csv':
+                df.to_csv(f"{path}.csv", index=False)
+            if file_type == 'xlsx':
+                with pd.ExcelWriter(f"{path}.xlsx") as writer:
+                    df.to_excel(writer, sheet_name=record['title'], index=False)
 
 
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import."""
     from icecream import ic
     from time import sleep
-    import pandas as pd
 
     test_data = {1: ['door', 'champ', 'slam'], 2: ['blam', 'clam', 'sam'], 3: ['tim', 'tam', 'fam']}
 
     # Create the DataFrame
     test_df = pd.DataFrame(test_data)
+    test_df = test_df.reset_index()  # Adds the index as a column
+    test_df.columns = ['Word ID', 'Word1', 'Word2', 'Word3']  # Rename cols
 
     chain = Chain()
     sleep(0.75)
@@ -373,30 +393,35 @@ if __name__ == "__main__":
         column_names=['Food 1', 'Food 2', 'Food 3']
     )
     sleep(0.2)
-    ic(chain.records)
-    ic(chain.initial_key)
-    ic(chain.initial_record)
-    ic(chain.initial_title)
-    ic(chain.initial_dt)
-    ic(chain.initial_data)
-    ic(chain.latest_key)
-    ic(chain.latest_record)
-    ic(chain.latest_title)
-    ic(chain.latest_dt)
-    ic(chain.latest_data)
-    ic(chain.latest_column_names)
-    ic(chain.title(2))
-    ic(chain.record_delta(1))
-    ic(chain.record_delta(2))
-    ic(chain.record_delta(3))
-    ic(chain.delta)
-    ic(chain.record(2))
-    ic(chain.record('Example2'))
-    ic(chain.data('Example2'))
-    ic(chain.title_key('Example2'))
-    ic(chain.combiner(['Example2', 'Example3']))
-    ic(chain.initial_table)
-    ic(chain.initial_table_id_column)
+    # ic(chain.records)
+    # ic(chain.initial_key)
+    # ic(chain.initial_record)
+    # ic(chain.initial_title)
+    # ic(chain.initial_dt)
+    # ic(chain.initial_data)
+    # ic(chain.latest_key)
+    # ic(chain.latest_record)
+    # ic(chain.latest_title)
+    # ic(chain.latest_dt)
+    # ic(chain.latest_data)
+    # ic(chain.latest_column_names)
+    # ic(chain.title(2))
+    # ic(chain.record_delta(1))
+    # ic(chain.record_delta(2))
+    # ic(chain.record_delta(3))
+    # ic(chain.delta)
+    # ic(chain.record(2))
+    # ic(chain.record('Example2'))
+    # ic(chain.data('Example2'))
+    # ic(chain.title_key('Example2'))
+    # ic(chain.initial_table)
+    # ic(chain.initial_table_id_column)
+    chain.output(
+        records=['Example1', 'Example2', 'Example3'],
+        file_type='csv',
+        name_prefix='Chain Test',
+        rejoin=True,
+        split=False)
 
 # TODO Chain level NaN handling? Causes errors in lots of functions
 # TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard
