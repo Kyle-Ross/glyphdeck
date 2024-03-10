@@ -5,9 +5,10 @@ from custom_types import (
     RecordList
 )
 from datetime import datetime, timedelta
-from utility import timedelta_to_string
 from functools import reduce
 import pandas as pd
+import openpyxl
+import re
 
 
 class Chain:
@@ -105,6 +106,11 @@ class Chain:
     def latest_table_id_column(self) -> IntStrNone:
         """Returns the latest 'table_id_column' from the latest 'record' in 'records'."""
         return self.table_id_column(self.latest_key)
+
+    @property
+    def latest_record_delta(self) -> timedelta:
+        """Returns the latest 'record_delta' from the latest 'record' in 'records'."""
+        return self.record_delta(self.latest_key)
 
     @property
     def latest_column_names(self) -> StrList:
@@ -279,7 +285,7 @@ class Chain:
         # Looping over selected records and making changes
         for record in selected_records:
             # Creating dataframes and in each of the records
-            df = pd.DataFrame.from_dict(record['data'])
+            df = pd.DataFrame.from_dict(record['data'], orient='index')  # Treats the index as the row_id
             # Renaming columns
             if use_suffix:  # Includes suffixes when there are multiple selections to avoid concatenation errors
                 df.columns = [name + "_" + record['title'] for name in record['column_names']]
@@ -289,8 +295,6 @@ class Chain:
             record['output_df'] = df
 
         # Returning the selected records
-        ic('FINAL OUTPUT OF SELECTOR')
-        ic(selected_records)
         return selected_records
 
     def combiner(self, records: list) -> RecordList:
@@ -336,24 +340,47 @@ class Chain:
                                                                left_on=self.initial_table_id_column,
                                                                right_index=True)
 
+        # Final changes to the output_df
+        for record in records_list:
+            df = record['output_df']
+            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
+            if record['table_id_column'] not in df.columns:
+                df.insert(0, record['table_id_column'], df.index)
+            df.sort_values(record['table_id_column'])  # Sort by the id column ascending
+            record['output_df'] = df
+
         def make_path(source_record: Record) -> str:
             """Function to generate file paths for records. Does not include file type."""
             formatted_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
-            title = source_record['title']
-            runtime = timedelta_to_string(source_record['delta'])
-            name = f"{name_prefix} - {title} - {runtime} - {formatted_time}"
+            # Conditionally setting the title to be used in the name
+            if file_type == 'csv' and split:
+                title = source_record['title']  # Each individual file has the title name
+            elif file_type == 'xlsx' and split:
+                title = "split"  # The containing excel file has 'split'
+            elif split:
+                title = "split"  # Shouldn't be possible but just in case
+            else:
+                title = "combined"
+
+            name = f"{name_prefix} - {title} - {formatted_time}"
             new_path = output_directory + "\\" + name
             return new_path
 
         # Output the dataframes
-        for record in records_list:
-            df = record['output_df']
-            path = make_path(record)
-            if file_type == 'csv':
+        if file_type == 'csv':
+            for record in records_list:
+                df = record['output_df']
+                path = make_path(record)
                 df.to_csv(f"{path}.csv", index=False)
-            if file_type == 'xlsx':
-                with pd.ExcelWriter(f"{path}.xlsx") as writer:
-                    df.to_excel(writer, sheet_name=record['title'], index=False)
+
+        if file_type == 'xlsx':
+            path = make_path(chain.latest_record)  # Argument may not be used in certain conditions
+            with pd.ExcelWriter(f"{path}.xlsx") as writer:
+                for record in records_list:  # Writing each record to its own sheet in the same xlsx file
+                    sheet_df = record['output_df']
+                    invalid_chars = r'[\/:*?"<>|]'
+                    sheet_title = re.sub(invalid_chars, '', record['title'])
+                    sheet_df.to_excel(writer, sheet_name=sheet_title, index=False)
 
 
 if __name__ == "__main__":
@@ -361,10 +388,12 @@ if __name__ == "__main__":
     from icecream import ic
     from time import sleep
 
-    test_data = {1: ['door', 'champ', 'slam'], 2: ['blam', 'clam', 'sam'], 3: ['tim', 'tam', 'fam']}
+    test_data = {1: ['door', 'champ', 'slam'],
+                 2: ['blam', 'clam', 'sam'],
+                 3: ['tim', 'tam', 'fam']}
 
     # Create the DataFrame
-    test_df = pd.DataFrame(test_data)
+    test_df = pd.DataFrame.from_dict(test_data, orient='index')
     test_df = test_df.reset_index()  # Adds the index as a column
     test_df.columns = ['Word ID', 'Word1', 'Word2', 'Word3']  # Rename cols
 
@@ -374,7 +403,9 @@ if __name__ == "__main__":
     # Otherwise the table will be the last time 'table' was assigned
     chain.append(
         title='Example1',
-        data={1: ['potato', 'steak', 'party'], 2: ['carrot', 'party', 'alpha'], 3: ['carrot', 'party', 'alpha']},
+        data={1: ['potato', 'steak', 'party'],
+              2: ['carrot', 'party', 'alpha'],
+              3: ['carrot', 'party', 'alpha']},
         table=test_df,
         table_id_column="Word ID",
         column_names=['Food1', 'Food2', 'Food3']
@@ -383,12 +414,16 @@ if __name__ == "__main__":
     # Since table is not assigned table will just be the last table
     chain.append(
         title='Example2',
-        data={1: ['potatoes', 'carrot', 'gary'], 2: ['carrots', 'pizza', 'pasta'], 3: ['bananas', 'beast', 'jeffery']}
+        data={1: ['potatoes', 'carrot', 'gary'],
+              2: ['carrots', 'pizza', 'pasta'],
+              3: ['bananas', 'beast', 'jeffery']}
     )
     sleep(0.6)
     chain.append(
         title='Example3',
-        data={1: ['keys', 'mud', 'salt'], 2: ['carrot cake', 'car', 'bike'], 3: ['banana sundae', 'icecream', 'intel']},
+        data={1: ['keys', 'mud', 'salt'],
+              2: ['carrot cake', 'car', 'bike'],
+              3: ['banana sundae', 'icecream', 'intel']},
         table_id_column="Word ID2",
         column_names=['Food 1', 'Food 2', 'Food 3']
     )
@@ -418,7 +453,7 @@ if __name__ == "__main__":
     # ic(chain.initial_table_id_column)
     chain.output(
         records=['Example1', 'Example2', 'Example3'],
-        file_type='csv',
+        file_type='xlsx',
         name_prefix='Chain Test',
         rejoin=True,
         split=False)

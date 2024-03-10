@@ -250,7 +250,8 @@ if __name__ == "__main__":
                          )
 
     handler.run()
-    ic(handler.raw_output_data)
+    handler.flatten_output_data(['Col1', 'Col2', 'Col3', 'Col4', 'Col5'])
+    ic(handler.output_data)
 
 # TODO - Logging
 # TODO - Cache the chain
