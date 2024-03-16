@@ -1,6 +1,3 @@
-# TODO - In NLP processing section add retry loop on ValidationError, with prompt add to get ChatGPT to fix the output
-# TODO - Review any rechecking methods available in langchain
-
 from pydantic import BaseModel, Field, field_validator
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program

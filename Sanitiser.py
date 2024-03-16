@@ -2,15 +2,11 @@ from typing import Union, Tuple, List, Dict, Any
 from custom_types import Data
 from icecream import ic
 import pandas as pd
-import pprint
 import re
 
 
 class RegexSanitiser:
     """Takes a string and uses selected patterns to replace private information with placeholders."""
-    # Define pretty printer for dictionary printing
-    pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)  # TODO Is this still needed at finish?
-
     # Email addresses
     email_regex: str = \
         r"(([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\." \
@@ -312,5 +308,3 @@ if __name__ == "__main__":
     ic(santiser_obj.total_matches)
     # 'raw_output_data' contains the result after 'sanitise()' is run
     ic(santiser_obj.output_data)
-
-# TODO Review date regex matching on decimals of numbers
