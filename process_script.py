@@ -106,6 +106,7 @@ prog_print("Finished creating output file(s)")
 
 prog_print("Finished Script")
 
+# TODO - Make script use environment variable for api key, remove all use of json secret method
 # TODO - Add length checker for per sub-category sentiment scores, somehow in validation
 # TODO - Add togglable log / print functionality
 # TODO - Class to categorise into existing schema
