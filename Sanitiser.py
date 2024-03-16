@@ -10,24 +10,6 @@ class RegexSanitiser:
     """Takes a string and uses selected patterns to replace private information with placeholders."""
     # Define pretty printer for dictionary printing
     pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)  # TODO Is this still needed at finish?
-    # IPv4
-    ipv4_regex: str = r"(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.)" \
-                      r"{3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
-    ipv4_pattern: re.Pattern[str] = re.compile(ipv4_regex)
-    # IPv6
-    ipv6_regex: str = r"((([0-9a-fA-F]){1,4})\\:){7}([0-9a-fA-F]){1,4}"
-    ipv6_pattern: re.Pattern[str] = re.compile(ipv6_regex)
-
-    # Mastercard numbers
-    mastercard_regex: str = r"^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$"
-    mastercard_pattern: re.Pattern[str] = re.compile(mastercard_regex)
-    # Visa numbers
-    visa_regex: str = r"	\b([4]\d{3}[\s]\d{4}[\s]\d{4}[\s]\d{4}|[4]\d{3}[-]\d{4}[-]\d{4}[-]" \
-                      r"\d{4}|[4]\d{3}[.]\d{4}[.]\d{4}[.]\d{4}|[4]\d{3}\d{4}\d{4}\d{4})\b"
-    visa_pattern: re.Pattern[str] = re.compile(visa_regex)
-    # American Express Card numbers
-    american_express_regex: str = r"^3[47][0-9]{13}$"
-    american_express_pattern: re.Pattern[str] = re.compile(american_express_regex)
 
     # Email addresses
     email_regex: str = \
@@ -35,8 +17,14 @@ class RegexSanitiser:
         r"([a-z]{2,6}(?:\.[a-z]{2})?))(?![^<]*>)"
     email_pattern: re.Pattern[str] = re.compile(email_regex)
 
-    # File paths
-    file_path_regex: str = r"\\[^\\]+$"
+    # Folder Paths
+    # Gets any folder path, but doesn't work when the file name has a space
+    folder_path_regex: str = r"(?:[a-zA-Z]:|\\\\[\w\.]+\\[\w.$]+)\\(?:[\s\w-]+\\)*([\w.-])*"
+    folder_path_pattern: re.Pattern[str] = re.compile(folder_path_regex)
+
+    # Full File Paths
+    # Anything starting with C:\ and ending in .filetype, works with file names that have spaces
+    file_path_regex: str = r"(?:[a-zA-Z]:|\\\\[\w\.]+\\[\w.$]+).*[\w](?=[.])[.\w]*"
     file_path_pattern: re.Pattern[str] = re.compile(file_path_regex)
 
     # URLs
@@ -60,81 +48,58 @@ class RegexSanitiser:
     date_pattern3: re.Pattern[str] = re.compile(date_regex3)
 
     # Lastly as a catch-all, replace all words that contain one or more digits
-    number_regex: str = r'\w*\d\w*'
+    # The 'word' can contain full stops and still be detected
+    number_regex: str = r'[.\w]*\d[.\w]*'
     number_pattern: re.Pattern[str] = re.compile(number_regex)
 
     # Storing that all as a dict
     patterns: Dict[str, Dict[str, Union[str, float, re.Pattern[str]]]] = {
-        'ipv4': {
-            'group': 'ip',
-            'placeholder': '<IP>',
-            'rank': 1,
-            'pattern': ipv4_pattern
-        },
-        'ipv6': {
-            'group': 'ip',
-            'placeholder': '<IP>',
-            'rank': 2,
-            'pattern': ipv6_pattern
-        },
-        'mastercard': {
-            'group': 'card',
-            'placeholder': '<CARD>',
-            'rank': 3,
-            'pattern': mastercard_pattern
-        },
-        'visa': {
-            'group': 'card',
-            'placeholder': '<CARD>',
-            'rank': 4,
-            'pattern': visa_pattern
-        },
-        'american_express': {
-            'group': 'card',
-            'placeholder': '<CARD>',
-            'rank': 5,
-            'pattern': american_express_pattern
-        },
         'date1': {
             'group': 'date',
             'placeholder': '<DATE>',
-            'rank': 6,
+            'rank': 1,
             'pattern': date_pattern1
         },
         'date2': {
             'group': 'date',
             'placeholder': '<DATE>',
-            'rank': 7,
+            'rank': 2,
             'pattern': date_pattern2
         },
         'date3': {
             'group': 'date',
             'placeholder': '<DATE>',
-            'rank': 8,
+            'rank': 3,
             'pattern': date_pattern3
         },
         'email': {
             'group': 'email',
             'placeholder': '<EMAIL>',
-            'rank': 9,
+            'rank': 4,
             'pattern': email_pattern
-        },
-        'file_path': {
-            'group': 'path',
-            'placeholder': '<PATH>',
-            'rank': 10,
-            'pattern': file_path_pattern
         },
         'url': {
             'group': 'url',
             'placeholder': '<URL>',
-            'rank': 11,
+            'rank': 5,
             'pattern': url_pattern
+        },
+        'file_path': {
+            'group': 'path',
+            'placeholder': '<PATH>',
+            'rank': 6,
+            'pattern': file_path_pattern
+        },
+        'folder_path': {
+            'group': 'path',
+            'placeholder': '<PATH>',
+            'rank': 7,
+            'pattern': folder_path_pattern
         },
         'number': {
             'group': 'number',
             'placeholder': '<NUM>',
-            'rank': 12,
+            'rank': 8,
             'pattern': number_pattern
         }
     }
@@ -204,7 +169,7 @@ class RegexSanitiser:
 
     def update_match_counts(self):
         """Updates the per group match count dictionary and the overall count variable.
-        Based on the per regex counts in the patterns dictionary."""
+        Based on the per regex counts in the 'patterns' dictionary."""
         # Clear existing counts
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
@@ -299,8 +264,8 @@ class RegexSanitiser:
                             result: Tuple[str, int] = re.subn(pattern_dict['pattern'],
                                                               pattern_dict['placeholder'],
                                                               self.output_data[data_key][index])
-                        self.output_data[data_key][index] = result[0]  # Replacing the item in the output
-                        pattern_dict['matches'] += result[1]  # Number of matches
+                            self.output_data[data_key][index] = result[0]  # Replacing the item in the output
+                            pattern_dict['matches'] += result[1]  # Number of matches
                 self.overall_run_state = True  # Shows regex has been run at least once
                 self.update_match_counts()  # Updates match counts
         return self
@@ -311,26 +276,31 @@ if __name__ == "__main__":
     data_example: Data = \
         {
             1: [
-                r"I like apple bottom jeans 15619878, 11/10/2020, jimbo@gmail.com",
+                r"I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
                 'My birthday is 11/10/2021',
                 'Product info: https://t.co/KNkANrdypk \r\r\nTo order'],
             2: [
                 'Nothing wrong with this',
-                'My email is jeff@babe.com',
+                'My email is jeff@babe.com, my ip address is 192.158.1.38',
                 'Go to this website: www.website.com.au'],
             3: [
-                'Big number is 1896987',
-                'I like blue jeans',
-                'I was born 15/12/1990'
+                r'Big number is 1896987, I store my files in C:\Users\username\Documents\GitHub',
+                'I like blue jeans, my card number is 2222 4053 4324 8877',
+                r'I was born 15/12/1990, a file path is C:\Users\username\Pictures\BYG0Djh.png'
             ]
         }
     santiser_obj = RegexSanitiser(data_example)
     # Select to only run certain groups
-    santiser_obj.select_groups(['number', 'date', 'email'])
+    santiser_obj.select_groups(selection=['number', 'date', 'email', 'path', 'url'])
     # Replace placeholders
-    santiser_obj.set_placeholders({'email': 'EMAILS>>', 'date': '<DA>TES>'})
+    santiser_obj.set_placeholders(placeholder_dict={'email': 'EMAILS>>', 'date': '<DA>TES>'})
     # Add a new pattern
-    santiser_obj.add_pattern('custom', 'custom_group', 'Cust', 0.5, r"jeans")
+    santiser_obj.add_pattern(
+        pattern_name='custom',
+        group='custom_group',
+        placeholder='Cust',
+        rank=.5,
+        regex=r"jeans")
     # Attributes showing group selections - shows that the new pattern group was added
     ic(santiser_obj.all_groups)
     ic(santiser_obj.active_groups)
@@ -343,6 +313,4 @@ if __name__ == "__main__":
     # 'raw_output_data' contains the result after 'sanitise()' is run
     ic(santiser_obj.output_data)
 
-# TODO Make some way to only run the regex on certain columns - maybe
-#  optional column name or number input in santitise method
 # TODO Review date regex matching on decimals of numbers

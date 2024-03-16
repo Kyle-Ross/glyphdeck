@@ -1,5 +1,5 @@
 from utility import time_since_start
-from RegexSanitiser import RegexSanitiser
+from Sanitiser import RegexSanitiser
 from LLMHandler import LLMHandler
 import type_models
 from Prepper import Prepper
@@ -48,7 +48,7 @@ prog_print("Finished chain initialisation and appending of prep data")
 # Running the regex sanitiser
 prog_print("Starting regex sanitiser")
 sanitised = RegexSanitiser(chain.latest_data) \
-    .select_groups(['ip', 'card', 'date', 'email', 'path', 'url', 'number']) \
+    .select_groups(['date', 'email', 'path', 'url', 'number']) \
     .sanitise()
 prog_print("Finished regex sanitiser")
 
@@ -91,7 +91,6 @@ chain.append(title='llmoutput', data=handler.output_data, column_names=handler.c
 prog_print("Finished appending llm output")
 
 prog_print("Starting creating output file(s)")
-ic(chain.initial_table_id_column)
 chain.output(
     records=[chain.latest_title],
     file_type='xlsx',

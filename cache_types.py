@@ -1,15 +1,12 @@
 from utility import time_since_start
 from diskcache import Cache
+from icecream import ic
 import hashlib
 import os
 
 
-# Define the decorator with max_mb_size parameter
-def lru_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
-    """Allows caching when used as a function decorator, up to a specified limit.
-    Will attempt to get the result from the cache instead of the function if it is available.
-    Once the max size is reached the least recent use (lru) records will be culled.
-    Saves results in the 'caches' sub-directory of the current directory."""
+def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
+    """Checks if a cache director exists, if not, creates it. Returns the cache object afterwards."""
     full_cache_dir = parent_dir + '\\' + cache_dir
     # Check if the specified cache directory exists, if not create it
     if not os.path.exists(full_cache_dir):
@@ -21,6 +18,14 @@ def lru_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
     # Create a DiskCache instance with the specified max_size
     max_size = max_mb_size * 1024 * 1024  # Convert megabytes to bytes
     cache = Cache(full_cache_dir, size_limit=max_size)
+    return cache, full_cache_dir
+
+
+def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
+    """Facilitates caching for openai in the handler when used as a decorator. Result will be taken from the cache
+    if available, saving API costs. When max size is reached the least recent use records will be culled."""
+    # Finds or creates the cache folder and object, as well as returning the directory of the cache
+    cache, full_cache_dir = cache_creator(parent_dir, cache_dir, max_mb_size)
 
     # Define the actual decorator function
     def decorator(func):

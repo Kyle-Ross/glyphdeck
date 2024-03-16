@@ -1,7 +1,7 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 from utility import string_cleaner
 from custom_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
-from cache_types import lru_cache
+from cache_types import openai_cache
 from icecream import ic
 import type_models
 import instructor
@@ -97,7 +97,7 @@ class LLMHandler:
         # Waits for (sec) 0.9375, 1.875, 3.75, 7.5, 15, 30, 60 (max)
         wait=wait_exponential(multiplier=2, min=0.9375, max=60),
         stop=stop_after_attempt(300))  # About 5 hours of retries!
-    @lru_cache('async_openai_cache')  # Can overwrite other args here which otherwise use default values
+    @openai_cache('async_openai_cache')  # Can overwrite other args here which otherwise use default values
     async def async_openai(self,
                            input_text: str,
                            key,

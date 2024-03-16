@@ -7,7 +7,6 @@ from custom_types import (
 from datetime import datetime, timedelta
 from functools import reduce
 import pandas as pd
-import openpyxl
 import re
 
 
@@ -428,35 +427,32 @@ if __name__ == "__main__":
         column_names=['Food 1', 'Food 2', 'Food 3']
     )
     sleep(0.2)
-    # ic(chain.records)
-    # ic(chain.initial_key)
-    # ic(chain.initial_record)
-    # ic(chain.initial_title)
-    # ic(chain.initial_dt)
-    # ic(chain.initial_data)
-    # ic(chain.latest_key)
-    # ic(chain.latest_record)
-    # ic(chain.latest_title)
-    # ic(chain.latest_dt)
-    # ic(chain.latest_data)
-    # ic(chain.latest_column_names)
-    # ic(chain.title(2))
-    # ic(chain.record_delta(1))
-    # ic(chain.record_delta(2))
-    # ic(chain.record_delta(3))
-    # ic(chain.delta)
-    # ic(chain.record(2))
-    # ic(chain.record('Example2'))
-    # ic(chain.data('Example2'))
-    # ic(chain.title_key('Example2'))
-    # ic(chain.initial_table)
-    # ic(chain.initial_table_id_column)
+    ic(chain.records)
+    ic(chain.initial_key)
+    ic(chain.initial_record)
+    ic(chain.initial_title)
+    ic(chain.initial_dt)
+    ic(chain.initial_data)
+    ic(chain.latest_key)
+    ic(chain.latest_record)
+    ic(chain.latest_title)
+    ic(chain.latest_dt)
+    ic(chain.latest_data)
+    ic(chain.latest_column_names)
+    ic(chain.title(2))
+    ic(chain.record_delta(1))
+    ic(chain.record_delta(2))
+    ic(chain.record_delta(3))
+    ic(chain.delta)
+    ic(chain.record(2))
+    ic(chain.record('Example2'))
+    ic(chain.data('Example2'))
+    ic(chain.title_key('Example2'))
+    ic(chain.initial_table)
+    ic(chain.initial_table_id_column)
     chain.output(
         records=['Example1', 'Example2', 'Example3'],
         file_type='xlsx',
         name_prefix='Chain Test',
         rejoin=True,
         split=False)
-
-# TODO Chain level NaN handling? Causes errors in lots of functions
-# TODO Convert to validating data with Pydantic, might be easier and clearer? Seems to be industry standard
