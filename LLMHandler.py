@@ -242,7 +242,7 @@ if __name__ == "__main__":
                          model="gpt-3.5-turbo",
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
-                         validation_model=type_models.PrimaryCategoryAndSubCategory,
+                         validation_model=type_models.PrimaryCategoryAndSubCategoryWithCharLimit,
                          cache_identifier='NLP-Categorise-TestData',
                          use_cache=True,
                          temperature=0.2,

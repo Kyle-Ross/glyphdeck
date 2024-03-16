@@ -69,8 +69,8 @@ handler = LLMHandler(chain.latest_data,
                      model="gpt-3.5-turbo",
                      role="An expert customer feedback analyst nlp system",
                      request="Analyse the feedback and return results in the correct format",
-                     validation_model=type_models.SubCategories,
-                     cache_identifier='NLPCategoryWomensClothesReview',
+                     validation_model=type_models.SubCategoriesWithPerItemSentiment,
+                     cache_identifier='NLPPerCategorySentimentWomensClothesReview',
                      use_cache=True,
                      temperature=0.2,
                      max_validation_retries=3
@@ -88,7 +88,11 @@ prog_print("Finished handler data flattening")
 
 prog_print("Starting appending llm output")
 # Appending the llm output
-chain.append(title='llmoutput', data=handler.output_data, column_names=handler.column_names)
+chain.append(
+    title='llmoutput',
+    data=handler.output_data,
+    column_names=handler.column_names,
+    update_expected_len=True)  # Updating len since the validation model can produce multiple columns per input
 prog_print("Finished appending llm output")
 
 prog_print("Starting creating output file(s)")
