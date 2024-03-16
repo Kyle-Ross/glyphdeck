@@ -69,8 +69,8 @@ handler = LLMHandler(chain.latest_data,
                      model="gpt-3.5-turbo",
                      role="An expert customer feedback analyst nlp system",
                      request="Analyse the feedback and return results in the correct format",
-                     validation_model=type_models.SubCategoriesWithPerItemSentiment,
-                     cache_identifier='NLPPerCategorySentimentWomensClothesReview',
+                     validation_model=type_models.SubCategoriesWithPerItemSentimentAndOverallSentiment,
+                     cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
                      use_cache=True,
                      temperature=0.2,
                      max_validation_retries=3
@@ -105,3 +105,8 @@ chain.output(
 prog_print("Finished creating output file(s)")
 
 prog_print("Finished Script")
+
+# TODO - Add length checker for per sub-category sentiment scores, somehow in validation
+# TODO - Add togglable log / print functionality
+# TODO - Class to categorise into existing schema
+# TODO - Script - Auto category schema generator logic - which then loops back to categorise against that scheme

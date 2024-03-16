@@ -196,6 +196,7 @@ class LLMHandler:
                     if full_column_name not in new_column_names:  # Add the column to the list if it isn't there
                         new_column_names.append(full_column_name)
                     if type(returned_data_value) == list:  # Flatten lists into comma delimited strings
+                        returned_data_value = [str(x) for x in returned_data_value]  # Ensuring items are strings
                         returned_data_value = ','.join(returned_data_value)
                     new_row_values.append(returned_data_value)  # Storing the value (in order) to the new list
             new_output_data[row_key] = new_row_values  # Storing the flattened list of values

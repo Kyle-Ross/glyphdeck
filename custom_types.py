@@ -17,7 +17,6 @@ dfList = List[pd.DataFrame]
 RecordList = List[Record]
 StrList_or_None = Union[StrList, None]
 List_or_Str = Union[str, list]
-ListOfTuplesWithStrThenFloat = List[Tuple[str, float]]
 
 
 def assert_custom_type(variable: Data, custom_type: str, var_name: str):

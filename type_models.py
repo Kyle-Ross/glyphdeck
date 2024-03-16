@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field, field_validator
-from custom_types import ListOfTuplesWithStrThenFloat
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program
 # Used to assert and advise the expected output from provider calls
@@ -19,17 +18,30 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
-        if isinstance(v, float):
+        if isinstance(v, float) or v in (-1, 0, 1):  # Allows some integers if inside the range
             assert round(v, 2) == v, 'value has more than 2 decimal places'
         return v
 
     @field_validator('sentiment_score', check_fields=False)
     def sentiment_float_in_range(cls, v):
         global sentiment_min, sentiment_max
-        if isinstance(v, float):
+        if isinstance(v, float) or v in (-1, 0, 1):
             minimum: float = sentiment_min
             maximum: float = sentiment_max
             assert minimum <= v <= maximum, f'sentiment float is not between {minimum} to {maximum}'
+        return v
+
+    @field_validator('per_sub_category_sentiment_scores', check_fields=False)
+    def list_of_sentiment_floats_in_range(cls, v):
+        global sentiment_min, sentiment_max
+        if isinstance(v, list):
+            for x in v:
+                assert type(x) == float or x in (-1, 0, 1), f'{x} is not a float'
+                assert round(x, 2) == x, f'value {x} has more than 2 decimal places'
+                # Assert sentiment is in the allowed range as assigned in the global variables
+                minimum: float = sentiment_min
+                maximum: float = sentiment_max
+                assert minimum <= x <= maximum, f'sentiment float {x} is not between {minimum} to {maximum}'
         return v
 
     @field_validator('top_categories', 'top_categories_with_char_limit', check_fields=False)
@@ -46,24 +58,6 @@ class BaseValidatorModel(BaseModel):
             minimum: int = 1
             maximum: int = 30
             assert minimum <= len(v) <= maximum, f'list does not contain between {minimum} to {maximum} entries'
-        return v
-
-    @field_validator('sub_categories_with_per_item_sentiment', check_fields=False)
-    def list_of_tuples_with_category_then_sentiment(cls, v):
-        global sentiment_min, sentiment_max
-        if isinstance(v, list):
-            for x in v:
-                if isinstance(x, tuple) and len(x) == 2:
-                    # Grab values from tuple
-                    category = x[0]
-                    sentiment = x[1]
-                    # Assert their types
-                    assert type(category) == str, f'{category} is not a string'
-                    assert type(sentiment) == float, f'{sentiment} is not a float'
-                    # Assert sentiment is in the allowed range assigned in the global variables
-                    minimum: float = sentiment_min
-                    maximum: float = sentiment_max
-                    assert minimum <= sentiment <= maximum, f'sentiment float is not between {minimum} to {maximum}'
         return v
 
     @field_validator('primary_category_with_char_limit', check_fields=False)
@@ -93,8 +87,18 @@ class BaseValidatorModel(BaseModel):
 # Defined separately to avoid repetition in similar classes below
 sentiment_score: float = \
     Field(
-        description="Decimal value that represents sentiment of a comment. Ranges from -1 (max negative sentiment) to 1"
-                    "(max positive sentiment), with 0 indicating neutral sentiment. It must be between -1 and 1"
+        description="A 2 decimal value that represents the overall sentiment of a comment. Ranges from -1.00 "
+                    "(max negative sentiment) to 1.00 (max positive sentiment), with 0.00 indicating neutral "
+                    "sentiment. It must be between -1.00 and 1.00"
+    )
+
+per_sub_category_sentiment_scores: list = \
+    Field(
+        description="A list of sentiment scores corresponding to the list of identified sub-categories. Each score is "
+                    "a 2 decimal value that represents sentiment of the corresponding sub-categories as it was used in "
+                    "the comment. Each score ranges from -1.00 (max negative sentiment) to 1.00 (max positive "
+                    "sentiment), with 0.00 indicating neutral sentiment. It must be between -1.00 and 1.00. The list "
+                    "should be of equal length to the list of corresponding sub-categories, and in the same order."
     )
 
 primary_category: str = Field(
@@ -109,16 +113,6 @@ top_5_categories: list = Field(
 categories_1_to_30: list = Field(
     description=f"All sub-categories identified in the comment in order of relevance, making sure to capture all the "
                 f"topics, with least 1 and no more than 30 categories. Each category name should be concise."
-)
-
-categories_1_to_30_with_per_item_sentiment: ListOfTuplesWithStrThenFloat = Field(
-    description=f"A list of tuples, each with two items: (sub_category: str, sentiment score: float). The list "
-                f"should cover all sub-categories identified in the comment in order of relevance, making sure to "
-                f"capture all the topics, with least 1 and no more than 30 categories. Each category name should be "
-                f"concise. For each sub-category, the second item in each tuple is a decimal value that represents the "
-                f"sentiment of the sub-category specific to its use in the comment. This sentiment score ranges from "
-                f"-1 (max negative sentiment) to 1 (max positive sentiment), with 0 indicating neutral sentiment. "
-                f"It must be between -1 and 1."
 )
 
 
@@ -199,8 +193,16 @@ class SubCategoriesAndSentiment(BaseValidatorModel):
 
 
 class SubCategoriesWithPerItemSentiment(BaseValidatorModel):
-    _field_count: int = 1
-    sub_categories_with_per_item_sentiment: ListOfTuplesWithStrThenFloat = categories_1_to_30_with_per_item_sentiment
+    _field_count: int = 2
+    sub_categories: list = categories_1_to_30
+    per_sub_category_sentiment_scores: list = per_sub_category_sentiment_scores
+
+
+class SubCategoriesWithPerItemSentimentAndOverallSentiment(BaseValidatorModel):
+    _field_count: int = 3
+    sub_categories: list = categories_1_to_30
+    per_sub_category_sentiment_scores: list = per_sub_category_sentiment_scores
+    sentiment_score: float = sentiment_score
 
 
 class TopCategoriesAndSentiment(BaseValidatorModel):
