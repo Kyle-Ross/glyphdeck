@@ -1,6 +1,5 @@
 from utility import time_since_start
 from diskcache import Cache
-from icecream import ic
 import hashlib
 import os
 

@@ -20,7 +20,7 @@ def prog_print(message: str):
 prog_print("Started Script")
 
 # Set file variables
-source_file = "scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train - 1000.csv"
+source_file = "scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
 source_file_type = source_file.split(".")[-1]
 
 prog_print("Set file vars")
@@ -29,8 +29,9 @@ prog_print("Set file vars")
 prog_print("Starting data prepper")
 prepared_data = (Prepper()
                  .load_data(source_file, source_file_type, encoding="ISO-8859-1")
-                 .set_id_column('UserName')
-                 .set_data_columns(['OriginalTweet', 'Location'])
+                 .set_id_column('Row ID')
+                 .set_data_columns(['Review Text'])
+                 # .set_data_columns(['OriginalTweet', 'Location'])
                  .set_data_dict())
 prog_print("Finished data prepper")
 
@@ -68,8 +69,8 @@ handler = LLMHandler(chain.latest_data,
                      model="gpt-3.5-turbo",
                      role="An expert customer feedback analyst nlp system",
                      request="Analyse the feedback and return results in the correct format",
-                     validation_model=type_models.SentimentScore,
-                     cache_identifier='NLP_SentimentScore_Twitter',
+                     validation_model=type_models.SubCategories,
+                     cache_identifier='NLPCategoryWomensClothesReview',
                      use_cache=True,
                      temperature=0.2,
                      max_validation_retries=3

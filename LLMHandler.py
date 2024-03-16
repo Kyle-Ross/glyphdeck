@@ -144,7 +144,7 @@ class LLMHandler:
             'temperature': item_temperature,
             'messages': [
                 {"role": "system", "content": item_role},
-                {"role": "user", "content": item_request + ' ' + input_text}
+                {"role": "user", "content": item_request + ' ' + str(input_text)}
             ]
         }
         # Defining the model and accessing parameters via dict unpack
