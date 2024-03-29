@@ -4,8 +4,6 @@ from LLMHandler import LLMHandler
 import type_models
 from Prepper import Prepper
 from Chain import Chain
-from icecream import ic
-import json
 
 print_progress = True
 
@@ -31,7 +29,6 @@ prepared_data = (Prepper()
                  .load_data(source_file, source_file_type, encoding="ISO-8859-1")
                  .set_id_column('Row ID')
                  .set_data_columns(['Review Text'])
-                 # .set_data_columns(['OriginalTweet', 'Location'])
                  .set_data_dict())
 prog_print("Finished data prepper")
 
@@ -56,11 +53,6 @@ prog_print("Finished regex sanitiser")
 # Leaving out table means the previous one is referenced
 chain.append(title='sanitised data', data=sanitised.output_data)
 prog_print("Appended sanitised data to chain")
-
-# Access the API key from the local secrets file
-with open("secrets.json") as file:
-    my_api_key = json.load(file)["openai_api_key"]
-prog_print("Set OpenAI API key")
 
 prog_print("Starting initialisation of LLMHandler class")
 # Initialising the llm handler
@@ -107,7 +99,6 @@ prog_print("Finished creating output file(s)")
 prog_print("Finished Script")
 
 # TODO - Make script use environment variable for api key, remove all use of json secret method
-# TODO - Add length checker for per sub-category sentiment scores, somehow in validation
 # TODO - Add togglable log / print functionality
 # TODO - Class to categorise into existing schema
 # TODO - Script - Auto category schema generator logic - which then loops back to categorise against that scheme

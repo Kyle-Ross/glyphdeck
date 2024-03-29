@@ -4,7 +4,8 @@ from custom_types import Data
 
 
 class Prepper:
-    """A class to process data from xlsx or csv files into a dataframe."""
+    """A class to process data from xlsx or csv files into a dataframe as well as the data type used in the
+    chain class"""
 
     def __init__(self):
         """Initialize an empty dataframe, id column name, and data columns dictionary."""

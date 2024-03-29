@@ -1,4 +1,4 @@
-from typing import Union, Dict, List, Tuple
+from typing import Union, Dict, List
 from datetime import datetime, timedelta
 import pandas as pd
 
