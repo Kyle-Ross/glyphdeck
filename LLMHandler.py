@@ -1,5 +1,5 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-from utility import string_cleaner
+from functions.strings import string_cleaner
 from custom_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
 from cache_types import openai_cache
 from icecream import ic

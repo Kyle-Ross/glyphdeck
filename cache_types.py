@@ -1,4 +1,4 @@
-from utility import time_since_start
+from functions.time import time_since_start
 from diskcache import Cache
 import hashlib
 import os

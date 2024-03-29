@@ -1,4 +1,4 @@
-from utility import time_since_start
+from functions.time import time_since_start
 from Sanitiser import RegexSanitiser
 from LLMHandler import LLMHandler
 import type_models
@@ -98,7 +98,6 @@ prog_print("Finished creating output file(s)")
 
 prog_print("Finished Script")
 
-# TODO - Make script use environment variable for api key, remove all use of json secret method
 # TODO - Add togglable log / print functionality
 # TODO - Class to categorise into existing schema
 # TODO - Script - Auto category schema generator logic - which then loops back to categorise against that scheme

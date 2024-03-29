@@ -16,12 +16,7 @@ def time_since_start(active=True):
         return ''
 
 
-def string_cleaner(input_str: str) -> str:
-    """Basic function to clean input strings."""
-    return input_str.strip().lower().replace(' ', '')
-
-
-def timedelta_to_string(td: timedelta) -> str:
+def delta_time_format(td: timedelta) -> str:
     """Takes a TimeDelta object and turns it into a nice string like '05h30m45s'"""
     total_seconds = td.total_seconds()
     hours = int(total_seconds // 3600)
