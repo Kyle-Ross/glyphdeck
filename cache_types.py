@@ -1,7 +1,10 @@
+from functions.logs import core_logger_setup
 from functions.time import time_since_start
 from diskcache import Cache
 import hashlib
 import os
+
+logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
 
 
 def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
@@ -10,9 +13,9 @@ def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
     # Check if the specified cache directory exists, if not create it
     if not os.path.exists(full_cache_dir):
         os.makedirs(full_cache_dir)
-        print(f"({time_since_start()}) '{full_cache_dir}' | Cache created")
+        logger.info(f"({time_since_start()}) '{full_cache_dir}' | Cache created")
     else:
-        print(f"({time_since_start()}) '{full_cache_dir}' | Cache exists")
+        logger.info(f"({time_since_start()}) '{full_cache_dir}' | Cache exists")
 
     # Create a DiskCache instance with the specified max_size
     max_size = max_mb_size * 1024 * 1024  # Convert megabytes to bytes
@@ -57,16 +60,15 @@ def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
             if self_use_cache:
                 if key in cache:
                     completions += 1
-                    print(f"({time_since_start()}) CACHE \u2713 | Key: {key_arg} | Index: {index_arg} | "
-                          f"#{completions} | '{full_cache_dir}'")
+                    logger.info(f"({time_since_start()}) CACHE - Key: {key_arg} - Index: {index_arg} - "
+                                f"#{completions} - '{full_cache_dir}'")
                     return cache[key]
 
             # Otherwise, call the function and store the result in the cache
             result = await func(self, *args, **kwargs)
             cache[key] = result
             completions += 1
-            print(f"({time_since_start()}) API   \u2713 | Key: {key_arg} | Index: {index_arg} | "
-                  f"#{completions}")
+            logger.info(f"({time_since_start()}) API  - Key: {key_arg} - Index: {index_arg} - #{completions}")
 
             # Return the result
             return result

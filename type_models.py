@@ -1,4 +1,10 @@
 from pydantic import BaseModel, Field, field_validator
+from functions.logs import assert_and_log_errors
+from functions.logs import core_logger_setup
+import os
+
+logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+current_file_name: str = os.path.basename(__file__)  # Used for log messages
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program
 # Used to assert and advise the expected output from provider calls
@@ -19,7 +25,8 @@ class BaseValidatorModel(BaseModel):
     @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
         if isinstance(v, float) or v in (-1, 0, 1):  # Allows some integers if inside the range
-            assert round(v, 2) == v, 'value has more than 2 decimal places'
+            assert_and_log_errors(logger, 'warning', current_file_name,
+                                  round(v, 2) == v, 'value has more than 2 decimal places')
         return v
 
     @field_validator('sentiment_score', check_fields=False)
@@ -28,7 +35,8 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, float) or v in (-1, 0, 1):
             minimum: float = sentiment_min
             maximum: float = sentiment_max
-            assert minimum <= v <= maximum, f'sentiment float is not between {minimum} to {maximum}'
+            assert_and_log_errors(logger, 'warning', current_file_name,
+                                  minimum <= v <= maximum, f'sentiment float is not between {minimum} to {maximum}')
         return v
 
     @field_validator('per_sub_category_sentiment_scores', check_fields=False)
@@ -36,12 +44,15 @@ class BaseValidatorModel(BaseModel):
         global sentiment_min, sentiment_max
         if isinstance(v, list):
             for x in v:
-                assert type(x) == float or x in (-1, 0, 1), f'{x} is not a float'
-                assert round(x, 2) == x, f'value {x} has more than 2 decimal places'
+                assert_and_log_errors(logger, 'warning', current_file_name,
+                                      type(x) == float or x in (-1, 0, 1), f'{x} is not a float')
+                assert_and_log_errors(logger, 'warning', current_file_name,
+                                      round(x, 2) == x, f'value {x} has more than 2 decimal places')
                 # Assert sentiment is in the allowed range as assigned in the global variables
                 minimum: float = sentiment_min
                 maximum: float = sentiment_max
-                assert minimum <= x <= maximum, f'sentiment float {x} is not between {minimum} to {maximum}'
+                assert_and_log_errors(logger, 'warning', current_file_name, minimum <= x <= maximum,
+                                      f'sentiment float {x} is not between {minimum} to {maximum}')
         return v
 
     @field_validator('top_categories', 'top_categories_with_char_limit', check_fields=False)
@@ -49,7 +60,8 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 5
-            assert minimum <= len(v) <= maximum, f'list does not contain between {minimum} to {maximum} entries'
+            assert_and_log_errors(logger, 'warning', current_file_name, minimum <= len(v) <= maximum,
+                                  f'list does not contain between {minimum} to {maximum} entries')
         return v
 
     @field_validator('sub_categories', 'sub_categories_with_char_limit', check_fields=False)
@@ -57,7 +69,8 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 30
-            assert minimum <= len(v) <= maximum, f'list does not contain between {minimum} to {maximum} entries'
+            assert_and_log_errors(logger, 'warning', current_file_name, minimum <= len(v) <= maximum,
+                                  f'list does not contain between {minimum} to {maximum} entries')
         return v
 
     @field_validator('primary_category_with_char_limit', check_fields=False)
@@ -66,7 +79,8 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, str):
             minimum: int = char_min
             maximum: int = char_max
-            assert minimum <= len(v) <= maximum, f'string is not between {minimum} to {maximum} characters'
+            assert_and_log_errors(logger, 'warning', current_file_name, minimum <= len(v) <= maximum,
+                                  f'string is not between {minimum} to {maximum} characters')
         return v
 
     @field_validator('top_categories_with_char_limit', 'sub_categories_with_char_limit', check_fields=False)
@@ -74,10 +88,11 @@ class BaseValidatorModel(BaseModel):
         global char_min, char_max
         if isinstance(v, list):
             for x in v:
-                assert type(x) == str, f'{x} is not a string'
+                assert_and_log_errors(logger, 'warning', current_file_name, type(x) == str, f'{x} is not a string')
                 minimum: int = char_min
                 maximum: int = char_max
-                assert minimum <= len(x) <= maximum, f'string "{x}" is not between {minimum} to {maximum} characters'
+                assert_and_log_errors(logger, 'warning', current_file_name, minimum <= len(x) <= maximum,
+                                      f'string "{x}" is not between {minimum} to {maximum} characters')
         return v
 
 

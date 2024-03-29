@@ -1,8 +1,11 @@
 from typing import Union, Tuple, List, Dict, Any
+from functions.logs import core_logger_setup
 from custom_types import Data
 from icecream import ic
 import pandas as pd
 import re
+
+logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
 
 
 class RegexSanitiser:
@@ -111,10 +114,12 @@ class RegexSanitiser:
         """Raises an error if any of the current placeholders contain non-alphabet characters excluding '<' and '>'."""
         for key, value in patterns_dict.items():
             if not all(char.isalpha() or char in '<>' for char in value['placeholder']):
-                raise TypeError(f"Placeholder {value['placeholder']}, "
-                                f"in pattern group '{value['group']}', "
-                                f"for pattern '{key}', "
-                                f"contains non-alphabet characters. This is not allowed in placeholders.")
+                error_message = f"Placeholder {value['placeholder']}, "\
+                                f"in pattern group '{value['group']}', "\
+                                f"for pattern '{key}', "\
+                                f"contains non-alphabet characters. This is not allowed in placeholders."
+                logger.error("TypeError: " + error_message)
+                raise TypeError(error_message)
 
     # Run a check on the default values
     placeholder_check(patterns)
@@ -184,7 +189,9 @@ class RegexSanitiser:
         # Check supplied patterns all exist
         for x in placeholder_dict:
             if x not in self.all_groups:
-                raise KeyError(f"Key {x} does not exist in available patterns: {self.all_groups}")
+                error_message = f"Key {x} does not exist in available patterns: {self.all_groups}"
+                logger.error("KeyError: " + error_message)
+                raise KeyError(error_message)
         # Add the placeholders to the patterns dictionary
         for key, value in self.patterns.items():
             if value['group'] in placeholder_dict:
@@ -199,7 +206,9 @@ class RegexSanitiser:
         # Check that each pattern exists
         for x in selection:
             if x not in self.all_groups:
-                raise KeyError(f"Pattern {x} does not exist in available patterns: {self.all_groups}")
+                error_message = f"Pattern {x} does not exist in available patterns: {self.all_groups}"
+                logger.error("KeyError: " + error_message)
+                raise KeyError(error_message)
         # Update 'active' in the patterns dict based on that list
         for key, value in self.patterns.items():
             if value['group'] in selection:

@@ -11,7 +11,7 @@ def time_since_start(active=True):
     elapsed_time = time.time() - start_time
     elapsed_time = "{:.4f}".format(elapsed_time)
     if active:
-        return f'\u25B2 {elapsed_time}s'
+        return f'^ {elapsed_time}s'
     else:
         return ''
 
