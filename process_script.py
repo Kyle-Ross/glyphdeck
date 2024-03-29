@@ -107,4 +107,8 @@ except Exception as error:
     logger.error(f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#")  # Log any errors that occurred
     raise
 
-# TODO - Class to categorise into existing schema
+# TODO - Example class to categorise into existing schema
+# TODO - Remove any types models with nesting, like the len checking category lists (they don't work with OpenAI)
+# TODO - Finalise project structure - i.e. directory organisation, where to put scripts vs classes
+# TODO - Make python environment / imports work like a VENV - so it can be set up easily on other machines
+# TODO - Create a front-end
