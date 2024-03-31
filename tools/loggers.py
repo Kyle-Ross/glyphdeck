@@ -1,6 +1,6 @@
+from tools.directory_creators import check_logs_directory
 from tools.time import time_since_start
-from typing import Type, NoReturn
-from constants import OUTPUT_LOGS_DIR
+from typing import Type, Tuple, NoReturn
 import traceback
 import logging
 import os
@@ -51,6 +51,18 @@ def assert_and_log_error(logger: logging.Logger,
     """Asserts a condition and logs the specified error"""
     if not condition:
         log_and_raise_error(logger, level, AssertionError, message, traceback_message)
+
+
+def log_start(process_name: str, logger: logging.Logger) -> Tuple[str, logging.Logger]:
+    """Shorthand function to log the start of a process"""
+    logger.info(f"Started: {process_name}")
+    return process_name, logger
+
+
+def log_end(log_start_tuple) -> NoReturn:
+    """Shorthand function to log the end of a process. Pass it the tuple returned by log_start()"""
+    process_name, logger = log_start_tuple
+    logger.info(f"Finished: {process_name}")
 
 
 def check_logger_exists(existing_logger):
@@ -107,17 +119,13 @@ class BaseLogger:
         self.file_log_level: int = file_log_level
         self.console_log_level: int = console_log_level
         self.log_file_name: str = log_file_name
-        self.log_file_path = os.path.join(OUTPUT_LOGS_DIR, self.log_file_name)
         self.format_string: str = f'%(asctime)s | {time_since_start()} | %(levelname)s | %(name)s |  %(message)s'
 
-        # Check if the log directory exists and create it if it doesn't
-        if not os.path.exists(OUTPUT_LOGS_DIR):
-            os.makedirs(OUTPUT_LOGS_DIR)  # Create the directory
-            log_dir_exists = False
-            log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder created"
-        else:
-            log_dir_exists = True
-            log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder exists"
+        # Check if the log directory exists (returns Tuple[bool, str, str])
+        log_dir_exists, log_message, log_directory = check_logs_directory()
+
+        # Define the full path of the log file
+        self.log_file_path = os.path.join(log_directory, self.log_file_name)
 
         # Create logger for just for logging inside the logger
         logging_logger = logger_setup('logging_logger',
@@ -199,9 +207,9 @@ class CacheLogger(BaseLogger):
                          console_log_level=shared_console_log_level)
 
 
-class BaseScriptLogger(BaseLogger):
+class BaseWorkflowLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='base_script',
+        super().__init__(name='base_workflow',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
 

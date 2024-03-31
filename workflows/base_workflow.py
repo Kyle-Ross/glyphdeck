@@ -1,4 +1,4 @@
-from tools.loggers import BaseScriptLogger, UnhandledErrorsLogger
+from tools.loggers import BaseWorkflowLogger, UnhandledErrorsLogger, log_start, log_end
 from processors.sanitiser import Sanitiser
 from processors.llm_handler import LLMHandler
 from processors.prepper import Prepper
@@ -7,38 +7,27 @@ from validation import validators
 import traceback
 import os
 
-logger = BaseScriptLogger().setup()
+logger = BaseWorkflowLogger().setup()
 unhandled_errors_logger = UnhandledErrorsLogger().setup()
 
 current_file_name = os.path.basename(__file__)
 
 
-def log_start(process_name: str) -> str:
-    """Shorthand function to log the start of a process"""
-    logger.info(f"Started: {process_name}")
-    return process_name
-
-
-def log_end(process_name: str):
-    """Shorthand function to log the end of a process"""
-    logger.info(f"Finished: {process_name}")
-
-
 # Try, Except over everything to log any errors
 try:
-    p1 = log_start(current_file_name)
+    p1 = log_start(current_file_name, logger)
 
     # Set the source file path
-    source_file = "scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
+    source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
     source_file_type = source_file.split(".")[-1]
 
     logger.info("Set file vars")
 
-    p2 = log_start('Chain initialisation')
+    p2 = log_start('Chain initialisation', logger)
     chain = Chain()
     log_end(p2)
 
-    p2 = log_start('Prepper')
+    p2 = log_start('Prepper', logger)
     prepared_data = (Prepper()
                      .load_data(source_file, source_file_type, encoding="ISO-8859-1")
                      .set_id_column('Row ID')
@@ -46,7 +35,7 @@ try:
                      .set_data_dict())
     log_end(p2)
 
-    p2 = log_start('Appending prepper data')
+    p2 = log_start('Appending prepper data', logger)
     chain.append(
         title='prepared data',
         data=prepared_data.output_data,
@@ -55,7 +44,7 @@ try:
         column_names=prepared_data.data_columns)
     log_end(p2)
 
-    p2 = log_start('Sanitiser')
+    p2 = log_start('Sanitiser', logger)
     sanitised = Sanitiser(chain.latest_data) \
         .select_groups(['date', 'email', 'path', 'url', 'number']) \
         .sanitise()
@@ -64,7 +53,7 @@ try:
     chain.append(title='sanitised data', data=sanitised.output_data)  # Other arguments are inherited
     logger.info("Appended sanitised data to chain")
 
-    p2 = log_start('LLMHandler initialisation')
+    p2 = log_start('LLMHandler initialisation', logger)
     handler = LLMHandler(chain.latest_data,
                          provider="OpenAI",
                          model="gpt-3.5-turbo",
@@ -72,21 +61,21 @@ try:
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                          cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                         use_cache=False,
+                         use_cache=True,
                          temperature=0.2,
                          max_validation_retries=3
                          )
     log_end(p2)
 
-    p2 = log_start('Running handler')
+    p2 = log_start('Running handler', logger)
     handler.run()
     log_end(p2)
 
-    p2 = log_start('LLMHandler data flattening')
+    p2 = log_start('LLMHandler data flattening', logger)
     handler.flatten_output_data(column_names=chain.latest_column_names)
     log_end(p2)
 
-    p2 = log_start('Appending handler output')
+    p2 = log_start('Appending handler output', logger)
     chain.append(
         title='llmoutput',
         data=handler.output_data,
@@ -94,7 +83,7 @@ try:
         update_expected_len=True)  # Updating len since the validation model can produce multiple columns per input
     log_end(p2)
 
-    p2 = log_start('Creating output file(s)')
+    p2 = log_start('Creating output file(s)', logger)
     chain.output(
         records=[chain.latest_title],
         file_type='xlsx',
@@ -123,7 +112,7 @@ except Exception as error:
         unhandled_errors_logger.critical(error_message)
         raise
 
-# TODO - Example class to categorise into existing schema
-# TODO - Finalise project structure - i.e. directory organisation, where to put scripts vs classes
+# TODO - Example class / workflow to categorise into existing schema
+# TODO - Think of better project name - ? Schema, Category, Mapper, StringEater
 # TODO - Make python environment / imports work like a VENV - so it can be set up easily on other machines
 # TODO - Create a front-end

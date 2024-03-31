@@ -5,6 +5,7 @@ from validation.data_types import (
     RecordList
 )
 from tools.loggers import assert_and_log_error, log_and_raise_error
+from tools.directory_creators import create_files_directory
 from tools.loggers import ChainLogger
 from constants import OUTPUT_FILES_DIR
 from datetime import datetime, timedelta
@@ -369,6 +370,9 @@ class Chain:
             file_name = f"{name_prefix} - {title} - {formatted_time}.{file_type}"
             file_path = os.path.join(OUTPUT_FILES_DIR, file_name)
             return file_path
+
+        # Create the files directory if it doesn't exist
+        create_files_directory(logger)
 
         # Output the dataframes
         if file_type == 'csv':

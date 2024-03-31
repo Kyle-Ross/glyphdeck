@@ -1,4 +1,4 @@
-from constants import OUTPUT_CACHES_DIR
+from tools.directory_creators import create_caches_directory
 from tools.loggers import CacheLogger
 from diskcache import Cache
 import hashlib
@@ -8,15 +8,9 @@ logger = CacheLogger().setup()
 
 
 def cache_creator(cache_dir: str, max_mb_size: int):
-    """Checks if a cache directory exists, if not, creates it. Returns the cache object afterwards."""
-    full_cache_dir = os.path.join(OUTPUT_CACHES_DIR, cache_dir)
-    # Check if the specified cache directory exists, if not create it
-    if not os.path.exists(full_cache_dir):
-        os.makedirs(full_cache_dir)
-        logger.info(f"'{full_cache_dir}' - Cache created")
-    else:
-        logger.debug(f"'{full_cache_dir}' - Cache exists")
-
+    """Checks if a cache exists, if not, creates it. Returns the cache object and file path afterwards."""
+    # Creates the caches directory and returns the full cache file path within
+    full_cache_dir = os.path.join(create_caches_directory(logger), cache_dir)
     # Create a DiskCache instance with the specified max_size
     max_size = max_mb_size * 1024 * 1024  # Convert megabytes to bytes
     cache = Cache(full_cache_dir, size_limit=max_size)
