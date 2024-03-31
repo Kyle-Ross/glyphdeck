@@ -71,7 +71,7 @@ def main():
 
 
 if __name__ == "__main__":  # Run the main code, with decorators and context managers in effect
-    with RuntimeLogBlock(logger), LogBlock(current_file_name, logger):
+    with RuntimeLogBlock(logger), LogBlock(current_file_name, logger):  # These run nested, in order (outer to inner)
         main()
 
 # TODO - Example class / workflow to categorise into existing schema
