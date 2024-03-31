@@ -1,9 +1,9 @@
-from functions.logs import BaseScriptLogger, UnhandledErrorsLogger
-from Sanitiser import RegexSanitiser
-from Handler import LLMHandler
-from Prepper import Prepper
-from Chain import Chain
-import validators
+from tools.loggers import BaseScriptLogger, UnhandledErrorsLogger
+from processors.sanitiser import Sanitiser
+from processors.llm_handler import LLMHandler
+from processors.prepper import Prepper
+from processors.chain import Chain
+from validation import validators
 import traceback
 import os
 
@@ -56,7 +56,7 @@ try:
     log_end(p2)
 
     p2 = log_start('Sanitiser')
-    sanitised = RegexSanitiser(chain.latest_data) \
+    sanitised = Sanitiser(chain.latest_data) \
         .select_groups(['date', 'email', 'path', 'url', 'number']) \
         .sanitise()
     log_end(p2)
@@ -82,7 +82,7 @@ try:
     handler.run()
     log_end(p2)
 
-    p2 = log_start('Handler data flattening')
+    p2 = log_start('LLMHandler data flattening')
     handler.flatten_output_data(column_names=chain.latest_column_names)
     log_end(p2)
 

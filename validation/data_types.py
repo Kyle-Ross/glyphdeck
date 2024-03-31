@@ -1,5 +1,5 @@
-from functions.logs import assert_and_log_error
-from functions.logs import DataTypesLogger
+from tools.loggers import assert_and_log_error
+from tools.loggers import DataTypesLogger
 from typing import Union, Dict, List
 from datetime import datetime, timedelta
 import pandas as pd

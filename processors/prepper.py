@@ -1,6 +1,6 @@
-from functions.logs import PrepperLogger, log_and_raise_error
+from tools.loggers import PrepperLogger, log_and_raise_error
 from typing import Union, List
-from data_types import Data
+from validation.data_types import Data
 import pandas as pd
 
 logger = PrepperLogger().setup()
@@ -61,7 +61,7 @@ class Prepper:
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
     from icecream import ic
-    test_file = "scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
+    test_file = "../scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
     processor = (Prepper()
                  .load_data(test_file, 'csv', encoding="ISO-8859-1")
                  .set_id_column('UserName')

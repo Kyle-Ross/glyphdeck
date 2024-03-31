@@ -1,17 +1,18 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-from data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
-from functions.logs import assert_and_log_error
-from functions.strings import string_cleaner
-from functions.logs import HandlerLogger
-from cache import openai_cache
+from validation.data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
+from validation import validators
+from tools.loggers import assert_and_log_error
+from tools.strings import string_cleaner
+from tools.loggers import LLMHandlerLogger
+from tools.caching import openai_cache
 from icecream import ic
-import validators
+import validation
 import instructor
 import asyncio
 import openai
 import os
 
-logger = HandlerLogger().setup()  # Gets the logger ready if it isn't there yet
+logger = LLMHandlerLogger().setup()  # Gets the logger ready if it isn't there yet
 
 
 class LLMHandler:
@@ -73,7 +74,7 @@ class LLMHandler:
                              f"{self.provider} is not in the list of available providers: "
                              f"\n{self.available_providers}")
 
-        # Object level llm information that serves as the default value if functions don't specify customisations
+        # Object level llm information that serves as the default value if tools don't specify customisations
         self.model: str = model
         self.role: str = role
         self.request: str = request

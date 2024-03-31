@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, field_validator
-from functions.logs import assert_and_log_error
-from functions.logs import TypeModelsLogger
+from tools.loggers import assert_and_log_error
+from tools.loggers import ValidatorsLogger
 
-logger = TypeModelsLogger().setup()
+logger = ValidatorsLogger().setup()
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program for data validation
 # Used to assert and advise the expected output from provider calls
@@ -15,8 +15,8 @@ sentiment_max = 1.00
 # ---BASE MODELS---
 # Add field names to the field_validator arguments if you want them to be validated by a method
 class BaseValidatorModel(BaseModel):
-    """Adds field validators to the resulting BaseValidatorModel class, which are used if columns match the arguments.
-    Multiple validators can apply to a single field if the column name is in multiple validators."""
+    """Adds field validation to the resulting BaseValidatorModel class, which are used if columns match the arguments.
+    Multiple validation can apply to a single field if the column name is in multiple validation."""
 
     @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):

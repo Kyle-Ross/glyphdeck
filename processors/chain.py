@@ -1,15 +1,17 @@
-from data_types import (
+from validation.data_types import (
     Record, Records, Data, IntStr, dFrame,
     dFrame_or_None, IntList, StrList,
     StrList_or_None, List_or_Str, IntStrNone,
     RecordList
 )
-from functions.logs import assert_and_log_error, log_and_raise_error
-from functions.logs import ChainLogger
+from tools.loggers import assert_and_log_error, log_and_raise_error
+from tools.loggers import ChainLogger
+from constants import OUTPUT_FILES_DIR
 from datetime import datetime, timedelta
 from functools import reduce
 import pandas as pd
 import re
+import os
 
 logger = ChainLogger().setup()
 
@@ -256,9 +258,9 @@ class Chain:
             else:
                 column_names_len = len(column_names)  # Otherwise, get the length from the provided list
             assert_and_log_error(logger, 'error', column_names_len == self.expected_len,
-                                  f"{self.expected_len} columns expected, but 'column_names' contains "
-                                  f"{column_names_len} entries. If this is expected, set "
-                                  f"self.append(update_expected_len=True), otherwise review your data.")
+                                 f"{self.expected_len} columns expected, but 'column_names' contains "
+                                 f"{column_names_len} entries. If this is expected, set "
+                                 f"self.append(update_expected_len=True), otherwise review your data.")
 
         now: datetime = datetime.now()
         delta: timedelta = now - self.latest_dt
@@ -323,13 +325,12 @@ class Chain:
                records: List_or_Str,
                file_type: str,
                name_prefix: str,
-               output_directory: str = r'output',
                rejoin: bool = True,
                split: bool = False):
         # Checking file_type is in allowed list
         allowed_file_types = ['csv', 'xlsx']
         assert_and_log_error(logger, 'error', file_type in allowed_file_types,
-                              f"'{file_type}' is not in allowed list {allowed_file_types}.")
+                             f"'{file_type}' is not in allowed list {allowed_file_types}.")
         # Use the separate or combined records
         if split:
             records_list: RecordList = self.selector(records, use_suffix=False)
@@ -353,7 +354,7 @@ class Chain:
             record['output_df'] = df
 
         def make_path(source_record: Record) -> str:
-            """Function to generate file paths for records. Does not include file type."""
+            """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
             # Conditionally setting the title to be used in the name
             if file_type == 'csv' and split:
@@ -365,20 +366,20 @@ class Chain:
             else:
                 title = "combined"
 
-            name = f"{name_prefix} - {title} - {formatted_time}"
-            new_path = output_directory + "\\" + name
-            return new_path
+            file_name = f"{name_prefix} - {title} - {formatted_time}.{file_type}"
+            file_path = os.path.join(OUTPUT_FILES_DIR, file_name)
+            return file_path
 
         # Output the dataframes
         if file_type == 'csv':
             for record in records_list:
                 df = record['output_df']
                 path = make_path(record)
-                df.to_csv(f"{path}.csv", index=False)
+                df.to_csv(path, index=False)
 
         if file_type == 'xlsx':
             path = make_path(self.latest_record)  # Argument may not be used in certain conditions
-            with pd.ExcelWriter(f"{path}.xlsx") as writer:
+            with pd.ExcelWriter(path) as writer:
                 for record in records_list:  # Writing each record to its own sheet in the same xlsx file
                     sheet_df = record['output_df']
                     invalid_chars = r'[\/:*?"<>|]'

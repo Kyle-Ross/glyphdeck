@@ -1,5 +1,6 @@
-from functions.time import time_since_start
+from tools.time import time_since_start
 from typing import Type, NoReturn
+from constants import OUTPUT_LOGS_DIR
 import traceback
 import logging
 import os
@@ -12,6 +13,7 @@ def log_and_raise_error(logger: logging.Logger,
                         traceback_message: bool = False) -> NoReturn:
     """Logs and raises an error with the same message string. Wraps in custom error to indicate this is an error that
     was handled. Later this will prevent it being re-raised as an unhandled error"""
+
     class HandledError(error_type):
         pass
 
@@ -51,10 +53,48 @@ def assert_and_log_error(logger: logging.Logger,
         log_and_raise_error(logger, level, AssertionError, message, traceback_message)
 
 
-def check_logger_exists(logger_name):
+def check_logger_exists(existing_logger):
     """Checks if a logger with the provided name exists"""
     existing_loggers = logging.Logger.manager.loggerDict.keys()
-    return logger_name in existing_loggers
+    return existing_logger in existing_loggers  # To be evaluated as True if it exists at all
+
+
+def logger_setup(name: str,
+                 format_string: str,
+                 file_log_level: int,
+                 console_log_level: int,
+                 log_file_path: str) -> logging.Logger:
+    """Initialises, configures and returns the logger object if it doesn't exist yet"""
+    # Check if the logger already exists, if it does, return it and skip the rest of the function
+    if check_logger_exists(name):
+        return logging.getLogger(name)
+
+    # Otherwise, set up the logger then return it
+
+    # Initialising the logger and naming it
+    logger = logging.getLogger(name)
+
+    # Set logger level to the lowest level between file and console
+    # This is because handlers can only access levels at or above the level of the logger
+    logger.setLevel(min(file_log_level, console_log_level))
+
+    # Get the formatter for this logger
+    formatter = logging.Formatter(format_string)
+
+    # File log handler
+    file_handler = logging.FileHandler(log_file_path)
+    file_handler.setLevel(file_log_level)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    # Console log handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(console_log_level)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    # Return the configured logger object
+    return logger
 
 
 class BaseLogger:
@@ -62,54 +102,43 @@ class BaseLogger:
                  name: str,
                  file_log_level: int,
                  console_log_level: int,
-                 log_file: str = 'base.log'):
+                 log_file_name: str = 'base.log'):
         self.name: str = name
         self.file_log_level: int = file_log_level
         self.console_log_level: int = console_log_level
-        self.log_file: str = log_file
+        self.log_file_name: str = log_file_name
+        self.log_file_path = os.path.join(OUTPUT_LOGS_DIR, self.log_file_name)
         self.format_string: str = f'%(asctime)s | {time_since_start()} | %(levelname)s | %(name)s |  %(message)s'
 
-    def check_logger_exists(self):
-        """Checks if a logger with the provided name exists"""
-        existing_loggers = logging.Logger.manager.loggerDict.keys()
-        return self.name in existing_loggers
+        # Check if the log directory exists and create it if it doesn't
+        if not os.path.exists(OUTPUT_LOGS_DIR):
+            os.makedirs(OUTPUT_LOGS_DIR)  # Create the directory
+            log_dir_exists = False
+            log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder created"
+        else:
+            log_dir_exists = True
+            log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder exists"
 
-    def setup(self):
-        """Initialises, configures and returns the logger object."""
-        # Check if the logger already exists, if it does, return it and skip the rest of the function
-        if self.check_logger_exists():
-            return logging.getLogger(self.name)
+        # Create logger for just for logging inside the logger
+        logging_logger = logger_setup('logging_logger',
+                                      self.format_string,
+                                      self.file_log_level,
+                                      self.console_log_level,
+                                      self.log_file_path)
 
-        # Otherwise, set up the logger then return it
+        # Log the results of the log directory check using the logging_logger
+        if log_dir_exists:
+            logging_logger.debug(log_message)
+        if not log_dir_exists:
+            logging_logger.info(log_message)
 
-        # Setting the path of the log file relative to this script location
-        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        log_dir = 'logs'
-        log_file_path = os.path.join(parent_dir, log_dir, self.log_file)
-
-        # Initialising the logger and naming it
-        logger = logging.getLogger(self.name)
-
-        # Set logger level to the lowest level between file and console
-        # This is because handlers can only access levels at or above the level of the logger
-        logger.setLevel(min(self.file_log_level, self.console_log_level))
-
-        # Get the formatter for this logger
-        formatter = logging.Formatter(self.format_string)
-
-        # File log handler
-        file_handler = logging.FileHandler(log_file_path)
-        file_handler.setLevel(self.file_log_level)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-        # Console log handler
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(self.console_log_level)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-        # Return the configured logger object
+    def setup(self) -> logging.Logger:
+        """Sets up the logger"""
+        logger = logger_setup(self.name,
+                              self.format_string,
+                              self.file_log_level,
+                              self.console_log_level,
+                              self.log_file_path)
         return logger
 
 
@@ -149,16 +178,16 @@ class SanitiserLogger(BaseLogger):
                          console_log_level=shared_console_log_level)
 
 
-class TypeModelsLogger(BaseLogger):
+class ValidatorsLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='type_models',
+        super().__init__(name='validators_models',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
 
 
-class HandlerLogger(BaseLogger):
+class LLMHandlerLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='Handler',
+        super().__init__(name='LLMHandler',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
 

@@ -1,4 +1,5 @@
-from functions.logs import CacheLogger
+from constants import OUTPUT_CACHES_DIR
+from tools.loggers import CacheLogger
 from diskcache import Cache
 import hashlib
 import os
@@ -6,15 +7,15 @@ import os
 logger = CacheLogger().setup()
 
 
-def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
-    """Checks if a cache director exists, if not, creates it. Returns the cache object afterwards."""
-    full_cache_dir = parent_dir + '\\' + cache_dir
+def cache_creator(cache_dir: str, max_mb_size: int):
+    """Checks if a cache directory exists, if not, creates it. Returns the cache object afterwards."""
+    full_cache_dir = os.path.join(OUTPUT_CACHES_DIR, cache_dir)
     # Check if the specified cache directory exists, if not create it
     if not os.path.exists(full_cache_dir):
         os.makedirs(full_cache_dir)
         logger.info(f"'{full_cache_dir}' - Cache created")
     else:
-        logger.info(f"'{full_cache_dir}' - Cache exists")
+        logger.debug(f"'{full_cache_dir}' - Cache exists")
 
     # Create a DiskCache instance with the specified max_size
     max_size = max_mb_size * 1024 * 1024  # Convert megabytes to bytes
@@ -22,12 +23,12 @@ def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
     return cache, full_cache_dir
 
 
-def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
+def openai_cache(cache_dir, max_mb_size: int = 1000):
     """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
     cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
     records will be culled."""
     # Finds or creates the cache folder and object, as well as returning the directory of the cache
-    cache, full_cache_dir = cache_creator(parent_dir, cache_dir, max_mb_size)
+    cache, full_cache_dir = cache_creator(cache_dir, max_mb_size)
 
     # Define the actual decorator function
     def decorator(func):

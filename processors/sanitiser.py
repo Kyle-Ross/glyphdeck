@@ -1,6 +1,6 @@
 from typing import Union, Tuple, List, Dict, Any
-from functions.logs import SanitiserLogger, log_and_raise_error
-from data_types import Data
+from tools.loggers import SanitiserLogger, log_and_raise_error
+from validation.data_types import Data
 from icecream import ic
 import pandas as pd
 import re
@@ -8,7 +8,7 @@ import re
 logger = SanitiserLogger().setup()
 
 
-class RegexSanitiser:
+class Sanitiser:
     """Takes a string and uses selected patterns to replace private information with placeholders."""
     # Email addresses
     email_regex: str = \
@@ -182,7 +182,7 @@ class RegexSanitiser:
                 self.group_matches[value['group']] += value['matches']
                 self.total_matches += value['matches']
 
-    def set_placeholders(self, placeholder_dict: Dict[str, str]) -> 'RegexSanitiser':
+    def set_placeholders(self, placeholder_dict: Dict[str, str]) -> 'Sanitiser':
         """Function to change the placeholders from their defaults
         Accepts a dict with {'group_name': 'placeholder',...}"""
         # Check supplied patterns all exist
@@ -199,7 +199,7 @@ class RegexSanitiser:
         self.placeholder_check(self.patterns)
         return self
 
-    def select_groups(self, selection: List) -> 'RegexSanitiser':
+    def select_groups(self, selection: List) -> 'Sanitiser':
         """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
         # Check that each pattern exists
         for x in selection:
@@ -291,7 +291,7 @@ if __name__ == "__main__":
                 r'I was born 15/12/1990, a file path is C:\Users\username\Pictures\BYG0Djh.png'
             ]
         }
-    santiser_obj = RegexSanitiser(data_example)
+    santiser_obj = Sanitiser(data_example)
     # Select to only run certain groups
     santiser_obj.select_groups(selection=['number', 'date', 'email', 'path', 'url'])
     # Replace placeholders
