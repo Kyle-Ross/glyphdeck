@@ -1,6 +1,6 @@
 from functions.logs import core_logger_setup
 from Sanitiser import RegexSanitiser
-from LLMHandler import LLMHandler
+from Handler import LLMHandler
 from Prepper import Prepper
 from Chain import Chain
 import type_models
@@ -8,7 +8,7 @@ import traceback
 import os
 
 logger = core_logger_setup()
-current_file_name: str = os.path.basename(__file__)  # Used for log messages
+current_file_name = os.path.basename(__file__)
 
 
 def log_start(process_name: str) -> str:
@@ -70,7 +70,7 @@ try:
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=type_models.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                          cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                         use_cache=True,
+                         use_cache=False,
                          temperature=0.2,
                          max_validation_retries=3
                          )
@@ -108,7 +108,6 @@ except Exception as error:
     raise
 
 # TODO - Example class to categorise into existing schema
-# TODO - Remove any types models with nesting, like the len checking category lists (they don't work with OpenAI)
 # TODO - Finalise project structure - i.e. directory organisation, where to put scripts vs classes
 # TODO - Make python environment / imports work like a VENV - so it can be set up easily on other machines
 # TODO - Create a front-end

@@ -8,7 +8,7 @@ def check_logger_exists(logger_name):
     return logger_name in existing_loggers
 
 
-def core_logger_setup(module_name=None):
+def core_logger_setup():
     """Initialises, configures and returns the core logger object for the project. To be imported in other files."""
     logger_name = 'core'
 
@@ -54,18 +54,19 @@ def core_logger_setup(module_name=None):
     return logger
 
 
-def assert_and_log_errors(logger, level, module_name: str, condition: bool, message: str):
+def assert_and_log_errors(logger, level, condition: bool, message: str):
     """Asserts a condition but logs the error. Raises the AssertionError if the level is 'error'"""
     levels = ['error', 'warning']
     level_clean = level.lower()
     assert level_clean in levels, f"Provided level '{level_clean}' is not in list of allowed arguments {levels}"
     try:
         # Adds module name here since it isn't recorded correctly at the logger level on import
-        assert condition, "(in " + module_name + ") " + message
+        assert condition, message
     except AssertionError as e:
         error = str(e)
         if level == 'error':
             logger.error(error)
             raise
-        if level == 'warning':  # Doesn't re-raise the error
+        if level == 'warning':
             logger.warning(error)
+            raise

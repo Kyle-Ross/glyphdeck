@@ -9,11 +9,9 @@ from functions.logs import core_logger_setup
 from datetime import datetime, timedelta
 from functools import reduce
 import pandas as pd
-import os
 import re
 
 logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
-current_file_name: str = os.path.basename(__file__)  # Used for log messages
 
 
 class Chain:
@@ -261,7 +259,7 @@ class Chain:
                 column_names_len = len(self.latest_column_names)  # Uses the latest if none were set
             else:
                 column_names_len = len(column_names)  # Otherwise, get the length from the provided list
-            assert_and_log_errors(logger, 'error', current_file_name, column_names_len == self.expected_len,
+            assert_and_log_errors(logger, 'error', column_names_len == self.expected_len,
                                   f"{self.expected_len} columns expected, but 'column_names' contains "
                                   f"{column_names_len} entries. If this is expected, set "
                                   f"self.append(update_expected_len=True), otherwise review your data.")
@@ -334,7 +332,7 @@ class Chain:
                split: bool = False):
         # Checking file_type is in allowed list
         allowed_file_types = ['csv', 'xlsx']
-        assert_and_log_errors(logger, 'error', current_file_name, file_type in allowed_file_types,
+        assert_and_log_errors(logger, 'error', file_type in allowed_file_types,
                               f"'{file_type}' is not in allowed list {allowed_file_types}.")
         # Use the separate or combined records
         if split:

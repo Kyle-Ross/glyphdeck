@@ -4,6 +4,7 @@ from custom_types import Data
 from icecream import ic
 import pandas as pd
 import re
+import os
 
 logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
 

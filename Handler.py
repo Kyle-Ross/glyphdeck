@@ -12,7 +12,6 @@ import openai
 import os
 
 logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
-current_file_name: str = os.path.basename(__file__)  # Used for log messages
 
 
 class LLMHandler:
@@ -21,7 +20,7 @@ class LLMHandler:
     def check_validation_model(self):
         """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
         check: bool = issubclass(self.validation_model, type_models.BaseValidatorModel)
-        assert_and_log_errors(logger, 'error', current_file_name, check,
+        assert_and_log_errors(logger, 'error', check,
                               f'{self.validation_model.__name__} is not a subclass of the '
                               f'Pydantic BaseValidatorModel class')
 
@@ -40,21 +39,21 @@ class LLMHandler:
 
         # Assert the variable type of the provided arguments
         assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(provider, str),
+        assert_and_log_errors(logger, 'error', isinstance(provider, str),
                               "'provider' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(model, str),
+        assert_and_log_errors(logger, 'error', isinstance(model, str),
                               "'model' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(role, str),
+        assert_and_log_errors(logger, 'error', isinstance(role, str),
                               "'role' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(request, str),
+        assert_and_log_errors(logger, 'error',  isinstance(request, str),
                               "'request' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(cache_identifier, str),
+        assert_and_log_errors(logger, 'error',  isinstance(cache_identifier, str),
                               "'cache_identifier' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(use_cache, bool),
+        assert_and_log_errors(logger, 'error',  isinstance(use_cache, bool),
                               "'use_cache' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(temperature, float),
+        assert_and_log_errors(logger, 'error',  isinstance(temperature, float),
                               "'temperature' argument must be type 'float'")
-        assert_and_log_errors(logger, 'error', current_file_name, isinstance(max_validation_retries, int),
+        assert_and_log_errors(logger, 'error',  isinstance(max_validation_retries, int),
                               "'max_validation_retries' argument must be type 'int'")
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
@@ -70,7 +69,7 @@ class LLMHandler:
         self.available_providers: tuple = ("openai",)
         self.provider: str = provider
         self.provider_clean: str = string_cleaner(self.provider)
-        assert_and_log_errors(logger, 'error', current_file_name, self.provider_clean in self.available_providers,
+        assert_and_log_errors(logger, 'error',  self.provider_clean in self.available_providers,
                               f"{self.provider} is not in the list of available providers: "
                               f"\n{self.available_providers}")
 
@@ -90,14 +89,14 @@ class LLMHandler:
     @property
     def output_data(self):
         """Accesses output data but only if the data has been flattened."""
-        assert_and_log_errors(logger, 'error', current_file_name, self.new_output_data is not None,
+        assert_and_log_errors(logger, 'error',  self.new_output_data is not None,
                               "output_data is empty, run self.flatten_output_data() first.")
         return self.new_output_data
 
     @property
     def column_names(self):
         """Accesses column names but only if the new names have been generated during data flattening."""
-        assert_and_log_errors(logger, 'error', current_file_name, self.new_column_names is not None,
+        assert_and_log_errors(logger, 'error',  self.new_column_names is not None,
                               "column_names is empty, run self.flatten_output_data() first.")
         return self.new_column_names
 
@@ -143,7 +142,7 @@ class LLMHandler:
             item_max_validation_retries = self.max_validation_retries
 
         # Asserting value limitations specific to OpenAI
-        assert_and_log_errors(logger, 'error', current_file_name, 0 <= item_temperature <= 1,
+        assert_and_log_errors(logger, 'error',  0 <= item_temperature <= 1,
                               "For OpenAI, temperature must be between 0 and 1")
 
         openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -261,7 +260,7 @@ if __name__ == "__main__":
                          model="gpt-3.5-turbo",
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
-                         validation_model=type_models.PrimaryCategoryAndSubCategoryWithCharLimit,
+                         validation_model=type_models.PrimaryCategoryAndSubCategory,
                          cache_identifier='NLP-Categorise-TestData',
                          use_cache=True,
                          temperature=0.2,
