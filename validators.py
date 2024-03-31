@@ -1,15 +1,13 @@
 from pydantic import BaseModel, Field, field_validator
-from functions.logs import assert_and_log_errors
+from functions.logs import assert_and_log_error
 from functions.logs import TypeModelsLogger
 
 logger = TypeModelsLogger().setup()
 
-# Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program
+# Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program for data validation
 # Used to assert and advise the expected output from provider calls
 
 # Global variables which define the min and max characters allowed in various fields
-char_min = 3
-char_max = 30
 sentiment_min = -1.00
 sentiment_max = 1.00
 
@@ -23,8 +21,8 @@ class BaseValidatorModel(BaseModel):
     @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
         if isinstance(v, float) or v in (-1, 0, 1):  # Allows some integers if inside the range
-            assert_and_log_errors(logger, 'warning', 
-                                  round(v, 2) == v, 'value has more than 2 decimal places')
+            assert_and_log_error(logger, 'warning',
+                                 round(v, 2) == v, 'value has more than 2 decimal places')
         return v
 
     @field_validator('sentiment_score', check_fields=False)
@@ -33,8 +31,8 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, float) or v in (-1, 0, 1):
             minimum: float = sentiment_min
             maximum: float = sentiment_max
-            assert_and_log_errors(logger, 'warning', 
-                                  minimum <= v <= maximum, f'sentiment float is not between {minimum} to {maximum}')
+            assert_and_log_error(logger, 'warning',
+                                 minimum <= v <= maximum, f'sentiment float is not between {minimum} to {maximum}')
         return v
 
     @field_validator('per_sub_category_sentiment_scores', check_fields=False)
@@ -42,14 +40,14 @@ class BaseValidatorModel(BaseModel):
         global sentiment_min, sentiment_max
         if isinstance(v, list):
             for x in v:
-                assert_and_log_errors(logger, 'warning', 
-                                      type(x) == float or x in (-1, 0, 1), f'{x} is not a float')
-                assert_and_log_errors(logger, 'warning', 
-                                      round(x, 2) == x, f'value {x} has more than 2 decimal places')
+                assert_and_log_error(logger, 'warning',
+                                     type(x) == float or x in (-1, 0, 1), f'{x} is not a float')
+                assert_and_log_error(logger, 'warning',
+                                     round(x, 2) == x, f'value {x} has more than 2 decimal places')
                 # Assert sentiment is in the allowed range as assigned in the global variables
                 minimum: float = sentiment_min
                 maximum: float = sentiment_max
-                assert_and_log_errors(logger, 'warning',  minimum <= x <= maximum,
+                assert_and_log_error(logger, 'warning', minimum <= x <= maximum,
                                       f'sentiment float {x} is not between {minimum} to {maximum}')
         return v
 
@@ -58,7 +56,7 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 5
-            assert_and_log_errors(logger, 'warning',  minimum <= len(v) <= maximum,
+            assert_and_log_error(logger, 'warning', minimum <= len(v) <= maximum,
                                   f'list does not contain between {minimum} to {maximum} entries')
         return v
 
@@ -67,7 +65,7 @@ class BaseValidatorModel(BaseModel):
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 30
-            assert_and_log_errors(logger, 'warning',  minimum <= len(v) <= maximum,
+            assert_and_log_error(logger, 'warning', minimum <= len(v) <= maximum,
                                   f'list does not contain between {minimum} to {maximum} entries')
         return v
 

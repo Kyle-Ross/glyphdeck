@@ -1,11 +1,11 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-from custom_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
-from functions.logs import assert_and_log_errors
+from data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
+from functions.logs import assert_and_log_error
 from functions.strings import string_cleaner
 from functions.logs import HandlerLogger
-from cache_types import openai_cache
+from cache import openai_cache
 from icecream import ic
-import type_models
+import validators
 import instructor
 import asyncio
 import openai
@@ -20,9 +20,9 @@ class LLMHandler:
     def check_validation_model(self):
         """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
         check: bool = issubclass(self.validation_model, type_models.BaseValidatorModel)
-        assert_and_log_errors(logger, 'error', check,
-                              f'{self.validation_model.__name__} is not a subclass of the '
-                              f'Pydantic BaseValidatorModel class')
+        assert_and_log_error(logger, 'error', check,
+                             f'{self.validation_model.__name__} is not a subclass of the '
+                             f'Pydantic BaseValidatorModel class')
 
     def __init__(self,
                  input_data: Data,  # Input variable of the custom 'Data' type
@@ -39,22 +39,22 @@ class LLMHandler:
 
         # Assert the variable type of the provided arguments
         assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
-        assert_and_log_errors(logger, 'error', isinstance(provider, str),
-                              "'provider' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', isinstance(model, str),
-                              "'model' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error', isinstance(role, str),
-                              "'role' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error',  isinstance(request, str),
-                              "'request' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error',  isinstance(cache_identifier, str),
-                              "'cache_identifier' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error',  isinstance(use_cache, bool),
-                              "'use_cache' argument must be type 'str'")
-        assert_and_log_errors(logger, 'error',  isinstance(temperature, float),
-                              "'temperature' argument must be type 'float'")
-        assert_and_log_errors(logger, 'error',  isinstance(max_validation_retries, int),
-                              "'max_validation_retries' argument must be type 'int'")
+        assert_and_log_error(logger, 'error', isinstance(provider, str),
+                             "'provider' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(model, str),
+                             "'model' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(role, str),
+                             "'role' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(request, str),
+                             "'request' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(cache_identifier, str),
+                             "'cache_identifier' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(use_cache, bool),
+                             "'use_cache' argument must be type 'str'")
+        assert_and_log_error(logger, 'error', isinstance(temperature, float),
+                             "'temperature' argument must be type 'float'")
+        assert_and_log_error(logger, 'error', isinstance(max_validation_retries, int),
+                             "'max_validation_retries' argument must be type 'int'")
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
@@ -69,9 +69,9 @@ class LLMHandler:
         self.available_providers: tuple = ("openai",)
         self.provider: str = provider
         self.provider_clean: str = string_cleaner(self.provider)
-        assert_and_log_errors(logger, 'error',  self.provider_clean in self.available_providers,
-                              f"{self.provider} is not in the list of available providers: "
-                              f"\n{self.available_providers}")
+        assert_and_log_error(logger, 'error', self.provider_clean in self.available_providers,
+                             f"{self.provider} is not in the list of available providers: "
+                             f"\n{self.available_providers}")
 
         # Object level llm information that serves as the default value if functions don't specify customisations
         self.model: str = model
@@ -89,15 +89,15 @@ class LLMHandler:
     @property
     def output_data(self):
         """Accesses output data but only if the data has been flattened."""
-        assert_and_log_errors(logger, 'error',  self.new_output_data is not None,
-                              "output_data is empty, run self.flatten_output_data() first.")
+        assert_and_log_error(logger, 'error', self.new_output_data is not None,
+                             "output_data is empty, run self.flatten_output_data() first.")
         return self.new_output_data
 
     @property
     def column_names(self):
         """Accesses column names but only if the new names have been generated during data flattening."""
-        assert_and_log_errors(logger, 'error',  self.new_column_names is not None,
-                              "column_names is empty, run self.flatten_output_data() first.")
+        assert_and_log_error(logger, 'error', self.new_column_names is not None,
+                             "column_names is empty, run self.flatten_output_data() first.")
         return self.new_column_names
 
     # Tenacity retry decorator for the following errors with exponential backoff
@@ -142,8 +142,8 @@ class LLMHandler:
             item_max_validation_retries = self.max_validation_retries
 
         # Asserting value limitations specific to OpenAI
-        assert_and_log_errors(logger, 'error',  0 <= item_temperature <= 1,
-                              "For OpenAI, temperature must be between 0 and 1")
+        assert_and_log_error(logger, 'error', 0 <= item_temperature <= 1,
+                             "For OpenAI, temperature must be between 0 and 1")
 
         openai.api_key = os.getenv("OPENAI_API_KEY")
 

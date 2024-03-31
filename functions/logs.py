@@ -1,6 +1,54 @@
+from functions.time import time_since_start
+from typing import Type, NoReturn
 import traceback
 import logging
 import os
+
+
+def log_and_raise_error(logger: logging.Logger,
+                        level: str,
+                        error_type: Type[BaseException],
+                        message: str,
+                        traceback_message: bool = False) -> NoReturn:
+    """Logs and raises an error with the same message string. Wraps in custom error to indicate this is an error that
+    was handled. Later this will prevent it being re-raised as an unhandled error"""
+    class HandledError(error_type):
+        pass
+
+    # Check the provided level arguments
+    allowed_levels = ('warning', 'error', 'critical')
+    try:
+        assert level.lower() in allowed_levels, f"AssertionError - Level argument {level} " \
+                                                f"is not one of the allowed levels {allowed_levels}"
+    except AssertionError as error:
+        logger.error(error)
+        raise HandledError(error)
+
+    # Build the log / error message
+    error_message = f"{error_type.__name__} - {message}"
+    if traceback_message:  # Include detailed traceback information in the log if specified
+        error_message = f"{error_message}\n{traceback.format_exc()}#ENDOFLOG#"
+
+    # Log the message at the specified level and re-raise the error
+    if level == 'warning':
+        logger.warning(error_message)
+        raise HandledError(error_message)
+    if level == 'error':
+        logger.error(error_message)
+        raise HandledError(error_message)
+    if level == 'critical':
+        logger.critical(error_message)
+        raise HandledError(error_message)
+
+
+def assert_and_log_error(logger: logging.Logger,
+                         level: str,
+                         condition: bool,
+                         message: str,
+                         traceback_message: bool = False) -> NoReturn:
+    """Asserts a condition and logs the specified error"""
+    if not condition:
+        log_and_raise_error(logger, level, AssertionError, message, traceback_message)
 
 
 def check_logger_exists(logger_name):
@@ -19,7 +67,7 @@ class BaseLogger:
         self.file_log_level: int = file_log_level
         self.console_log_level: int = console_log_level
         self.log_file: str = log_file
-        self.format_string: str = '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
+        self.format_string: str = f'%(asctime)s | {time_since_start()} | %(levelname)s | %(name)s |  %(message)s'
 
     def check_logger_exists(self):
         """Checks if a logger with the provided name exists"""
@@ -73,9 +121,9 @@ shared_console_log_level = logging.INFO
 
 
 # Loggers inheriting from the base logger with their own name and level controls
-class CustomTypesLogger(BaseLogger):
+class DataTypesLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='custom_types',
+        super().__init__(name='data_types',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
 
@@ -115,9 +163,9 @@ class HandlerLogger(BaseLogger):
                          console_log_level=shared_console_log_level)
 
 
-class CacheTypesLogger(BaseLogger):
+class CacheLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='cache_types',
+        super().__init__(name='cache',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
 
@@ -129,31 +177,8 @@ class BaseScriptLogger(BaseLogger):
                          console_log_level=shared_console_log_level)
 
 
-class UncaughtErrorsLogger(BaseLogger):
+class UnhandledErrorsLogger(BaseLogger):
     def __init__(self):
-        super().__init__(name='uncaught_errors',
+        super().__init__(name='unhandled_errors',
                          file_log_level=shared_file_log_level,
                          console_log_level=shared_console_log_level)
-
-
-def assert_and_log_errors(logger, level, condition: bool, message: str, traceback_message: bool = False):
-    """Asserts a condition but logs the error. Raises the AssertionError if the level is 'error'"""
-    levels = ['error', 'warning']
-    level_clean = level.lower()
-    assert level_clean in levels, f"Provided level '{level_clean}' is not in list of allowed arguments {levels}"
-    try:
-        # Adds module name here since it isn't recorded correctly at the logger level on import
-        assert condition, message
-    except AssertionError as error:
-        # Conditionally log a more detailed message with the full traceback appended
-        if traceback_message:
-            error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
-        else:
-            error_message = str(error)
-        # Send as an error or warning depending on the argument
-        if level == 'error':
-            logger.error(error_message)
-            raise
-        if level == 'warning':
-            logger.warning(error_message)
-            raise

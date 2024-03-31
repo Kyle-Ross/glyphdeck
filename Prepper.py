@@ -1,6 +1,6 @@
-from functions.logs import PrepperLogger
+from functions.logs import PrepperLogger, log_and_raise_error
 from typing import Union, List
-from custom_types import Data
+from data_types import Data
 import pandas as pd
 
 logger = PrepperLogger().setup()
@@ -24,7 +24,8 @@ class Prepper:
         elif file_type == 'csv':
             self.df = pd.read_csv(file_path, encoding=encoding)
         else:
-            raise ValueError("Invalid file type. Only 'xlsx' and 'csv' are supported.")
+            log_and_raise_error(logger, 'error', ValueError,
+                                "Invalid file type. Only 'xlsx' and 'csv' are supported.")
         return self
 
     def set_id_column(self, id_column: Union[str, int]) -> 'Prepper':
@@ -32,7 +33,8 @@ class Prepper:
         if self.df[id_column].is_unique:
             self.id_column = str(id_column)
         else:
-            raise ValueError("ID column must have unique values.")
+            log_and_raise_error(logger, 'error', ValueError,
+                                "ID column must have unique values.")
         return self
 
     def set_data_columns(self, data_columns: Union[str, List[str]]) -> 'Prepper':
@@ -41,10 +43,12 @@ class Prepper:
             self.data_columns = [data_columns]
         elif isinstance(data_columns, list):
             if len(data_columns) != len(set(data_columns)):
-                raise ValueError("Data columns must all be unique.")
+                log_and_raise_error(logger, 'error', ValueError,
+                                    "Data columns must all be unique.")
             self.data_columns = data_columns
         else:
-            raise ValueError("Data columns must be either a string or a list of strings.")
+            log_and_raise_error(logger, 'error', ValueError,
+                                "Data columns must be either a string or a list of strings.")
         return self
 
     def set_data_dict(self) -> 'Prepper':

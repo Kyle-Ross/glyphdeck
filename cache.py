@@ -1,10 +1,9 @@
-from functions.logs import CacheTypesLogger
-from functions.time import time_since_start
+from functions.logs import CacheLogger
 from diskcache import Cache
 import hashlib
 import os
 
-logger = CacheTypesLogger().setup()
+logger = CacheLogger().setup()
 
 
 def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
@@ -13,9 +12,9 @@ def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
     # Check if the specified cache directory exists, if not create it
     if not os.path.exists(full_cache_dir):
         os.makedirs(full_cache_dir)
-        logger.info(f"({time_since_start()}) '{full_cache_dir}' | Cache created")
+        logger.info(f"'{full_cache_dir}' - Cache created")
     else:
-        logger.info(f"({time_since_start()}) '{full_cache_dir}' | Cache exists")
+        logger.info(f"'{full_cache_dir}' - Cache exists")
 
     # Create a DiskCache instance with the specified max_size
     max_size = max_mb_size * 1024 * 1024  # Convert megabytes to bytes
@@ -24,8 +23,9 @@ def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
 
 
 def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
-    """Facilitates caching for openai in the handler when used as a decorator. Result will be taken from the cache
-    if available, saving API costs. When max size is reached the least recent use records will be culled."""
+    """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
+    cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
+    records will be culled."""
     # Finds or creates the cache folder and object, as well as returning the directory of the cache
     cache, full_cache_dir = cache_creator(parent_dir, cache_dir, max_mb_size)
 
@@ -60,7 +60,7 @@ def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
             if self_use_cache:
                 if key in cache:
                     completions += 1
-                    logger.info(f"({time_since_start()}) CACHE - Key: {key_arg} - Index: {index_arg} - "
+                    logger.info(f"CACHE - Key: {key_arg} - Index: {index_arg} - "
                                 f"#{completions} - '{full_cache_dir}'")
                     return cache[key]
 
@@ -68,7 +68,7 @@ def openai_cache(cache_dir, parent_dir='caches', max_mb_size: int = 1000):
             result = await func(self, *args, **kwargs)
             cache[key] = result
             completions += 1
-            logger.info(f"({time_since_start()}) API  - Key: {key_arg} - Index: {index_arg} - #{completions}")
+            logger.info(f"API  - Key: {key_arg} - Index: {index_arg} - #{completions}")
 
             # Return the result
             return result

@@ -1,10 +1,10 @@
-from custom_types import (
+from data_types import (
     Record, Records, Data, IntStr, dFrame,
     dFrame_or_None, IntList, StrList,
     StrList_or_None, List_or_Str, IntStrNone,
     RecordList
 )
-from functions.logs import assert_and_log_errors
+from functions.logs import assert_and_log_error, log_and_raise_error
 from functions.logs import ChainLogger
 from datetime import datetime, timedelta
 from functools import reduce
@@ -36,9 +36,8 @@ class Chain:
             try:
                 if record_dict['title'] == title:
                     return record_num
-            except TypeError:
-                logger.error(f"Provided title 'f{title}' does not exist.")
-                raise
+            except TypeError as error:
+                log_and_raise_error(logger, 'error', error, f"Provided title 'f{title}' does not exist.")
 
     def record(self, record_identifier: IntStr) -> Record:
         """Returns the record corresponding to the provided record number or record title."""
@@ -125,9 +124,8 @@ class Chain:
     def initial_key(self) -> int:
         """Returns 1, but only if record_identifier 1 exists in the records."""
         if 1 not in self.records:
-            error_message = "KeyError: Initial record does not exist yet! Use self.append to get started."
-            logger.error(error_message)
-            raise KeyError(error_message)
+            log_and_raise_error(logger, 'error', KeyError,
+                                "KeyError: Initial record does not exist yet! Use self.append to get started.")
         return 1
 
     @property
@@ -209,8 +207,7 @@ class Chain:
                                         f"{target_not_initial}"
             key_validator_message += "\n\nRecords cannot be missing keys or add new keys that are not " \
                                      "already in the initial record."
-            logger.error("KeyError: " + key_validator_message)
-            raise ValueError(key_validator_message)
+            log_and_raise_error(logger, 'error', KeyError, key_validator_message)
 
     def data_validator(self, target_key: int):
         """Checks that each list in the data of the target record has the expected length."""
@@ -237,8 +234,7 @@ class Chain:
                                      f"These keys were: \n" \
                                      f"{bad_keys}"
         if bad_len != 0:
-            logger.error("ValueError: " + data_validator_message)
-            raise ValueError(data_validator_message)
+            log_and_raise_error(logger, 'error', ValueError, data_validator_message)
 
     def append(self,
                title: str,
@@ -259,7 +255,7 @@ class Chain:
                 column_names_len = len(self.latest_column_names)  # Uses the latest if none were set
             else:
                 column_names_len = len(column_names)  # Otherwise, get the length from the provided list
-            assert_and_log_errors(logger, 'error', column_names_len == self.expected_len,
+            assert_and_log_error(logger, 'error', column_names_len == self.expected_len,
                                   f"{self.expected_len} columns expected, but 'column_names' contains "
                                   f"{column_names_len} entries. If this is expected, set "
                                   f"self.append(update_expected_len=True), otherwise review your data.")
@@ -332,7 +328,7 @@ class Chain:
                split: bool = False):
         # Checking file_type is in allowed list
         allowed_file_types = ['csv', 'xlsx']
-        assert_and_log_errors(logger, 'error', file_type in allowed_file_types,
+        assert_and_log_error(logger, 'error', file_type in allowed_file_types,
                               f"'{file_type}' is not in allowed list {allowed_file_types}.")
         # Use the separate or combined records
         if split:

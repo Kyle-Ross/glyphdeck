@@ -1,6 +1,6 @@
 from typing import Union, Tuple, List, Dict, Any
-from functions.logs import SanitiserLogger
-from custom_types import Data
+from functions.logs import SanitiserLogger, log_and_raise_error
+from data_types import Data
 from icecream import ic
 import pandas as pd
 import re
@@ -118,8 +118,7 @@ class RegexSanitiser:
                                 f"in pattern group '{value['group']}', "\
                                 f"for pattern '{key}', "\
                                 f"contains non-alphabet characters. This is not allowed in placeholders."
-                logger.error("TypeError: " + error_message)
-                raise TypeError(error_message)
+                log_and_raise_error(logger, 'error', TypeError, error_message)
 
     # Run a check on the default values
     placeholder_check(patterns)
@@ -189,9 +188,8 @@ class RegexSanitiser:
         # Check supplied patterns all exist
         for x in placeholder_dict:
             if x not in self.all_groups:
-                error_message = f"Key {x} does not exist in available patterns: {self.all_groups}"
-                logger.error("KeyError: " + error_message)
-                raise KeyError(error_message)
+                log_and_raise_error(logger, 'error', KeyError,
+                                    f"Key {x} does not exist in available patterns: {self.all_groups}")
         # Add the placeholders to the patterns dictionary
         for key, value in self.patterns.items():
             if value['group'] in placeholder_dict:
@@ -206,9 +204,8 @@ class RegexSanitiser:
         # Check that each pattern exists
         for x in selection:
             if x not in self.all_groups:
-                error_message = f"Pattern {x} does not exist in available patterns: {self.all_groups}"
-                logger.error("KeyError: " + error_message)
-                raise KeyError(error_message)
+                log_and_raise_error(logger, 'error', KeyError,
+                                    f"Pattern {x} does not exist in available patterns: {self.all_groups}")
         # Update 'active' in the patterns dict based on that list
         for key, value in self.patterns.items():
             if value['group'] in selection:

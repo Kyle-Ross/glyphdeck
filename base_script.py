@@ -1,14 +1,14 @@
-from functions.logs import BaseScriptLogger, UncaughtErrorsLogger
+from functions.logs import BaseScriptLogger, UnhandledErrorsLogger
 from Sanitiser import RegexSanitiser
 from Handler import LLMHandler
 from Prepper import Prepper
 from Chain import Chain
-import type_models
+import validators
 import traceback
 import os
 
 logger = BaseScriptLogger().setup()
-uncaught_errors_logger = UncaughtErrorsLogger().setup()
+unhandled_errors_logger = UnhandledErrorsLogger().setup()
 
 current_file_name = os.path.basename(__file__)
 
@@ -72,7 +72,7 @@ try:
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=type_models.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                          cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                         use_cache=True,
+                         use_cache=False,
                          temperature=0.2,
                          max_validation_retries=3
                          )
@@ -105,17 +105,23 @@ try:
 
     log_end(p1)
 
-# Final exception to capture any unknown errors and log them
+# Logging any unhandled exceptions
 except Exception as error:
-    traceback_message: bool = False
-    # Conditionally log a more detailed message with the full traceback appended
-    if traceback_message:
-        error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
+    # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
+    # So if the exception has this name, just re-raise it
+    if type(error).__name__ == 'HandledError':
+        raise
+    # Other log the unhandled error as critical and then re_raise
     else:
-        error_message = str(error)
-    # Log the message
-    uncaught_errors_logger.critical(error_message)  # Logs as CRITICAL
-    raise
+        traceback_message: bool = False
+        # Conditionally log a more detailed message with the full traceback appended
+        if traceback_message:
+            error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
+        else:
+            error_message = str(error)
+        # Log the message as CRITICAL
+        unhandled_errors_logger.critical(error_message)
+        raise
 
 # TODO - Example class to categorise into existing schema
 # TODO - Finalise project structure - i.e. directory organisation, where to put scripts vs classes
