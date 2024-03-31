@@ -5,13 +5,13 @@ from custom_types import (
     RecordList
 )
 from functions.logs import assert_and_log_errors
-from functions.logs import core_logger_setup
+from functions.logs import ChainLogger
 from datetime import datetime, timedelta
 from functools import reduce
 import pandas as pd
 import re
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = ChainLogger().setup()
 
 
 class Chain:

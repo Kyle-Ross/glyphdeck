@@ -1,12 +1,11 @@
 from typing import Union, Tuple, List, Dict, Any
-from functions.logs import core_logger_setup
+from functions.logs import SanitiserLogger
 from custom_types import Data
 from icecream import ic
 import pandas as pd
 import re
-import os
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = SanitiserLogger().setup()
 
 
 class RegexSanitiser:

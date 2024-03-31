@@ -1,4 +1,4 @@
-from functions.logs import core_logger_setup
+from functions.logs import BaseScriptLogger, UncaughtErrorsLogger
 from Sanitiser import RegexSanitiser
 from Handler import LLMHandler
 from Prepper import Prepper
@@ -7,7 +7,9 @@ import type_models
 import traceback
 import os
 
-logger = core_logger_setup()
+logger = BaseScriptLogger().setup()
+uncaught_errors_logger = UncaughtErrorsLogger().setup()
+
 current_file_name = os.path.basename(__file__)
 
 
@@ -70,7 +72,7 @@ try:
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=type_models.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                          cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                         use_cache=False,
+                         use_cache=True,
                          temperature=0.2,
                          max_validation_retries=3
                          )
@@ -98,13 +100,21 @@ try:
         file_type='xlsx',
         name_prefix='Chain Test',
         rejoin=True,
-        split=True)
+        split=False)
     log_end(p2)
 
     log_end(p1)
 
+# Final exception to capture any unknown errors and log them
 except Exception as error:
-    logger.error(f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#")  # Log any errors that occurred
+    traceback_message: bool = False
+    # Conditionally log a more detailed message with the full traceback appended
+    if traceback_message:
+        error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
+    else:
+        error_message = str(error)
+    # Log the message
+    uncaught_errors_logger.critical(error_message)  # Logs as CRITICAL
     raise
 
 # TODO - Example class to categorise into existing schema

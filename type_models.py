@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, field_validator
 from functions.logs import assert_and_log_errors
-from functions.logs import core_logger_setup
+from functions.logs import TypeModelsLogger
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = TypeModelsLogger().setup()
 
 # Pydantic Models, Types, Fields and Classes for import and use elsewhere in the program
 # Used to assert and advise the expected output from provider calls

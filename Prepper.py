@@ -1,6 +1,9 @@
-import pandas as pd
+from functions.logs import PrepperLogger
 from typing import Union, List
 from custom_types import Data
+import pandas as pd
+
+logger = PrepperLogger().setup()
 
 
 class Prepper:

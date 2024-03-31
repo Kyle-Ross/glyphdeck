@@ -1,8 +1,8 @@
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 from custom_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
 from functions.logs import assert_and_log_errors
-from functions.logs import core_logger_setup
 from functions.strings import string_cleaner
+from functions.logs import HandlerLogger
 from cache_types import openai_cache
 from icecream import ic
 import type_models
@@ -11,7 +11,7 @@ import asyncio
 import openai
 import os
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = HandlerLogger().setup()  # Gets the logger ready if it isn't there yet
 
 
 class LLMHandler:

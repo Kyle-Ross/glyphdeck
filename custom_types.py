@@ -1,11 +1,10 @@
 from functions.logs import assert_and_log_errors
-from functions.logs import core_logger_setup
+from functions.logs import CustomTypesLogger
 from typing import Union, Dict, List
 from datetime import datetime, timedelta
 import pandas as pd
-import os
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = CustomTypesLogger().setup()
 
 # Types that will be used across the project
 Record = Union[str, Union[datetime, None, timedelta, dict, list]]

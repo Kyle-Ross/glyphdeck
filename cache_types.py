@@ -1,10 +1,10 @@
-from functions.logs import core_logger_setup
+from functions.logs import CacheTypesLogger
 from functions.time import time_since_start
 from diskcache import Cache
 import hashlib
 import os
 
-logger = core_logger_setup()  # Gets the logger ready if it isn't there yet
+logger = CacheTypesLogger().setup()
 
 
 def cache_creator(parent_dir: str, cache_dir: str, max_mb_size: int):
