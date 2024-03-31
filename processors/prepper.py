@@ -17,10 +17,14 @@ class Prepper:
         self.data_columns: List[str] = []
         self.output_data: Data = {}
 
-    def load_data(self, file_path: str, file_type: str, encoding: str = "utf-8") -> 'Prepper':
+    def load_data(self,
+                  file_path: str,
+                  file_type: str,
+                  sheet_name: Union[str, int] = 0,  # xlsx sheet index or name - default being 0 (the first sheet)
+                  encoding: str = "utf-8") -> 'Prepper':
         """Load data from a file into a dataframe."""
         if file_type == 'xlsx':
-            self.df = pd.read_excel(file_path)
+            self.df = pd.read_excel(file_path, sheet_name=sheet_name)
         elif file_type == 'csv':
             self.df = pd.read_csv(file_path, encoding=encoding)
         else:
