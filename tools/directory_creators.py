@@ -1,6 +1,8 @@
-from constants import OUTPUT_DIR, OUTPUT_LOGS_DIR, OUTPUT_CACHES_DIR, OUTPUT_FILES_DIR
-from typing import Tuple
 import os
+
+from typing import Tuple
+
+from constants import OUTPUT_DIR, OUTPUT_LOGS_DIR, OUTPUT_CACHES_DIR, OUTPUT_FILES_DIR
 
 
 def create_directory(directory, directory_name, logger) -> str:

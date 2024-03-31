@@ -1,26 +1,29 @@
-from datetime import timedelta
+import logging
 import time
 
-start_time = time.time()
 
-
-def time_since_start(active=True):
-    """Returns string representing sec delta since script start. Start time is initialised in the function source .py.
-    Can be turned on and off using the 'active' variable."""
-    global start_time
-    elapsed_time = time.time() - start_time
-    elapsed_time = "{:.4f}".format(elapsed_time)
-    if active:
-        return f'^ {elapsed_time}s'
-    else:
-        return ''
-
-
-def delta_time_format(td: timedelta) -> str:
-    """Takes a TimeDelta object and turns it into a nice string like '05h30m45s'"""
-    total_seconds = td.total_seconds()
+def delta_time_formatter(total_seconds: float) -> str:
+    """Takes a float representing seconds and turns it into a nice string like '05h30m45s'"""
     hours = int(total_seconds // 3600)
     minutes = int((total_seconds % 3600) // 60)
     seconds = int(total_seconds % 60)
     result = f"{hours:02d}h{minutes:02d}m{seconds:02d}s"
     return result
+
+
+class RuntimeLogBlock:
+    """Content manager for 'with' blocks that logs the time elapsed over the total runtime of the block"""
+    def __init__(self,
+                 logger: logging.Logger):
+        self.logger = logger
+
+    def __enter__(self):  # Record the time at the start of the block
+        self.start_time: float = time.time()
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):  # Compare that to the time at the end and log the result
+        self.end_time: float = time.time()
+        self.elapsed_time: float = self.end_time - self.start_time
+        self.elapsed_time_seconds: str = format(self.elapsed_time, ',.4f')
+        self.logger.info(f'Total runtime - {delta_time_formatter(self.elapsed_time)} '
+                         f'({self.elapsed_time_seconds} sec)')

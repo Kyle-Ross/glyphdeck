@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
-from tools.loggers import assert_and_log_error
-from tools.loggers import ValidatorsLogger
+
+from tools.loggers import ValidatorsLogger, assert_and_log_error
 
 logger = ValidatorsLogger().setup()
 

@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta
+from typing import Union, Dict, List
+
+import pandas as pd
+
 from tools.loggers import assert_and_log_error
 from tools.loggers import DataTypesLogger
-from typing import Union, Dict, List
-from datetime import datetime, timedelta
-import pandas as pd
 
 logger = DataTypesLogger().setup()
 

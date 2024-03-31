@@ -1,18 +1,18 @@
-from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
-from validation.data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
-from validation import validators
-from tools.loggers import assert_and_log_error
-from tools.strings import string_cleaner
-from tools.loggers import LLMHandlerLogger
-from tools.caching import openai_cache
+import os
+
 from icecream import ic
-import validation
 import instructor
 import asyncio
 import openai
-import os
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 
-logger = LLMHandlerLogger().setup()  # Gets the logger ready if it isn't there yet
+from validation.data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
+from validation import validators
+from tools.loggers import assert_and_log_error, LLMHandlerLogger
+from tools.strings import string_cleaner
+from tools.caching import openai_cache
+
+logger = LLMHandlerLogger().setup()
 
 
 class LLMHandler:

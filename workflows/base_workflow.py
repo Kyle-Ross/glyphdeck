@@ -1,116 +1,78 @@
-from tools.loggers import BaseWorkflowLogger, UnhandledErrorsLogger, log_start, log_end
+import os
+
 from processors.sanitiser import Sanitiser
 from processors.llm_handler import LLMHandler
 from processors.prepper import Prepper
 from processors.chain import Chain
+from tools.loggers import BaseWorkflowLogger, UnhandledErrorsLogger, LogBlock, exception_logger
+from tools.time import RuntimeLogBlock
 from validation import validators
-import traceback
-import os
 
 logger = BaseWorkflowLogger().setup()
 unhandled_errors_logger = UnhandledErrorsLogger().setup()
-
 current_file_name = os.path.basename(__file__)
 
 
-# Try, Except over everything to log any errors
-try:
-    p1 = log_start(current_file_name, logger)
+@exception_logger(unhandled_errors_logger)
+def main():
+    with LogBlock("Set file vars", logger):
+        source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
+        source_file_type = source_file.split(".")[-1]
 
-    # Set the source file path
-    source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
-    source_file_type = source_file.split(".")[-1]
+    with LogBlock('Chain initialisation', logger):
+        chain = Chain()
 
-    logger.info("Set file vars")
+    with LogBlock('Preparing & appending Prepper output', logger):
+        prepared_data = (Prepper()
+                         .load_data(source_file, source_file_type, encoding="ISO-8859-1")
+                         .set_id_column('Row ID')
+                         .set_data_columns(['Review Text'])
+                         .set_data_dict())
+        chain.append(
+            title='prepared data',
+            data=prepared_data.output_data,
+            table=prepared_data.df,
+            table_id_column=prepared_data.id_column,
+            column_names=prepared_data.data_columns)
 
-    p2 = log_start('Chain initialisation', logger)
-    chain = Chain()
-    log_end(p2)
+    with LogBlock('Preparing & appending Sanitiser output', logger):
+        sanitised = Sanitiser(chain.latest_data) \
+            .select_groups(['date', 'email', 'path', 'url', 'number']) \
+            .sanitise()
+        chain.append(title='sanitised data', data=sanitised.output_data)  # Other arguments are inherited now
 
-    p2 = log_start('Prepper', logger)
-    prepared_data = (Prepper()
-                     .load_data(source_file, source_file_type, encoding="ISO-8859-1")
-                     .set_id_column('Row ID')
-                     .set_data_columns(['Review Text'])
-                     .set_data_dict())
-    log_end(p2)
+    with LogBlock('Preparing & appending LLMHandler output', logger):
+        handler = LLMHandler(chain.latest_data,
+                             provider="OpenAI",
+                             model="gpt-3.5-turbo",
+                             role="An expert customer feedback analyst nlp system",
+                             request="Analyse the feedback and return results in the correct format",
+                             validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
+                             cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
+                             use_cache=True,
+                             temperature=0.2,
+                             max_validation_retries=3
+                             )
+        handler.run()
+        handler.flatten_output_data(column_names=chain.latest_column_names)
+        chain.append(
+            title='llmoutput',
+            data=handler.output_data,
+            column_names=handler.column_names,
+            update_expected_len=True)  # Updating len since the validators can produce multiple columns per input
 
-    p2 = log_start('Appending prepper data', logger)
-    chain.append(
-        title='prepared data',
-        data=prepared_data.output_data,
-        table=prepared_data.df,
-        table_id_column=prepared_data.id_column,
-        column_names=prepared_data.data_columns)
-    log_end(p2)
+    with LogBlock('Generating & writing output file(s)', logger):
+        chain.output(
+            records=[chain.latest_title],
+            file_type='xlsx',
+            name_prefix='Chain Test',
+            rejoin=True,
+            split=False)
 
-    p2 = log_start('Sanitiser', logger)
-    sanitised = Sanitiser(chain.latest_data) \
-        .select_groups(['date', 'email', 'path', 'url', 'number']) \
-        .sanitise()
-    log_end(p2)
 
-    chain.append(title='sanitised data', data=sanitised.output_data)  # Other arguments are inherited
-    logger.info("Appended sanitised data to chain")
-
-    p2 = log_start('LLMHandler initialisation', logger)
-    handler = LLMHandler(chain.latest_data,
-                         provider="OpenAI",
-                         model="gpt-3.5-turbo",
-                         role="An expert customer feedback analyst nlp system",
-                         request="Analyse the feedback and return results in the correct format",
-                         validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
-                         cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                         use_cache=True,
-                         temperature=0.2,
-                         max_validation_retries=3
-                         )
-    log_end(p2)
-
-    p2 = log_start('Running handler', logger)
-    handler.run()
-    log_end(p2)
-
-    p2 = log_start('LLMHandler data flattening', logger)
-    handler.flatten_output_data(column_names=chain.latest_column_names)
-    log_end(p2)
-
-    p2 = log_start('Appending handler output', logger)
-    chain.append(
-        title='llmoutput',
-        data=handler.output_data,
-        column_names=handler.column_names,
-        update_expected_len=True)  # Updating len since the validation model can produce multiple columns per input
-    log_end(p2)
-
-    p2 = log_start('Creating output file(s)', logger)
-    chain.output(
-        records=[chain.latest_title],
-        file_type='xlsx',
-        name_prefix='Chain Test',
-        rejoin=True,
-        split=False)
-    log_end(p2)
-
-    log_end(p1)
-
-# Logging any unhandled exceptions
-except Exception as error:
-    # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
-    # So if the exception has this name, just re-raise it
-    if type(error).__name__ == 'HandledError':
-        raise
-    # Other log the unhandled error as critical and then re_raise
-    else:
-        traceback_message: bool = False
-        # Conditionally log a more detailed message with the full traceback appended
-        if traceback_message:
-            error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
-        else:
-            error_message = str(error)
-        # Log the message as CRITICAL
-        unhandled_errors_logger.critical(error_message)
-        raise
+if __name__ == "__main__":  # Run the main code, with decorators and context managers in effect
+    with RuntimeLogBlock(logger), LogBlock(current_file_name, logger):
+        main()
 
 # TODO - Example class / workflow to categorise into existing schema
 # TODO - Think of better project name - ? Schema, Category, Mapper, StringEater

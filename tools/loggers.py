@@ -1,16 +1,17 @@
-from tools.directory_creators import check_logs_directory
-from tools.time import time_since_start
-from typing import Type, Tuple, NoReturn
 import traceback
 import logging
 import os
+
+from typing import Type, NoReturn
+
+from tools.directory_creators import check_logs_directory
 
 
 def log_and_raise_error(logger: logging.Logger,
                         level: str,
                         error_type: Type[BaseException],
                         message: str,
-                        traceback_message: bool = False) -> NoReturn:
+                        include_traceback: bool = False) -> NoReturn:
     """Logs and raises an error with the same message string. Wraps in custom error to indicate this is an error that
     was handled. Later this will prevent it being re-raised as an unhandled error"""
 
@@ -28,7 +29,7 @@ def log_and_raise_error(logger: logging.Logger,
 
     # Build the log / error message
     error_message = f"{error_type.__name__} - {message}"
-    if traceback_message:  # Include detailed traceback information in the log if specified
+    if include_traceback:  # Include detailed traceback information in the log if specified
         error_message = f"{error_message}\n{traceback.format_exc()}#ENDOFLOG#"
 
     # Log the message at the specified level and re-raise the error
@@ -53,22 +54,48 @@ def assert_and_log_error(logger: logging.Logger,
         log_and_raise_error(logger, level, AssertionError, message, traceback_message)
 
 
-def log_start(process_name: str, logger: logging.Logger) -> Tuple[str, logging.Logger]:
-    """Shorthand function to log the start of a process"""
-    logger.info(f"Started: {process_name}")
-    return process_name, logger
+class LogBlock:
+    """Context manager for 'with' blocks, logging the start and end with a specified process name"""
+    def __init__(self, process_name: str, logger: logging.Logger):
+        self.process_name: str = process_name
+        self.logger: logging.Logger = logger
 
+    def __enter__(self):  # What happens at the start of the 'with' block
+        self.logger.info(f"Started: {self.process_name}")
 
-def log_end(log_start_tuple) -> NoReturn:
-    """Shorthand function to log the end of a process. Pass it the tuple returned by log_start()"""
-    process_name, logger = log_start_tuple
-    logger.info(f"Finished: {process_name}")
+    def __exit__(self, exc_type, exc_value, exc_tb):  # What happens at the end
+        self.logger.info(f"Finished: {self.process_name}")
 
 
 def check_logger_exists(existing_logger):
     """Checks if a logger with the provided name exists"""
     existing_loggers = logging.Logger.manager.loggerDict.keys()
     return existing_logger in existing_loggers  # To be evaluated as True if it exists at all
+
+
+def exception_logger(logger, include_traceback=False):  # At this level the function is a "decorator factory"
+    """Decorator function to automatically log any errors that are not explicitly handled elsewhere"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)  # Try the function that was passed in
+            except Exception as error:
+                # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
+                # So if the exception has this name, just re-raise it - it will already have logging
+                if type(error).__name__ == 'HandledError':
+                    raise
+                # Otherwise, log the unhandled error as critical and then re_raise
+                else:
+                    # Conditionally log a more detailed message with the error traceback appended
+                    if include_traceback:
+                        error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
+                    else:
+                        error_message = str(error)
+                    # Log the message as CRITICAL and re-raise
+                    logger.critical(error_message)
+                    raise
+        return wrapper
+    return decorator
 
 
 def logger_setup(name: str,
@@ -119,7 +146,7 @@ class BaseLogger:
         self.file_log_level: int = file_log_level
         self.console_log_level: int = console_log_level
         self.log_file_name: str = log_file_name
-        self.format_string: str = f'%(asctime)s | {time_since_start()} | %(levelname)s | %(name)s |  %(message)s'
+        self.format_string: str = f'%(asctime)s | %(levelname)s | %(name)s |  %(message)s'
 
         # Check if the log directory exists (returns Tuple[bool, str, str])
         log_dir_exists, log_message, log_directory = check_logs_directory()
