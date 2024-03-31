@@ -70,7 +70,7 @@ try:
                          model="gpt-3.5-turbo",
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
-                         validation_model=type_models.SubCategoriesWithPerItemSentimentAndOverallSentiment,
+                         validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                          cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
                          use_cache=False,
                          temperature=0.2,

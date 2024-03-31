@@ -19,7 +19,7 @@ class LLMHandler:
 
     def check_validation_model(self):
         """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
-        check: bool = issubclass(self.validation_model, type_models.BaseValidatorModel)
+        check: bool = issubclass(self.validation_model, validators.BaseValidatorModel)
         assert_and_log_error(logger, 'error', check,
                              f'{self.validation_model.__name__} is not a subclass of the '
                              f'Pydantic BaseValidatorModel class')
@@ -260,7 +260,7 @@ if __name__ == "__main__":
                          model="gpt-3.5-turbo",
                          role="An expert customer feedback analyst nlp system",
                          request="Analyse the feedback and return results in the correct format",
-                         validation_model=type_models.PrimaryCategoryAndSubCategory,
+                         validation_model=validators.PrimaryCategoryAndSubCategory,
                          cache_identifier='NLP-Categorise-TestData',
                          use_cache=True,
                          temperature=0.2,

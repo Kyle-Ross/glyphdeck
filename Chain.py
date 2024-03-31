@@ -37,7 +37,7 @@ class Chain:
                 if record_dict['title'] == title:
                     return record_num
             except TypeError as error:
-                log_and_raise_error(logger, 'error', error, f"Provided title 'f{title}' does not exist.")
+                log_and_raise_error(logger, 'error', type(error), f"Provided title 'f{title}' does not exist.")
 
     def record(self, record_identifier: IntStr) -> Record:
         """Returns the record corresponding to the provided record number or record title."""
