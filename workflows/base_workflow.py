@@ -51,8 +51,7 @@ def main():
                              cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
                              use_cache=True,
                              temperature=0.2,
-                             max_validation_retries=3
-                             )
+                             max_validation_retries=3)
         handler.run()
         handler.flatten_output_data(column_names=chain.latest_column_names)
         chain.append(
