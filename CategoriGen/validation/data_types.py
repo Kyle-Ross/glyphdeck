@@ -3,8 +3,8 @@ from typing import Union, Dict, List
 
 import pandas as pd
 
-from tools.loggers import assert_and_log_error
-from tools.loggers import DataTypesLogger
+from CategoriGen.tools.loggers import assert_and_log_error
+from CategoriGen.tools.loggers import DataTypesLogger
 
 logger = DataTypesLogger().setup()
 

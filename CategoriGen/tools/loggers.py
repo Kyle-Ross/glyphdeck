@@ -1,10 +1,9 @@
 import traceback
 import logging
 import os
-
 from typing import Type, NoReturn
 
-from tools.directory_creators import check_logs_directory
+from CategoriGen.tools.directory_creators import check_logs_directory
 
 
 def log_and_raise_error(logger: logging.Logger,

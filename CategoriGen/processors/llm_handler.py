@@ -1,16 +1,16 @@
 import os
+import asyncio
 
 from icecream import ic
 import instructor
-import asyncio
 import openai
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 
-from validation.data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
-from validation import validators
-from tools.loggers import assert_and_log_error, LLMHandlerLogger
-from tools.strings import string_cleaner
-from tools.caching import openai_cache
+from CategoriGen.validation.data_types import Data, assert_custom_type, StrList, Data_or_None, StrList_or_None
+from CategoriGen.validation import validators
+from CategoriGen.tools.loggers import assert_and_log_error, LLMHandlerLogger
+from CategoriGen.tools.strings import string_cleaner
+from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
 

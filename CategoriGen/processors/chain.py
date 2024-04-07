@@ -5,11 +5,11 @@ import os
 
 import pandas as pd
 
-from validation.data_types import (Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList,
-                                   StrList, StrList_or_None, List_or_Str, IntStrNone, RecordList)
-from tools.loggers import ChainLogger, assert_and_log_error, log_and_raise_error
-from tools.directory_creators import create_files_directory
-from constants import OUTPUT_FILES_DIR
+from CategoriGen.validation.data_types import (Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList,
+                                               StrList, StrList_or_None, List_or_Str, IntStrNone, RecordList)
+from CategoriGen.tools.loggers import ChainLogger, assert_and_log_error, log_and_raise_error
+from CategoriGen.tools.directory_creators import create_files_directory
+from CategoriGen.constants import OUTPUT_FILES_DIR
 
 logger = ChainLogger().setup()
 

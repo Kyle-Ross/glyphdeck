@@ -1,12 +1,12 @@
 import os
 
-from processors.sanitiser import Sanitiser
-from processors.llm_handler import LLMHandler
-from processors.prepper import Prepper
-from processors.chain import Chain
-from tools.loggers import BaseWorkflowLogger, UnhandledErrorsLogger, LogBlock, exception_logger
-from tools.time import RuntimeLogBlock
-from validation import validators
+from CategoriGen.processors.sanitiser import Sanitiser
+from CategoriGen.processors.llm_handler import LLMHandler
+from CategoriGen.processors.prepper import Prepper
+from CategoriGen.processors.chain import Chain
+from CategoriGen.tools.loggers import BaseWorkflowLogger, UnhandledErrorsLogger, LogBlock, exception_logger
+from CategoriGen.tools.time import RuntimeLogBlock
+from CategoriGen.validation import validators
 
 logger = BaseWorkflowLogger().setup()
 unhandled_errors_logger = UnhandledErrorsLogger().setup()

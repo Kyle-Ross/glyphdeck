@@ -1,11 +1,11 @@
 import re
-
 from typing import Union, Tuple, List, Dict, Any
+
 from icecream import ic
 import pandas as pd
 
-from tools.loggers import SanitiserLogger, log_and_raise_error
-from validation.data_types import Data
+from CategoriGen.tools.loggers import SanitiserLogger, log_and_raise_error
+from CategoriGen.validation.data_types import Data
 
 logger = SanitiserLogger().setup()
 

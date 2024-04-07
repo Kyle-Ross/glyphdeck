@@ -2,8 +2,8 @@ from typing import Union, List
 
 import pandas as pd
 
-from tools.loggers import PrepperLogger, log_and_raise_error
-from validation.data_types import Data
+from CategoriGen.tools.loggers import PrepperLogger, log_and_raise_error
+from CategoriGen.validation.data_types import Data
 
 logger = PrepperLogger().setup()
 
@@ -67,7 +67,7 @@ class Prepper:
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
     from icecream import ic
-    test_file = "../scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
+    test_file = "../../scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
     processor = (Prepper()
                  .load_data(test_file, 'csv', encoding="ISO-8859-1")
                  .set_id_column('UserName')

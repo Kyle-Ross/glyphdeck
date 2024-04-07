@@ -3,8 +3,8 @@ import os
 
 from diskcache import Cache
 
-from tools.directory_creators import create_caches_directory
-from tools.loggers import CacheLogger
+from CategoriGen.tools.directory_creators import create_caches_directory
+from CategoriGen.tools.loggers import CacheLogger
 
 logger = CacheLogger().setup()
 
