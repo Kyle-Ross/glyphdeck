@@ -1,7 +1,6 @@
 import os
 import asyncio
 
-from icecream import ic
 import instructor
 import openai
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
@@ -270,4 +269,4 @@ if __name__ == "__main__":
 
     handler.run()
     handler.flatten_output_data(['Col1', 'Col2', 'Col3', 'Col4', 'Col5'])
-    ic(handler.output_data)
+    print(handler.output_data)

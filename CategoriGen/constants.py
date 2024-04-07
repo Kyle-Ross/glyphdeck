@@ -2,7 +2,7 @@ import os
 
 # Constants for folder paths - keep this .py in the project root directory
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-DOCS_DIR = os.path.join(ROOT_DIR, 'docs')
+DOCS_DIR = os.path.join(ROOT_DIR, '../docs')
 PROCESSORS_DIR = os.path.join(ROOT_DIR, 'processors')
 TOOLS_DIR = os.path.join(ROOT_DIR, 'tools')
 VALIDATORS_DIR = os.path.join(ROOT_DIR, 'validation')

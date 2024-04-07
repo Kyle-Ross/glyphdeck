@@ -79,7 +79,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-CategoriGen/docs/_build/
+docs/_build/
 
 # PyBuilder
 .pybuilder/

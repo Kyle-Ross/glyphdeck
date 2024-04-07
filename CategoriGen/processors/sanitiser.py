@@ -1,7 +1,6 @@
 import re
 from typing import Union, Tuple, List, Dict, Any
 
-from icecream import ic
 import pandas as pd
 
 from CategoriGen.tools.loggers import SanitiserLogger, log_and_raise_error
@@ -306,13 +305,20 @@ if __name__ == "__main__":
         rank=.5,
         regex=r"jeans")
     # Attributes showing group selections - shows that the new pattern group was added
-    ic(santiser_obj.all_groups)
-    ic(santiser_obj.active_groups)
-    ic(santiser_obj.inactive_groups)
+    print("print(santiser_obj.all_groups)")
+    print(santiser_obj.all_groups)
+    print("print(santiser_obj.active_groups)")
+    print(santiser_obj.active_groups)
+    print("print(santiser_obj.inactive_groups)")
+    print(santiser_obj.inactive_groups)
     # Runs the patterns
+    print("santiser_obj.sanitise()")
     santiser_obj.sanitise()
     # Show match counts
-    ic(santiser_obj.group_matches)
-    ic(santiser_obj.total_matches)
+    print("print(santiser_obj.group_matches)")
+    print(santiser_obj.group_matches)
+    print("print(santiser_obj.total_matches)")
+    print(santiser_obj.total_matches)
     # 'raw_output_data' contains the result after 'sanitise()' is run
-    ic(santiser_obj.output_data)
+    print("print(santiser_obj.output_data)")
+    print(santiser_obj.output_data)

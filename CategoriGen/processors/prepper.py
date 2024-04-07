@@ -66,14 +66,17 @@ class Prepper:
 
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
-    from icecream import ic
     test_file = "../../scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
     processor = (Prepper()
                  .load_data(test_file, 'csv', encoding="ISO-8859-1")
                  .set_id_column('UserName')
                  .set_data_columns(['OriginalTweet', 'Location'])
                  .set_data_dict())
+    print("print(processor.output_data)")
     print(processor.output_data)
-    ic(processor.df)
-    ic(processor.id_column)
-    ic(processor.data_columns)
+    print("print(processor.df)")
+    print(processor.df)
+    print("print(processor.id_column)")
+    print(processor.id_column)
+    print("print(processor.data_columns)")
+    print(processor.data_columns)
