@@ -72,8 +72,3 @@ def main():
 if __name__ == "__main__":  # Run the main code, with decorators and context managers in effect
     with RuntimeLogBlock(logger), LogBlock(current_file_name, logger):  # These run nested, in order (outer to inner)
         main()
-
-# TODO - Example class / workflow to categorise into existing schema
-# TODO - Think of better project name - ? Schema, Category, Mapper, StringEater
-# TODO - Make python environment / imports work like a VENV - so it can be set up easily on other machines
-# TODO - Create a front-end
