@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/elastic-llm-nlp.iml" filepath="$PROJECT_DIR$/.idea/elastic-llm-nlp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CategoriGen.iml" filepath="$PROJECT_DIR$/.idea/CategoriGen.iml" />
     </modules>
   </component>
 </project>
