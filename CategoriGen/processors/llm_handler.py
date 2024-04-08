@@ -149,7 +149,7 @@ class LLMHandler:
 
         # Initialising the client
         # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
-        openai_client = instructor.apatch(openai.AsyncOpenAI())
+        openai_client = instructor.patch(openai.AsyncOpenAI())
 
         # Sending the request
         # Having patched with instructor changes the response object...
