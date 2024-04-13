@@ -3,5 +3,5 @@
   <component name="AhkProjectSettings">
     <option name="defaultAhkSdk" value="AutoHotkey v1.1.33" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (CategoriGen)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10" project-jdk-type="Python SDK" />
 </project>
