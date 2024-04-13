@@ -4,6 +4,7 @@ import os
 from typing import Type, NoReturn
 
 from CategoriGen.tools.directory_creators import check_logs_directory
+from CategoriGen.constants import file_log_level_constant, console_log_level_constant
 
 
 def log_and_raise_error(logger: logging.Logger,
@@ -176,72 +177,70 @@ class BaseLogger:
         return logger
 
 
-# Shared logging levels - edit in each class for more granular control
+# Logging levels - use the constant or edit in each class for more granular control
 # This sets the minimum level of logging each logger will save to the file or print to the console
-# Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL - enter like logging.INFO
-shared_file_log_level = logging.INFO
-shared_console_log_level = logging.INFO
+# Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL -  orenter like logging.INFO
 
 
 # Loggers inheriting from the base logger with their own name and level controls
 class DataTypesLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='data_types',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class PrepperLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Prepper',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class ChainLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Chain',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class SanitiserLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Sanitiser',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class ValidatorsLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='validators_models',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class LLMHandlerLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='LLMHandler',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class CacheLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='cache',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class BaseWorkflowLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='base_workflow',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
 
 
 class UnhandledErrorsLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='unhandled_errors',
-                         file_log_level=shared_file_log_level,
-                         console_log_level=shared_console_log_level)
+                         file_log_level=file_log_level_constant,
+                         console_log_level=console_log_level_constant)
