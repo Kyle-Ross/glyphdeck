@@ -12,6 +12,7 @@ from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
+logger.debug("Initialised logger")
 
 
 class LLMHandler:
@@ -36,6 +37,8 @@ class LLMHandler:
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
                  max_validation_retries: int = 2):  # Max times the request can retry on the basis of failed validation
         """__init__ func which is run when the object is initialised."""
+
+        logger.debug("Function - __init__() - Start - Initialising LLMHandler object")
 
         # Assert the variable type of the provided arguments
         assert_custom_type(input_data, "Data", "input_data")  # Check the custom data type 'Data'
@@ -86,18 +89,36 @@ class LLMHandler:
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
 
+        # Preparing openai client
+        if self.provider_clean == 'openai':
+            openai.api_key = os.getenv("OPENAI_API_KEY")
+            logger.debug("Function - __init__() - Action - Set openai api key")
+
+            # Initialising the client
+            # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
+            self.openai_client = instructor.patch(openai.AsyncOpenAI())
+            logger.debug("Function - __init__() - Action - Set openai_client and patched with instructor")
+
+        logger.debug("Function - __init__() - Finish - Initialised LLMHandler object")
+
     @property
     def output_data(self):
         """Accesses output data but only if the data has been flattened."""
+        logger.debug("Function - output_data() - Start - Checking if self.new_output_data is not none, "
+                     "indicating data has been flattened")
         assert_and_log_error(logger, 'error', self.new_output_data is not None,
                              "output_data is empty, run self.flatten_output_data() first.")
+        logger.debug("Function - output_data() - Finish - Returning self.new_output_data")
         return self.new_output_data
 
     @property
     def column_names(self):
         """Accesses column names but only if the new names have been generated during data flattening."""
+        logger.debug("Function - column_names() - Start - checking if self.new_output_data is not none, "
+                     "indicating data has been flattened")
         assert_and_log_error(logger, 'error', self.new_column_names is not None,
                              "column_names is empty, run self.flatten_output_data() first.")
+        logger.debug("Function - column_names() - Finish - Returning self.new_column_names")
         return self.new_column_names
 
     # Tenacity retry decorator for the following errors with exponential backoff
@@ -126,6 +147,8 @@ class LLMHandler:
                            item_max_validation_retries: int = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
 
+        logger.debug("Function - async_openai() - Start")
+
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
@@ -145,12 +168,6 @@ class LLMHandler:
         assert_and_log_error(logger, 'error', 0 <= item_temperature <= 1,
                              "For OpenAI, temperature must be between 0 and 1")
 
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-
-        # Initialising the client
-        # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
-        openai_client = instructor.patch(openai.AsyncOpenAI())
-
         # Sending the request
         # Having patched with instructor changes the response object...
         # response information is now accessed like item_validation_model.field_name
@@ -164,44 +181,63 @@ class LLMHandler:
                 {"role": "user", "content": item_request + ' ' + str(input_text)}
             ]
         }
-        # Defining the model and accessing parameters via dict unpack
-        instructor_model = await openai_client.chat.completions.create(**chat_params)
+        logger.debug(f"Function - async_openai() - Action - Set chat_params as: \n {chat_params}")
+
+        # Running the chat completion and saving as an instructor model
+        logger.debug("Function - async_openai() - Action - Attempting chat completion")
+        instructor_model = await self.openai_client.chat.completions.create(**chat_params)
+        logger.debug("Function - async_openai() - Action - Chat completion success, saved to instructor_model")
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel
         response = dict(instructor_model)
 
         # Returning the response as a tuple (shorthand syntax)
+        logger.debug(f"Function - async_openai() - Finish - Returning (response, key, index) tuple: \n"
+                     f"({response}, {key}, {index})")
         return response, key, index
 
     async def create_coroutines(self, func) -> list:
         """Creates coroutines for the provided input data, using the specified LLM function."""
         # Create and store the tasks across the whole variable in a list
+        logger.debug(f"Function - create_coroutines() - Start - Creating coroutines")
         coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
                       for key, list_value in self.input_data.items()  # For every key in the input_data dict
                       for index, item_value in enumerate(list_value)]  # For every item in every list
+        logger.debug(f"Function - create_coroutines() - Finish - Returning coroutines")
         return coroutines
 
     async def await_coroutines(self, func):
         """Await coroutines,  returning results in the order of completion, not the order they are run."""
+        logger.debug(f"Function - await_coroutines() - Start")
+        logger.debug(f"Function - await_coroutines() - Action - Running create_coroutines(func)")
         coroutines = await self.create_coroutines(func)
+        logger.debug(f"Function - await_coroutines() - Action - Ran and saved create_coroutines(func)")
         # Loop over the futures
+        logger.debug(f"Function - await_coroutines() - Action - Looping over futures of coroutines using as_completed")
         for future in asyncio.as_completed(coroutines):
+            logger.debug("Function - await_coroutines() - Action - Inside future loop - Trying to await future")
             result = await future
+            logger.debug(f"Function - await_coroutines() - Action - Inside future loop - "
+                         f"Successfully awaited future, result is: \n {result}")
             response = result[0]
             key = result[1]
             index = result[2]
             self.raw_output_data[key][index] = response
+        logger.debug(f"Function - await_coroutines() - Finish - Looped over futures of coroutines")
 
     def run(self):
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
+        logger.debug(f"Function - run() - Start")
         if self.provider_clean == "openai":
             asyncio.run(self.await_coroutines(self.async_openai))
+        logger.debug(f"Function - run() - Finish - Returning self")
         return self
 
     def flatten_output_data(self, column_names: StrList):
         """Flattens output data into a dictionary of lists for compatibility with the chain class.
         Also creates the new column names for the eventual output."""
+        logger.debug(f"Function - flatten_output_data() - Start")
         new_output_data = {}  # Storage for key: list pairs representing rows
         new_column_names = []  # Storing a list of the column names corresponding to the ordered list
 
@@ -221,6 +257,7 @@ class LLMHandler:
         self.new_output_data = new_output_data  # Save the new output data to self
         self.new_column_names = new_column_names  # Save the new column names to self
 
+        logger.debug(f"Function - flatten_output_data() - Finish - Returning self")
         return self
 
 
@@ -262,7 +299,7 @@ if __name__ == "__main__":
                          request="Analyse the feedback and return results in the correct format",
                          validation_model=validators.PrimaryCategoryAndSubCategory,
                          cache_identifier='NLP-Categorise-TestData',
-                         use_cache=True,
+                         use_cache=False,
                          temperature=0.2,
                          max_validation_retries=3
                          )

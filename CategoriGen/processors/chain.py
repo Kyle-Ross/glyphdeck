@@ -9,7 +9,7 @@ from CategoriGen.validation.data_types import (Record, Records, Data, IntStr, dF
                                                StrList, StrList_or_None, List_or_Str, IntStrNone, RecordList)
 from CategoriGen.tools.loggers import ChainLogger, assert_and_log_error, log_and_raise_error
 from CategoriGen.tools.directory_creators import create_files_directory
-from CategoriGen.constants import OUTPUT_FILES_DIR
+from CategoriGen.path_constants import OUTPUT_FILES_DIR
 
 logger = ChainLogger().setup()
 

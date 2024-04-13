@@ -2,7 +2,7 @@ import os
 
 from typing import Tuple
 
-from CategoriGen.constants import OUTPUT_DIR, OUTPUT_LOGS_DIR, OUTPUT_CACHES_DIR, OUTPUT_FILES_DIR
+from CategoriGen.path_constants import OUTPUT_DIR, OUTPUT_LOGS_DIR, OUTPUT_CACHES_DIR, OUTPUT_FILES_DIR
 
 
 def create_directory(directory, directory_name, logger) -> str:

@@ -4,7 +4,7 @@ import os
 from typing import Type, NoReturn
 
 from CategoriGen.tools.directory_creators import check_logs_directory
-from CategoriGen.constants import file_log_level_constant, console_log_level_constant
+import CategoriGen.logger_constants as logger_constants
 
 
 def log_and_raise_error(logger: logging.Logger,
@@ -186,61 +186,61 @@ class BaseLogger:
 class DataTypesLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='data_types',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.data_types_file_log_level,
+                         console_log_level=logger_constants.data_types_console_log_level)
 
 
 class PrepperLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Prepper',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.prepper_file_log_level,
+                         console_log_level=logger_constants.prepper_console_log_level)
 
 
 class ChainLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Chain',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.chain_file_log_level,
+                         console_log_level=logger_constants.chain_console_log_level)
 
 
 class SanitiserLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='Sanitiser',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.sanitiser_file_log_level,
+                         console_log_level=logger_constants.sanitiser_console_log_level)
 
 
 class ValidatorsLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='validators_models',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.validators_file_log_level,
+                         console_log_level=logger_constants.console_log_level_default)
 
 
 class LLMHandlerLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='LLMHandler',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.llmhandler_file_log_level,
+                         console_log_level=logger_constants.llmhandler_console_log_level)
 
 
 class CacheLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='cache',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.cache_file_log_level,
+                         console_log_level=logger_constants.cache_console_log_level)
 
 
 class BaseWorkflowLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='base_workflow',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.base_workflow_file_log_level,
+                         console_log_level=logger_constants.base_workflow_console_log_level)
 
 
 class UnhandledErrorsLogger(BaseLogger):
     def __init__(self):
         super().__init__(name='unhandled_errors',
-                         file_log_level=file_log_level_constant,
-                         console_log_level=console_log_level_constant)
+                         file_log_level=logger_constants.unhandled_errors_file_log_level,
+                         console_log_level=logger_constants.unhandled_errors_console_log_level)
