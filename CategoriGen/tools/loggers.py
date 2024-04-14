@@ -74,6 +74,9 @@ def check_logger_exists(logger_name: str):
     return logger_name in existing_loggers  # To be evaluated as True if it exists at all
 
 
+nesting_level = 0
+
+
 def log_decorator(logger_arg,
                   level: str = 'debug',
                   start: Optional[str] = None,
@@ -102,7 +105,9 @@ def log_decorator(logger_arg,
         def inner_wrapper(*args, **kwargs):
             def conditional_log(message):
                 """Make a different type of log depending on the provided arguments"""
-                if level == 'debug':
+                if level == 'off':
+                    pass
+                elif level == 'debug':
                     logger_arg.debug(message)
                 elif level == 'info':
                     logger_arg.info(message)
@@ -117,9 +122,13 @@ def log_decorator(logger_arg,
                     raise AssertionError(error_message)
 
             # Log before and after the function
-            conditional_log(start_message)
+            global nesting_level
+            nesting_level += 1
+            nesting_prefix = f"Nest {nesting_level}: "
+            conditional_log(nesting_prefix + start_message)
             result = func(*args, **kwargs)
-            conditional_log(finish_message)
+            conditional_log(nesting_prefix + finish_message)
+            nesting_level -= 1
 
             return result
 
@@ -257,14 +266,14 @@ class PrepperLogger(BaseLogger):
 
 class ChainLogger(BaseLogger):
     def __init__(self):
-        super().__init__(logger_name='processors.Chain',
+        super().__init__(logger_name='processors.chain',
                          file_log_level=logger_constants.chain_file_log_level,
                          console_log_level=logger_constants.chain_console_log_level)
 
 
 class SanitiserLogger(BaseLogger):
     def __init__(self):
-        super().__init__(logger_name='processors.Sanitiser',
+        super().__init__(logger_name='processors.sanitiser',
                          file_log_level=logger_constants.sanitiser_file_log_level,
                          console_log_level=logger_constants.sanitiser_console_log_level)
 
@@ -302,13 +311,6 @@ class CacheLogger(BaseLogger):
         super().__init__(logger_name='tools.caching',
                          file_log_level=logger_constants.cache_file_log_level,
                          console_log_level=logger_constants.cache_console_log_level)
-
-
-class DirectoryCreatorsLogger(BaseLogger):
-    def __init__(self):
-        super().__init__(logger_name='tools.directory_creators',
-                         file_log_level=logger_constants.tools_directory_creators_file_log_level,
-                         console_log_level=logger_constants.tools_directory_creators_console_log_level)
 
 
 class StringsToolsLogger(BaseLogger):

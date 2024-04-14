@@ -174,7 +174,7 @@ class Sanitiser:
         self.active_groups: List = self.update_group(self.patterns, [True])
         self.inactive_groups: List = self.update_group(self.patterns, [False])
 
-    @log_decorator(logger)
+    @log_decorator(logger, "off")  # Runs for every row, logs off by default
     def update_match_counts(self):
         """Updates the per group match count dictionary and the overall count variable.
         Based on the per regex counts in the 'patterns' dictionary."""

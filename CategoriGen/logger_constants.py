@@ -6,7 +6,7 @@
 # Default levels
 # -----------------
 file_log_level_default: int = 20
-console_log_level_default: int = 10
+console_log_level_default: int = 20
 
 # -----------------
 # Granular Control
@@ -48,14 +48,10 @@ base_workflow_console_log_level: int = console_log_level_default
 unhandled_errors_file_log_level: int = file_log_level_default
 unhandled_errors_console_log_level: int = console_log_level_default
 
-# Unhandled errors as used in workflow files
-tools_directory_creators_file_log_level: int = file_log_level_default
-tools_directory_creators_console_log_level: int = console_log_level_default
-
-# Unhandled errors as used in workflow files
+# tools/strings.py
 tools_strings_file_log_level: int = file_log_level_default
 tools_strings_console_log_level: int = console_log_level_default
 
-# Unhandled errors as used in workflow files
+# tools/time.py
 tools_time_file_log_level: int = file_log_level_default
 tools_time_console_log_level: int = console_log_level_default

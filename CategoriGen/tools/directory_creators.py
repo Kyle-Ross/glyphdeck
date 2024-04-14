@@ -4,7 +4,7 @@ from typing import Tuple
 
 from CategoriGen.path_constants import OUTPUT_DIR, OUTPUT_LOGS_DIR, OUTPUT_CACHES_DIR, OUTPUT_FILES_DIR
 
-# Not implementing logging here since it is nested within the functions themselves
+# Not implementing function decorator logging here since it is nested within the functions themselves
 
 
 def create_directory(directory, directory_name, logger_arg) -> str:
