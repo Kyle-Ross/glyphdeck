@@ -1,5 +1,5 @@
 # Logging levels
-# This sets the minimum level of logging each logger will save to the file or print to the console
+# This sets the minimum level of logging each logger_arg will save to the file or print to the console
 # Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL
 
 # -----------------
@@ -47,3 +47,15 @@ base_workflow_console_log_level: int = console_log_level_default
 # Unhandled errors as used in workflow files
 unhandled_errors_file_log_level: int = file_log_level_default
 unhandled_errors_console_log_level: int = console_log_level_default
+
+# Unhandled errors as used in workflow files
+tools_directory_creators_file_log_level: int = file_log_level_default
+tools_directory_creators_console_log_level: int = console_log_level_default
+
+# Unhandled errors as used in workflow files
+tools_strings_file_log_level: int = file_log_level_default
+tools_strings_console_log_level: int = console_log_level_default
+
+# Unhandled errors as used in workflow files
+tools_time_file_log_level: int = file_log_level_default
+tools_time_console_log_level: int = console_log_level_default

@@ -3,7 +3,7 @@ from typing import Union, Tuple, List, Dict, Any
 
 import pandas as pd
 
-from CategoriGen.tools.loggers import SanitiserLogger, log_and_raise_error
+from CategoriGen.tools.loggers import SanitiserLogger, log_and_raise_error, log_decorator
 from CategoriGen.validation.data_types import Data
 
 logger = SanitiserLogger().setup()
@@ -18,7 +18,7 @@ class Sanitiser:
     email_pattern: re.Pattern[str] = re.compile(email_regex)
 
     # Folder Paths
-    # Gets any folder path, but doesn't work when the file name has a space
+    # Gets any folder path, but doesn't work when the file logger_name has a space
     folder_path_regex: str = r"(?:[a-zA-Z]:|\\\\[\w\.]+\\[\w.$]+)\\(?:[\s\w-]+\\)*([\w.-])*"
     folder_path_pattern: re.Pattern[str] = re.compile(folder_path_regex)
 
@@ -111,6 +111,7 @@ class Sanitiser:
         values['matches'] = 0
 
     @staticmethod
+    @log_decorator(logger, is_static_method=True)
     def placeholder_check(patterns_dict: 'patterns'):
         """Raises an error if any of the current placeholders contain non-alphabet characters excluding '<' and '>'."""
         for key, value in patterns_dict.items():
@@ -125,6 +126,7 @@ class Sanitiser:
     placeholder_check(patterns)
 
     @staticmethod
+    @log_decorator(logger, is_static_method=True)
     def order_patterns(patterns_dict: 'patterns'):
         """Re-sorts the pattern dictionary by rank, for use if you have added a new pattern to the patterns attribute"""
         # Change the dict to a list with nested tuples and sort it by ascending rank
@@ -137,12 +139,14 @@ class Sanitiser:
     patterns = order_patterns(patterns)
 
     @staticmethod
+    @log_decorator(logger, is_static_method=True)
     def remove_arrows(input_string: str):
         """Removes '<' and '>' from a string"""
         input_string = input_string.replace('<', '').replace('>', '')
         return input_string
 
     @staticmethod
+    @log_decorator(logger, is_static_method=True)
     def update_group(patterns_dict: 'patterns', active_type: Union[list, set] = (True, False)):
         """Returns a list of groups, with particular bool values in the 'active' record_identifier. Used to update
         reference attributes"""
@@ -150,6 +154,7 @@ class Sanitiser:
         groups = list(set(groups))  # Remove duplicates
         return groups
 
+    @log_decorator(logger, start="Initialising Chain object", finish="Initialised Chain object")
     def __init__(self,
                  input_data: Data) -> None:
         self.input_data: Data = input_data
@@ -161,6 +166,7 @@ class Sanitiser:
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
 
+    @log_decorator(logger)
     def update_groups(self):
         """Uses update_group() to update all group references"""
         # Storing all the available pattern groups in a distinct list for reference
@@ -168,6 +174,7 @@ class Sanitiser:
         self.active_groups: List = self.update_group(self.patterns, [True])
         self.inactive_groups: List = self.update_group(self.patterns, [False])
 
+    @log_decorator(logger)
     def update_match_counts(self):
         """Updates the per group match count dictionary and the overall count variable.
         Based on the per regex counts in the 'patterns' dictionary."""
@@ -183,6 +190,7 @@ class Sanitiser:
                 self.group_matches[value['group']] += value['matches']
                 self.total_matches += value['matches']
 
+    @log_decorator(logger)
     def set_placeholders(self, placeholder_dict: Dict[str, str]) -> 'Sanitiser':
         """Function to change the placeholders from their defaults
         Accepts a dict with {'group_name': 'placeholder',...}"""
@@ -200,6 +208,7 @@ class Sanitiser:
         self.placeholder_check(self.patterns)
         return self
 
+    @log_decorator(logger)
     def select_groups(self, selection: List) -> 'Sanitiser':
         """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
         # Check that each pattern exists
@@ -217,11 +226,13 @@ class Sanitiser:
         self.update_groups()
         return self
 
+    @log_decorator(logger)
     def sort_patterns(self):
         """Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
         Making sure the patterns are run in order of rank regardless of other actions."""
         self.patterns = self.order_patterns(self.patterns)
 
+    @log_decorator(logger)
     def add_pattern(self,
                     pattern_name: str,
                     group: str,
@@ -249,6 +260,7 @@ class Sanitiser:
         self.sort_patterns()  # Sort patterns by rank
         self.update_groups()  # Update selected groups lists
 
+    @log_decorator(logger)
     def sanitise(self):
         """Run all selected patterns in order, updating the 'raw_output_data'.
 

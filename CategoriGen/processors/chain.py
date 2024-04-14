@@ -15,6 +15,7 @@ logger = ChainLogger().setup()
 
 
 class Chain:
+    @log_decorator(logger, start="Initialising Chain object", finish="Initialised Chain object")
     def __init__(self):
         """Common object for storing and passing the chained results of data processing."""
         self.expected_len = 0
@@ -389,9 +390,9 @@ class Chain:
         def make_path(source_record: Record) -> str:
             """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime('%Y-%m-%d %H-%M-%S')
-            # Conditionally setting the title to be used in the name
+            # Conditionally setting the title to be used in the logger_name
             if file_type == 'csv' and split:
-                title = source_record['title']  # Each individual file has the title name
+                title = source_record['title']  # Each individual file has the title logger_name
             elif file_type == 'xlsx' and split:
                 title = "split"  # The containing excel file has 'split'
             elif split:

@@ -2,7 +2,7 @@ from typing import Union, List
 
 import pandas as pd
 
-from CategoriGen.tools.loggers import PrepperLogger, log_and_raise_error
+from CategoriGen.tools.loggers import PrepperLogger, log_and_raise_error, log_decorator
 from CategoriGen.validation.data_types import Data
 
 logger = PrepperLogger().setup()
@@ -12,17 +12,19 @@ class Prepper:
     """A class to process data from xlsx or csv files into a dataframe as well as the data type used in the
     chain class"""
 
+    @log_decorator(logger, start="Initialising Prepper object", finish="Initialised Prepper object")
     def __init__(self):
-        """Initialize an empty dataframe, id column name, and data columns dictionary."""
+        """Initialize an empty dataframe, id column logger_name, and data columns dictionary."""
         self.df = pd.DataFrame()
         self.id_column: str = ""
         self.data_columns: List[str] = []
         self.output_data: Data = {}
 
+    @log_decorator(logger)
     def load_data(self,
                   file_path: str,
                   file_type: str,
-                  sheet_name: Union[str, int] = 0,  # xlsx sheet index or name - default being 0 (the first sheet)
+                  sheet_name: Union[str, int] = 0,  # xlsx sheet index or logger_name - default being 0 (the first sheet)
                   encoding: str = "utf-8") -> 'Prepper':
         """Load data from a file into a dataframe."""
         if file_type == 'xlsx':
@@ -34,8 +36,9 @@ class Prepper:
                                 "Invalid file type. Only 'xlsx' and 'csv' are supported.")
         return self
 
+    @log_decorator(logger)
     def set_id_column(self, id_column: Union[str, int]) -> 'Prepper':
-        """Set the id column name and check if it only has unique values."""
+        """Set the id column logger_name and check if it only has unique values."""
         if self.df[id_column].is_unique:
             self.id_column = str(id_column)
         else:
@@ -43,8 +46,9 @@ class Prepper:
                                 "ID column must have unique values.")
         return self
 
+    @log_decorator(logger)
     def set_data_columns(self, data_columns: Union[str, List[str]]) -> 'Prepper':
-        """Set the id column name and check if it only has unique values."""
+        """Set the id column logger_name and check if it only has unique values."""
         if isinstance(data_columns, str):
             self.data_columns = [data_columns]
         elif isinstance(data_columns, list):
@@ -57,6 +61,7 @@ class Prepper:
                                 "Data columns must be either a string or a list of strings.")
         return self
 
+    @log_decorator(logger)
     def set_data_dict(self) -> 'Prepper':
         """Sets the data dict where keys are ids and values are lists of selected data column values."""
         for _, row in self.df.iterrows():

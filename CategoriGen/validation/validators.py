@@ -16,7 +16,7 @@ sentiment_max = 1.00
 # Add field names to the field_validator arguments if you want them to be validated by a method
 class BaseValidatorModel(BaseModel):
     """Adds field validation to the resulting BaseValidatorModel class, which are used if columns match the arguments.
-    Multiple validation can apply to a single field if the column name is in multiple validation."""
+    Multiple validation can apply to a single field if the column logger_name is in multiple validation."""
 
     @field_validator('sentiment_score', check_fields=False)  # Check fields uses since the item_model inherits from base
     def check_decimal_places(cls, v):
@@ -91,17 +91,17 @@ per_sub_category_sentiment_scores: list = \
     )
 
 primary_category: str = Field(
-    description=f"The primary category identified in the comment. Each category name should be concise."
+    description=f"The primary category identified in the comment. Each category logger_name should be concise."
 )
 
 top_5_categories: list = Field(
     description=f"The top 1 to 5 sub-categories identified in the comment in order of relevance. "
-                f"Each category name should be concise."
+                f"Each category logger_name should be concise."
 )
 
 categories_1_to_30: list = Field(
     description=f"All sub-categories identified in the comment in order of relevance, making sure to capture all the "
-                f"topics, with least 1 and no more than 30 categories. Each category name should be concise."
+                f"topics, with least 1 and no more than 30 categories. Each category logger_name should be concise."
 )
 
 # Additional information on the fields above
@@ -117,7 +117,7 @@ field_schema: dict = {
 
 # ---CLASSES---
 # Classes use the common fields above
-# Validated according to @field_validator methods defined in the BaseValidatorModel if the field name matches
+# Validated according to @field_validator methods defined in the BaseValidatorModel if the field logger_name matches
 # Type annotations need to be repeated, but use the above as a reference.
 # Pydantic excludes attributes that start with an underscore from validation actions
 

@@ -4,11 +4,12 @@ import os
 from diskcache import Cache
 
 from CategoriGen.tools.directory_creators import create_caches_directory
-from CategoriGen.tools.loggers import CacheLogger
+from CategoriGen.tools.loggers import CacheLogger, log_decorator
 
 logger = CacheLogger().setup()
 
 
+@log_decorator(logger)
 def cache_creator(cache_dir: str, max_mb_size: int):
     """Checks if a cache exists, if not, creates it. Returns the cache object and file path afterwards."""
     # Creates the caches directory and returns the full cache file path within
@@ -19,6 +20,7 @@ def cache_creator(cache_dir: str, max_mb_size: int):
     return cache, full_cache_dir
 
 
+@log_decorator(logger)
 def openai_cache(cache_dir, max_mb_size: int = 1000):
     """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
     cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'

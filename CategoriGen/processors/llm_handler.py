@@ -12,7 +12,7 @@ from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
-logger.debug("Initialised logger")
+logger.debug("Initialised logger_arg")
 
 
 class LLMHandler:
