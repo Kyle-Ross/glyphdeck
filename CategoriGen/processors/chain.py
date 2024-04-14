@@ -7,7 +7,7 @@ import pandas as pd
 
 from CategoriGen.validation.data_types import (Record, Records, Data, IntStr, dFrame, dFrame_or_None, IntList,
                                                StrList, StrList_or_None, List_or_Str, IntStrNone, RecordList)
-from CategoriGen.tools.loggers import ChainLogger, assert_and_log_error, log_and_raise_error
+from CategoriGen.tools.loggers import ChainLogger, assert_and_log_error, log_and_raise_error, log_decorator
 from CategoriGen.tools.directory_creators import create_files_directory
 from CategoriGen.path_constants import OUTPUT_FILES_DIR
 
@@ -29,7 +29,9 @@ class Chain:
                 'column_names': None  # Names of the columns, in order
             }
         }
+        logger.debug("Function - __init__() - Finish - Initialised Chain object")
 
+    @log_decorator(logger)
     def title_key(self, title: str) -> int:
         """Returns the record number for a given title"""
         for record_num, record_dict in self.records.items():
@@ -39,6 +41,7 @@ class Chain:
             except TypeError as error:
                 log_and_raise_error(logger, 'error', type(error), f"Provided title 'f{title}' does not exist.")
 
+    @log_decorator(logger)
     def record(self, record_identifier: IntStr) -> Record:
         """Returns the record corresponding to the provided record number or record title."""
         key_type = type(record_identifier)
@@ -47,80 +50,97 @@ class Chain:
         if key_type == str:
             return self.records[self.title_key(record_identifier)]
 
+    @log_decorator(logger)
     def title(self, key: IntStr) -> str:
         """Returns the title corresponding to the provided record_identifier number."""
         return self.record(key)['title']
 
+    @log_decorator(logger)
     def dt(self, key: IntStr) -> datetime:
         """Returns the datetime corresponding to the provided record_identifier number."""
         return self.record(key)['dt']
 
+    @log_decorator(logger)
     def data(self, key: IntStr) -> Data:
         """Returns the data dictionary corresponding to the provided record_identifier number."""
         return self.record(key)['data']
 
+    @log_decorator(logger)
     def table(self, key: IntStr) -> dFrame:
         """Returns the table corresponding to the provided record_identifier number."""
         return self.record(key)['table']
 
+    @log_decorator(logger)
     def table_id_column(self, key: IntStr) -> IntStrNone:
         """Returns the table corresponding to the provided record_identifier number."""
         return self.record(key)['table_id_column']
 
+    @log_decorator(logger)
     def record_delta(self, key: IntStr) -> timedelta:
         """Returns the timedelta corresponding to the provided record_identifier number."""
         return self.record(key)['delta']
 
+    @log_decorator(logger)
     def column_names(self, key: IntStr) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)['column_names']
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_key(self) -> int:
         """Returns the max record_identifier from 'records'."""
         return max(self.records.keys())
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_record(self) -> Record:
         """Returns the latest 'record' from 'records'."""
         return self.record(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_title(self) -> str:
         """Returns the latest 'title' from 'records'."""
         return self.title(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_dt(self) -> datetime:
         """Returns the latest 'dt' from 'records'."""
         return self.dt(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_data(self) -> Data:
         """Returns the latest 'data' from the latest 'record' in 'records'."""
         return self.data(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_table(self) -> dFrame_or_None:
         """Returns the latest 'table' from the latest 'record' in 'records'."""
         return self.table(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_table_id_column(self) -> IntStrNone:
         """Returns the latest 'table_id_column' from the latest 'record' in 'records'."""
         return self.table_id_column(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_record_delta(self) -> timedelta:
         """Returns the latest 'record_delta' from the latest 'record' in 'records'."""
         return self.record_delta(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def latest_column_names(self) -> StrList:
         """Returns the latest 'column_names' from 'records'."""
         return self.column_names(self.latest_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_key(self) -> int:
         """Returns 1, but only if record_identifier 1 exists in the records."""
         if 1 not in self.records:
@@ -129,50 +149,60 @@ class Chain:
         return 1
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_record(self) -> Record:
         """Returns the initial 'record' from 'records'."""
         return self.record(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_title(self) -> str:
         """Returns the initial 'title' from 'records'."""
         return self.title(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_dt(self) -> datetime:
         """Returns the initial 'dt' from 'records'."""
         return self.dt(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_data(self) -> Data:
         """Returns the initial 'data' from the latest 'record' in 'records'."""
         return self.data(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_table(self) -> dFrame_or_None:
         """Returns the initial 'table' from the latest 'record' in 'records'."""
         return self.table(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_table_id_column(self) -> IntStrNone:
         """Returns the initial 'table_id_column' from the latest 'record' in 'records'."""
         return self.table_id_column(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def initial_column_names(self) -> StrList:
         """Returns the initial 'column_names' from the latest 'record' in 'records'."""
         return self.column_names(self.initial_key)
 
     @property
+    @log_decorator(logger, is_property=True)
     def delta(self) -> timedelta:
         """Returns the overall timedelta."""
         return self.latest_dt - self.dt(0)
 
+    @log_decorator(logger)
     def set_expected_len(self, value: int):
         """Updates the number of values expected for each list in the records data"""
         self.expected_len = value
         return self
 
+    @log_decorator(logger)
     def key_validator(self, target_key: int):
         """Validates that records have identical keys, and no new or missing keys."""
 
@@ -209,6 +239,7 @@ class Chain:
                                      "already in the initial record."
             log_and_raise_error(logger, 'error', KeyError, key_validator_message)
 
+    @log_decorator(logger)
     def data_validator(self, target_key: int):
         """Checks that each list in the data of the target record has the expected length."""
         target_data: Data = self.data(target_key)
@@ -236,6 +267,7 @@ class Chain:
         if bad_len != 0:
             log_and_raise_error(logger, 'error', ValueError, data_validator_message)
 
+    @log_decorator(logger)
     def append(self,
                title: str,
                data: Data,
@@ -276,6 +308,7 @@ class Chain:
         self.data_validator(new_key)
         return self
 
+    @log_decorator(logger)
     def selector(self, records: List_or_Str, use_suffix: bool) -> RecordList:
         """Returns a list of clean DataFrames from the selected records. Adds column names back on."""
         # Handling str input
@@ -299,6 +332,7 @@ class Chain:
         # Returning the selected records
         return selected_records
 
+    @log_decorator(logger)
     def combiner(self, records: list) -> RecordList:
         """Combines records into a single dataframe."""
         # Grab the dataframes, combining them, and returning them
@@ -319,6 +353,7 @@ class Chain:
         }]
         return combined_record
 
+    @log_decorator(logger)
     def output(self,
                records: List_or_Str,
                file_type: str,

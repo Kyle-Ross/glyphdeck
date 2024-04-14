@@ -6,7 +6,7 @@
 # Default levels
 # -----------------
 file_log_level_default: int = 20
-console_log_level_default: int = 20
+console_log_level_default: int = 10
 
 # -----------------
 # Granular Control

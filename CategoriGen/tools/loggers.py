@@ -1,7 +1,7 @@
 import traceback
 import logging
 import os
-from typing import Type, NoReturn
+from typing import Type, NoReturn, Optional
 
 from CategoriGen.tools.directory_creators import check_logs_directory
 import CategoriGen.logger_constants as logger_constants
@@ -56,6 +56,7 @@ def assert_and_log_error(logger: logging.Logger,
 
 class LogBlock:
     """Context manager for 'with' blocks, logging the start and end with a specified process name"""
+
     def __init__(self, process_name: str, logger: logging.Logger):
         self.process_name: str = process_name
         self.logger: logging.Logger = logger
@@ -73,8 +74,57 @@ def check_logger_exists(existing_logger):
     return existing_logger in existing_loggers  # To be evaluated as True if it exists at all
 
 
+def log_decorator(logger,
+                  level: str = 'debug',
+                  start: Optional[str] = None,
+                  finish: Optional[str] = None,
+                  is_property=False):
+    """Function decorator to log the start and end of a function with an optional suffix message"""
+    # Create the suffixes only if they were provided
+    start = " - " + start if start is not None else ""
+    finish = " - " + finish if finish is not None else ""
+    # Set the prefix text
+    prefix = "Property" if is_property else "Function"
+
+    levels = ['debug', 'info', 'warning', 'error', 'critical']
+
+    def outer_wrapper(func):
+        # Build the message
+        start_message = f"{prefix}: '{func.__name__}' - Start{start}"
+        finish_message = f"{prefix}: '{func.__name__}' - Finish{finish}"
+
+        def inner_wrapper(*args, **kwargs):
+            def conditional_log(message):
+                """Make a different type of log depending on the provided arguments"""
+                if level == 'debug':
+                    logger.debug(message)
+                elif level == 'info':
+                    logger.info(message)
+                elif level == 'warning':
+                    logger.warning(message)
+                elif level == 'error':
+                    logger.error(message)
+                elif level == 'critical':
+                    logger.critical(message)
+                else:
+                    error_message = f"Level argument '{level}' is not in available levels list: {levels}"
+                    raise AssertionError(error_message)
+
+            # Log before and after the function
+            conditional_log(start_message)
+            result = func(*args, **kwargs)
+            conditional_log(finish_message)
+
+            return result
+
+        return inner_wrapper
+
+    return outer_wrapper
+
+
 def exception_logger(logger, include_traceback=False):  # At this level the function is a "decorator factory"
     """Decorator function to automatically log any errors that are not explicitly handled elsewhere"""
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
@@ -94,7 +144,9 @@ def exception_logger(logger, include_traceback=False):  # At this level the func
                     # Log the message as CRITICAL and re-raise
                     logger.critical(error_message)
                     raise
+
         return wrapper
+
     return decorator
 
 
