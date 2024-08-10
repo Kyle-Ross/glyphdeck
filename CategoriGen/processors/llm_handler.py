@@ -37,11 +37,14 @@ class LLMHandler:
                  use_cache: bool = True,  # Set whether to check the cache for values or not
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
                  max_validation_retries: int = 2,  # Max times the request can retry on the basis of failed validation
-                 # Below: Maximum amount of 'pre-prepared' coroutines
+                 # Below: Maximum amount of 'pre-prepared' coroutines, that can exist before being awaited
                  # Lower limits can help manage memory usage and reduce context switching overhead
-                 # Context vs grabbing it from memory when 'pre-prepared', vs just creating it as needed
+                 # Context Handling being grabbing it from memory when 'pre-prepared', vs just creating it as needed
                  # Optimal number can vary, depending on the task and your system (CPU + Memory)
-                 max_preprepared_coroutines: int = 10):
+                 max_preprepared_coroutines: int = 10,
+                 # Below: After creation, the maximum amount of coroutines that can be 'awaiting' at once
+                 # Essentially represents the max api calls that can be in-memory, waiting on the api return at once
+                 max_awaiting_coroutines: int = 1000):
         """__init__ func which is run when the object is initialised."""
 
         logger.debug("Function - __init__() - Start - Initialising LLMHandler object")
@@ -96,6 +99,7 @@ class LLMHandler:
 
         # Initialise Semaphores
         self.max_preprepared_coroutines_semaphore = asyncio.Semaphore(max_preprepared_coroutines)
+        self.max_awaiting_coroutines_semaphore = asyncio.Semaphore(max_awaiting_coroutines)
 
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
