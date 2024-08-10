@@ -16,7 +16,7 @@ current_file_name = os.path.basename(__file__)
 @exception_logger(unhandled_errors_logger)
 def main():
     with LogBlock("Set file vars", logger):
-        source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 100.csv"
+        source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 1000.csv"
         source_file_type = source_file.split(".")[-1]
 
     with LogBlock('Chain initialisation', logger):
@@ -49,9 +49,10 @@ def main():
                              request="Analyse the feedback and return results in the correct format",
                              validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
                              cache_identifier='NLPPerCategorySentimentAndOverallSentimentWomensClothesReview',
-                             use_cache=True,
+                             use_cache=False,
                              temperature=0.2,
-                             max_validation_retries=3)
+                             max_validation_retries=3,
+                             max_concurrent_tasks=100)
         handler.run()
         handler.flatten_output_data(column_names=chain.latest_column_names)
         chain.append(

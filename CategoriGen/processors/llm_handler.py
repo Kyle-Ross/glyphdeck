@@ -35,7 +35,14 @@ class LLMHandler:
                  cache_identifier: str,  # A Unique string used to identify discrete jobs and avoid cache mixing
                  use_cache: bool = True,  # Set whether to check the cache for values or not
                  temperature: float = 0.2,  # How deterministic (low num) or random (high num) the responses will be
-                 max_validation_retries: int = 2):  # Max times the request can retry on the basis of failed validation
+                 max_validation_retries: int = 2,  # Max times the request can retry on the basis of failed validation
+                 # Below: Maximum amount of simultaneously running concurrent tasks
+                 # Lower limits can help manage memory usage and reduce context switching overhead
+                 # Optimal number can vary, depending on the task and your system (CPU + Memory)
+                 # There's no one-size-fits-all answer, so testing is required
+                 # Note 1/2: This does not limit the tasks that are awaiting the API.
+                 # 2/2: The semaphore is released when the API request is made. Memory can still stack up at this point.
+                 max_concurrent_tasks: int = 10):
         """__init__ func which is run when the object is initialised."""
 
         logger.debug("Function - __init__() - Start - Initialising LLMHandler object")
@@ -58,6 +65,8 @@ class LLMHandler:
                              "'temperature' argument must be type 'float'")
         assert_and_log_error(logger, 'error', isinstance(max_validation_retries, int),
                              "'max_validation_retries' argument must be type 'int'")
+        assert_and_log_error(logger, 'error', isinstance(max_concurrent_tasks, int),
+                             "'max_concurrent_tasks' argument must be type 'int'")
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
@@ -85,6 +94,7 @@ class LLMHandler:
         self.use_cache: bool = use_cache  # Referenced in lru_cache by accessing sel
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
+        self.max_concurrent_tasks_semaphore = asyncio.Semaphore(max_concurrent_tasks)
 
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
@@ -201,9 +211,12 @@ class LLMHandler:
         """Creates coroutines for the provided input data, using the specified LLM function."""
         # Create and store the tasks across the whole variable in a list
         logger.debug(f"Function - create_coroutines() - Start - Creating coroutines")
-        coroutines = [func(input_text=item_value, key=key, index=index)  # List of coroutines
-                      for key, list_value in self.input_data.items()  # For every key in the input_data dict
-                      for index, item_value in enumerate(list_value)]  # For every item in every list
+        coroutines = []
+        for key, list_value in self.input_data.items():
+            for index, item_value in enumerate(list_value):
+                async with self.max_concurrent_tasks_semaphore:  # Limits the amount of concurrent tasks
+                    coroutine = func(input_text=item_value, key=key, index=index)
+                    coroutines.append(coroutine)
         logger.debug(f"Function - create_coroutines() - Finish - Returning coroutines")
         return coroutines
 
@@ -301,7 +314,8 @@ if __name__ == "__main__":
                          cache_identifier='NLP-Categorise-TestData',
                          use_cache=False,
                          temperature=0.2,
-                         max_validation_retries=3
+                         max_validation_retries=3,
+                         max_concurrent_tasks=10
                          )
 
     handler.run()
