@@ -1,7 +1,7 @@
 import traceback
 import logging
 import os
-from typing import Type, NoReturn, Optional
+from typing import Type, Optional
 
 from CategoriGen.tools.directory_creators import check_logs_directory
 import CategoriGen.logger_constants as logger_constants
@@ -11,10 +11,11 @@ def log_and_raise_error(logger_arg: logging.Logger,
                         level: str,
                         error_type: Type[BaseException],
                         message: str,
-                        include_traceback: bool = False) -> NoReturn:
+                        include_traceback: bool = False) -> None:
     """Logs and raises an error with the same message string. Wraps in custom error to indicate this is an error that
-    was handled. Later this will prevent it being re-raised as an unhandled error"""
+    was handled. Later this will prevent it being re-raised as an log level CRITICAL unhandled error"""
 
+    # This class name is what is check to see if an error is handled
     class HandledError(error_type):
         pass
 
@@ -30,7 +31,7 @@ def log_and_raise_error(logger_arg: logging.Logger,
     # Build the log / error message
     error_message = f"{error_type.__name__} - {message}"
     if include_traceback:  # Include detailed traceback information in the log if specified
-        error_message = f"{error_message}\n{traceback.format_exc()}#ENDOFLOG#"
+        error_message = f"{error_message}\\n{traceback.format_exc().replace('\n', '\\n')}"
 
     # Log the message at the specified level and re-raise the error
     if level == 'warning':
@@ -137,7 +138,7 @@ def log_decorator(logger_arg,
     return outer_wrapper
 
 
-def exception_logger(logger_arg, include_traceback=False):  # At this level the function is a "decorator factory"
+def exception_logger(logger_arg, include_traceback=True):  # At this level the function is a "decorator factory"
     """Decorator function to automatically log any errors that are not explicitly handled elsewhere"""
 
     def decorator(func):
@@ -149,13 +150,14 @@ def exception_logger(logger_arg, include_traceback=False):  # At this level the 
                 # So if the exception has this logger_name, just re-raise it - it will already have logging
                 if type(error).__name__ == 'HandledError':
                     raise
-                # Otherwise, log the unhandled error as critical and then re_raise
+                # Otherwise, log the unhandled error as critical and then re-raise
                 else:
                     # Conditionally log a more detailed message with the error traceback appended
                     if include_traceback:
-                        error_message = f"{type(error).__name__}\n{traceback.format_exc()}#ENDOFLOG#"
+                        # Flattens the traceback into a single line by replacing newlines
+                        error_message = f"{type(error).__name__}\\n{traceback.format_exc().replace('\n', '\\n')}"
                     else:
-                        error_message = str(error)
+                        error_message = type(error).__name__
                     # Log the message as CRITICAL and re-raise
                     logger_arg.critical(error_message)
                     raise
