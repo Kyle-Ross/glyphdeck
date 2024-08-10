@@ -16,7 +16,7 @@ current_file_name = os.path.basename(__file__)
 @exception_logger(unhandled_errors_logger)
 def main():
     with LogBlock("Set file vars", logger):
-        source_file = "../scratch/Womens clothing reviews/Womens Clothing E-Commerce Reviews - 1000.csv"
+        source_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
         source_file_type = source_file.split(".")[-1]
 
     with LogBlock('Chain initialisation', logger):
