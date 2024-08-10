@@ -44,7 +44,8 @@ class LLMHandler:
                  max_preprepared_coroutines: int = 10,
                  # Below: After creation, the maximum amount of coroutines that can be 'awaiting' at once
                  # Essentially represents the max api calls that can be in-memory, waiting on the api return at once
-                 max_awaiting_coroutines: int = 1000):
+                 # High values will run faster incrementally faster, but consume more memory
+                 max_awaiting_coroutines: int = 100):
         """__init__ func which is run when the object is initialised."""
 
         logger.debug("Function - __init__() - Start - Initialising LLMHandler object")
@@ -237,14 +238,17 @@ class LLMHandler:
         # Loop over the futures
         logger.debug(f"Function - await_coroutines() - Action - Looping over futures of coroutines using as_completed")
         for future in asyncio.as_completed(coroutines):
-            logger.debug("Function - await_coroutines() - Action - Inside future loop - Trying to await future")
-            result = await future
-            logger.debug(f"Function - await_coroutines() - Action - Inside future loop - "
-                         f"Successfully awaited future, result is: \n {result}")
-            response = result[0]
-            key = result[1]
-            index = result[2]
-            self.raw_output_data[key][index] = response
+            # Limiting the amount of coroutines running / waiting on the api (and taking up memory)
+            # as_completed() above means the semaphore is released as the future is completed, in any order
+            async with self.max_awaiting_coroutines_semaphore:
+                logger.debug("Function - await_coroutines() - Action - Inside future loop - Trying to await future")
+                result = await future
+                logger.debug(f"Function - await_coroutines() - Action - Inside future loop - "
+                            f"Successfully awaited future, result is: \n {result}")
+                response = result[0]
+                key = result[1]
+                index = result[2]
+                self.raw_output_data[key][index] = response
         logger.debug(f"Function - await_coroutines() - Finish - Looped over futures of coroutines")
 
     def run(self):
