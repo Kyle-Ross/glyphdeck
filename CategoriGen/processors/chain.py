@@ -223,20 +223,16 @@ class Chain:
         if total_differences > 0:
             key_validator_message = ""
             if initial_not_target_len > 0:
-                key_validator_message = f"\n" \
-                                        f"{initial_not_target_len} keys were in the initial record {self.initial_key} " \
+                key_validator_message = f"{initial_not_target_len} keys were in the initial record {self.initial_key} " \
                                         f"'{initial_title}" \
-                                        f"', but not in the appended record {target_key} '{target_title}'.\n" \
-                                        f"These were the following keys:\n" \
-                                        f"{initial_not_target}"
+                                        f"', but not in the appended record {target_key} '{target_title}'. " \
+                                        f"These were the following keys: {initial_not_target}"
             if target_not_initial_len > 0:
-                key_validator_message = f"\n" \
-                                        f"{target_not_initial_len} keys were in the appended record {target_key} " \
+                key_validator_message = f"{target_not_initial_len} keys were in the appended record {target_key} " \
                                         f"'{target_title}" \
-                                        f"', but not in the initial record {self.initial_key} '{initial_title}'.\n" \
-                                        f"These were the following keys:\n" \
-                                        f"{target_not_initial}"
-            key_validator_message += "\n\nRecords cannot be missing keys or add new keys that are not " \
+                                        f"', but not in the initial record {self.initial_key} '{initial_title}'. " \
+                                        f"These were the following keys: {target_not_initial}"
+            key_validator_message += " | Records cannot be missing keys or add new keys that are not " \
                                      "already in the initial record."
             log_and_raise_error(logger, 'error', KeyError, key_validator_message)
 
@@ -262,9 +258,8 @@ class Chain:
         elif bad_len != 0:
             data_validator_message = f"Some keys in record '{target_title}' " \
                                      f"contained lists of unexpected length / column count, " \
-                                     f"where expected length was '{self.expected_len}'.\n\n" \
-                                     f"These keys were: \n" \
-                                     f"{bad_keys}"
+                                     f"where expected length was '{self.expected_len}'. " \
+                                     f"These keys were: {bad_keys}"
         if bad_len != 0:
             log_and_raise_error(logger, 'error', ValueError, data_validator_message)
 

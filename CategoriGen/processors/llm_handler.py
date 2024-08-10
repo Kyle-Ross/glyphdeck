@@ -92,7 +92,7 @@ class LLMHandler:
         self.provider_clean: str = string_cleaner(self.provider)
         assert_and_log_error(logger, 'error', self.provider_clean in self.available_providers,
                              f"{self.provider} is not in the list of available providers: "
-                             f"\n{self.available_providers}")
+                             f"{self.available_providers}")
 
         # Object level llm information that serves as the default value if tools don't specify customisations
         self.model: str = model
@@ -199,7 +199,7 @@ class LLMHandler:
                 {"role": "user", "content": item_request + ' ' + str(input_text)}
             ]
         }
-        logger.debug(f"Function - async_openai() - Action - Set chat_params as: \n {chat_params}")
+        logger.debug(f"Function - async_openai() - Action - Set chat_params as: {chat_params}")
 
         # Running the chat completion and saving as an instructor model
         logger.debug("Function - async_openai() - Action - Attempting chat completion")
@@ -211,7 +211,7 @@ class LLMHandler:
         response = dict(instructor_model)
 
         # Returning the response as a tuple (shorthand syntax)
-        logger.debug(f"Function - async_openai() - Finish - Returning (response, key, index) tuple: \n"
+        logger.debug(f"Function - async_openai() - Finish - Returning (response, key, index) tuple: "
                      f"({response}, {key}, {index})")
         return response, key, index
 
@@ -244,7 +244,7 @@ class LLMHandler:
                 logger.debug("Function - await_coroutines() - Action - Inside future loop - Trying to await future")
                 result = await future
                 logger.debug(f"Function - await_coroutines() - Action - Inside future loop - "
-                            f"Successfully awaited future, result is: \n {result}")
+                            f"Successfully awaited future, result is: {result}")
                 response = result[0]
                 key = result[1]
                 index = result[2]
