@@ -1,5 +1,6 @@
 import os
 import asyncio
+from typing import Optional
 
 import instructor
 import openai
@@ -149,12 +150,12 @@ class LLMHandler:
                            input_text: str,
                            key,
                            index: int,
-                           item_model: str = None,
-                           item_role: str = None,
-                           item_request: str = None,
+                           item_model: Optional[str] = None,
+                           item_role: Optional[str] = None,
+                           item_request: Optional[str] = None,
                            item_validation_model=None,
-                           item_temperature: float = None,
-                           item_max_validation_retries: int = None) -> tuple:
+                           item_temperature: Optional[float] = None,
+                           item_max_validation_retries: Optional[int] = None) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
 
         logger.debug("Function - async_openai() - Start")
