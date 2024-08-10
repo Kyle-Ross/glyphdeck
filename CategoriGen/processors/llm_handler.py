@@ -69,6 +69,12 @@ class LLMHandler:
                              "'max_validation_retries' argument must be type 'int'")
         assert_and_log_error(logger, 'error', isinstance(max_preprepared_coroutines, int),
                              "'max_preprepared_coroutines' argument must be type 'int'")
+        assert_and_log_error(logger, 'error', isinstance(max_awaiting_coroutines, int),
+                             "'max_awaiting_coroutines' argument must be type 'int'")
+        
+        # Initialise Semaphores (these are class level and will not change between LLM providers)
+        self.max_preprepared_coroutines_semaphore = asyncio.Semaphore(max_preprepared_coroutines)
+        self.max_awaiting_coroutines_semaphore = asyncio.Semaphore(max_awaiting_coroutines)
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
         self.input_data: Data = input_data
@@ -96,10 +102,6 @@ class LLMHandler:
         self.use_cache: bool = use_cache  # Referenced in lru_cache by accessing sel
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
-
-        # Initialise Semaphores
-        self.max_preprepared_coroutines_semaphore = asyncio.Semaphore(max_preprepared_coroutines)
-        self.max_awaiting_coroutines_semaphore = asyncio.Semaphore(max_awaiting_coroutines)
 
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
