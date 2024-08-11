@@ -33,7 +33,7 @@ logger = ChainLogger().setup()
 
 class Chain:
     @log_decorator(
-        logger, start="Initialising Chain object", finish="Initialised Chain object"
+        logger, "info", start="Initialising Chain object", finish="Initialised Chain object"
     )
     def __init__(self):
         """Common object for storing and passing the chained results of data processing."""
@@ -49,7 +49,6 @@ class Chain:
                 "column_names": None,  # Names of the columns, in order
             }
         }
-        logger.debug("Function - __init__() - Finish - Initialised Chain object")
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:

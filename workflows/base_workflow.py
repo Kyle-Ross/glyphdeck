@@ -20,28 +20,30 @@ current_file_name = os.path.basename(__file__)
 
 @exception_logger(unhandled_errors_logger)
 def main():
-    with LogBlock("Set file vars", logger):
-        source_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
-        source_file_type = source_file.split(".")[-1]
+    # Set file vars
+    source_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
+    source_file_type = source_file.split(".")[-1]
 
-    with LogBlock("Chain initialisation", logger):
-        chain = Chain()
+    # Intialising a chain object, ready to have data appended
+    chain = Chain()
 
-    with LogBlock("Preparing & appending Prepper output", logger):
-        prepared_data = (
-            Prepper()
-            .load_data(source_file, source_file_type, encoding="ISO-8859-1")
-            .set_id_column("Row ID")
-            .set_data_columns(["Review Text"])
-            .set_data_dict()
-        )
-        chain.append(
-            title="prepared data",
-            data=prepared_data.output_data,
-            table=prepared_data.df,
-            table_id_column=prepared_data.id_column,
-            column_names=prepared_data.data_columns,
-        )
+    # Initialising prepper object, loading data and getting it ready
+    prepared_data = (
+        Prepper()
+        .load_data(source_file, source_file_type, encoding="ISO-8859-1")
+        .set_id_column("Row ID")
+        .set_data_columns(["Review Text"])
+        .set_data_dict()
+    )
+
+    # Adding the prepared data to the chain object
+    chain.append(
+        title="prepared data",
+        data=prepared_data.output_data,
+        table=prepared_data.df,
+        table_id_column=prepared_data.id_column,
+        column_names=prepared_data.data_columns,
+    )
 
     with LogBlock("Preparing & appending Sanitiser output", logger):
         sanitised = (
