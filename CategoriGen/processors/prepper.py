@@ -2,7 +2,7 @@ from typing import Union, List
 
 import pandas as pd
 
-from CategoriGen.tools.loggers import PrepperLogger, log_and_raise_error, log_decorator
+from CategoriGen.tools.loggers import PrepperLogger, log_decorator, assert_and_log_error
 from CategoriGen.validation.data_types import Data
 
 logger = PrepperLogger().setup()
@@ -13,95 +13,163 @@ class Prepper:
     chain class"""
 
     @log_decorator(
-        logger, start="Initialising Prepper object", finish="Initialised Prepper object"
+        logger,
+        "info",
+        start="Initialising Prepper object",
+        finish="Initialised Prepper object",
     )
-    def __init__(self):
-        """Initialize an empty dataframe, id column logger_name, and data columns dictionary."""
-        self.df = pd.DataFrame()
-        self.id_column: str = ""
-        self.data_columns: List[str] = []
-        self.output_data: Data = {}
-
-    @log_decorator(logger)
-    def load_data(
+    def __init__(
         self,
         file_path: str,
         file_type: str,
-        sheet_name: Union[
+        id_column: str,
+        data_columns: Union[str, List[str]],
+        sheet: Union[
             str, int
-        ] = 0,  # xlsx sheet index or logger_name - default being 0 (the first sheet)
-        encoding: str = "utf-8",
-    ) -> "Prepper":
+        ] = 0,  # Only used for xlsx, can be the sheet name or its 0 based index
+        encoding: str = "utf-8",  # Only used for csv
+    ):
+        """Assert argument types and then store in self for Prepper object"""
+        # Assert types
+        supported_file_types = ("xlsx", "csv")
+
+        # file_path assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(file_path, str),
+            "'file_path' argument must be type 'str'",
+        )
+        # file_type assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(file_type, str),
+            "'file_type' argument must be type 'str'",
+        )
+        assert_and_log_error(
+            logger,
+            "error",
+            file_type in supported_file_types,
+            f"'file_type' argument must be one of the supported file types: {supported_file_types}",
+        )
+        # id_column assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(id_column, str),
+            "'id_column' argument must be type 'str'",
+        )
+        # data_columns assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(data_columns, str)
+            or (
+                isinstance(data_columns, list)
+                and all(isinstance(item, str) for item in data_columns)
+            ),
+            "'data_columns' argument must be type 'str' or 'List[str]'",
+        )
+        if isinstance(data_columns, list):  # Only for lists
+            assert_and_log_error(
+                logger,
+                "error",
+                len(data_columns) == len(set(data_columns)),
+                "'data_columns' argument must only have unique values.",
+            )
+        # sheet assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(sheet, (str, int)),
+            "'sheet' argument must be type 'str' or 'int'",
+        )
+        # encoding assertions
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(encoding, str),
+            "'encoding' argument must be type 'str'",
+        )
+
+        # Store the validated attributes
+        self.df = pd.DataFrame()
+        self.output_data: Data = {}
+        self.file_path: str = file_path
+        self.file_type: str = file_type
+        self.id_column: str = id_column
+        self.data_columns: Union[str, List[str]] = (
+            [data_columns]
+            if isinstance(data_columns, str)
+            else data_columns  # Puts str types in a list for compatibility
+        )
+        self.sheet: Union[str, int] = sheet
+        self.encoding: str = encoding
+
+    @log_decorator(logger)
+    def load_data(self) -> "Prepper":
         """Load data from a file into a dataframe."""
-        if file_type == "xlsx":
-            self.df = pd.read_excel(file_path, sheet_name=sheet_name)
-        elif file_type == "csv":
-            self.df = pd.read_csv(file_path, encoding=encoding)
-        else:
-            log_and_raise_error(
-                logger,
-                "error",
-                ValueError,
-                "Invalid file type. Only 'xlsx' and 'csv' are supported.",
-            )
-        return self
-
-    @log_decorator(logger)
-    def set_id_column(self, id_column: Union[str, int]) -> "Prepper":
-        """Set the id column logger_name and check if it only has unique values."""
-        if self.df[id_column].is_unique:
-            self.id_column = str(id_column)
-        else:
-            log_and_raise_error(
-                logger, "error", ValueError, "ID column must have unique values."
-            )
-        return self
-
-    @log_decorator(logger)
-    def set_data_columns(self, data_columns: Union[str, List[str]]) -> "Prepper":
-        """Set the id column logger_name and check if it only has unique values."""
-        if isinstance(data_columns, str):
-            self.data_columns = [data_columns]
-        elif isinstance(data_columns, list):
-            if len(data_columns) != len(set(data_columns)):
-                log_and_raise_error(
-                    logger, "error", ValueError, "Data columns must all be unique."
-                )
-            self.data_columns = data_columns
-        else:
-            log_and_raise_error(
-                logger,
-                "error",
-                ValueError,
-                "Data columns must be either a string or a list of strings.",
-            )
+        # Load the data from the file
+        if self.file_type == "xlsx":
+            self.df = pd.read_excel(self.file_path, sheet_name=self.sheet)
+        if self.file_type == "csv":
+            self.df = pd.read_csv(self.file_path, encoding=self.encoding)
+        # Check the id exists
+        assert_and_log_error(
+            logger,
+            "error",
+            self.id_column in self.df.columns,
+            f"Data loaded, but 'id_column' with name ('{self.id_column}') was not found in the dataframe.",
+        )
         return self
 
     @log_decorator(logger)
     def set_data_dict(self) -> "Prepper":
-        """Sets the data dict where keys are ids and values are lists of selected data column values."""
+        """Sets the data dict where keys are ids and values are lists of selected data column values.
+        Checks that the id_column is unique, then saves the dict in the output_data attribute."""
+        # Check that the id is unique before proceeding
+        assert_and_log_error(
+            logger,
+            "error",
+            self.df[self.id_column].is_unique,
+            f"'id_column' ({self.id_column}) must have unique values in every row.",
+        )
+        # Build the dictionary
         for _, row in self.df.iterrows():
             self.output_data[row[self.id_column]] = [
                 row[column] for column in self.data_columns
             ]
         return self
 
+    @log_decorator(logger, "info", start="Preparing data", finish="Prepared data")
+    def prepare(self) -> "Prepper":
+        """Abstraction method which runs all the Prepper methods, without separating the load and data dict step.
+        Use this if no manual changes need to be made between the load_data() and set_data_dict() steps."""
+        self.load_data()
+        self.set_data_dict()
+        return self
+
 
 if __name__ == "__main__":
     """Only runs below if script is run directly, not on import, so this is for testing purposes"""
-    test_file = "../../scratch/Kaggle - Coronavirus tweets NLP - Text Classification/Corona_NLP_train.csv"
-    processor = (
-        Prepper()
-        .load_data(test_file, "csv", encoding="ISO-8859-1")
-        .set_id_column("UserName")
-        .set_data_columns(["OriginalTweet", "Location"])
-        .set_data_dict()
+    test_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Kaggle - Coronavirus tweets NLP - Text Classification\Corona_NLP_test.csv"
+    # Initialise the object
+    prepper = Prepper(
+        file_path=test_file,
+        file_type="csv",
+        encoding="ISO-8859-1",
+        id_column="UserName",
+        data_columns=["OriginalTweet", "Location"],
     )
-    print("print(processor.output_data)")
-    print(processor.output_data)
-    print("print(processor.df)")
-    print(processor.df)
-    print("print(processor.id_column)")
-    print(processor.id_column)
-    print("print(processor.data_columns)")
-    print(processor.data_columns)
+    # Prepare the data
+    prepper.prepare()
+
+    print("print(prepper.output_data)")
+    print(prepper.output_data)
+    print("print(prepper.df)")
+    print(prepper.df)
+    print("print(prepper.id_column)")
+    print(prepper.id_column)
+    print("print(prepper.data_columns)")
+    print(prepper.data_columns)
