@@ -313,7 +313,7 @@ class Chain:
         """Adds a new record to the 'records' dictionary."""
         if self.latest_key == 0 or update_expected_len:
             # Set expected len if this is the first entry or update_expected_len = True
-            # Sets the len of the first list in the data dict
+            # Sets the len using the first list in the data dict
             self.set_expected_len(len(data[next(iter(data))]))
         else:
             # Check if the list of column names is of the correct length
