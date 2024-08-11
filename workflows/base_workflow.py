@@ -27,14 +27,18 @@ def main():
     # Intialising a chain object, ready to have data appended
     chain = Chain()
 
-    # Initialising prepper object, loading data and getting it ready
-    prepared_data = (
-        Prepper()
-        .load_data(source_file, source_file_type, encoding="ISO-8859-1")
-        .set_id_column("Row ID")
-        .set_data_columns(["Review Text"])
-        .set_data_dict()
+    # Initialising prepper object
+    prepared_data = Prepper(
+        file_path=source_file,
+        file_type=source_file_type,
+        encoding="ISO-8859-1",
+        id_column="Row ID",
+        data_columns=["Review Text"],
     )
+    # Loading, validating and preparing the data
+    prepared_data.prepare()
+
+    # TODO Continue moving logs and abstracting code ahead of publishing
 
     # Adding the prepared data to the chain object
     chain.append(
