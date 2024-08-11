@@ -27,12 +27,24 @@ List_or_Str = Union[str, list]
 
 def assert_custom_type(variable: Data, custom_type: str, var_name: str):
     if custom_type.lower() == "data":
-        assert_and_log_error(logger, 'error', isinstance(variable, dict),
-                             f"Expected custom 'Data' type in '{var_name}', instead got '{type(variable)}'")
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(variable, dict),
+            f"Expected custom 'Data' type in '{var_name}', instead got '{type(variable)}'",
+        )
         for key, value in variable.items():
-            assert_and_log_error(logger, 'error', isinstance(key, (int, str)),
-                                  f"Expected int or str dict key in custom 'Data' type variable "
-                                  f"'{var_name}', instead got {type(key)}")
-            assert_and_log_error(logger, 'error', isinstance(value, list),
-                                  f"Expected list dict value in custom 'Data' type variable "
-                                  f"'{var_name}', instead got {type(value)}")
+            assert_and_log_error(
+                logger,
+                "error",
+                isinstance(key, (int, str)),
+                f"Expected int or str dict key in custom 'Data' type variable "
+                f"'{var_name}', instead got {type(key)}",
+            )
+            assert_and_log_error(
+                logger,
+                "error",
+                isinstance(value, list),
+                f"Expected list dict value in custom 'Data' type variable "
+                f"'{var_name}', instead got {type(value)}",
+            )

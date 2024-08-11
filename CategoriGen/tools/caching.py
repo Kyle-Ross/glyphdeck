@@ -44,12 +44,14 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             self_validation_model = self.validation_model.__name__
 
             # Accessing individual args and kwargs if they exist, for use in logs
-            key_arg = args[2] if len(args) > 2 else kwargs.get('key')
-            index_arg = args[3] if len(args) > 3 else kwargs.get('index')
+            key_arg = args[2] if len(args) > 2 else kwargs.get("key")
+            index_arg = args[3] if len(args) > 3 else kwargs.get("index")
 
             # Building a string key out the accessible information
-            cache_key = f"{self_cache_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|" \
-                        f"{self_validation_model}|{self_model}|{self_role}|{self_request}"
+            cache_key = (
+                f"{self_cache_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|"
+                f"{self_validation_model}|{self_model}|{self_role}|{self_request}"
+            )
             # Hashing the key, decreasing size and potentially speeding up lookups
             # Deterministically creates the same hash for any given string
             hash_object = hashlib.sha256(cache_key.encode())
@@ -59,8 +61,10 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             if self_use_cache:
                 if key in cache:
                     completions += 1
-                    logger.info(f"CACHE - Key: {key_arg} - Index: {index_arg} - "
-                                f"#{completions} - '{full_cache_dir}'")
+                    logger.info(
+                        f"CACHE - Key: {key_arg} - Index: {index_arg} - "
+                        f"#{completions} - '{full_cache_dir}'"
+                    )
                     return cache[key]
 
             # Otherwise, call the function and store the result in the cache
