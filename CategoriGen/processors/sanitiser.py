@@ -178,7 +178,7 @@ class Sanitiser:
         return groups
 
     @log_decorator(
-        logger, start="Initialising Chain object", finish="Initialised Chain object"
+        logger, "info", start="Initialising Sanitiser object", finish="Initialised Sanitiser object"
     )
     def __init__(self, input_data: Data) -> None:
         self.input_data: Data = input_data
