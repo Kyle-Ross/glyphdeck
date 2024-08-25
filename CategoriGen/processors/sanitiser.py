@@ -164,11 +164,10 @@ class Sanitiser:
 
     @staticmethod
     @log_decorator(logger, is_static_method=True)
-    def update_group(
+    def groups_where(
         patterns_dict: patterns_data_type, active_type: Union[list, set] = (True, False)
     ):
-        """Returns a list of groups, with particular bool values in the 'active' record_identifier. Used to update
-        reference attributes"""
+        """Returns a list of groups where the 'active' record_identifier, is True or False. Returns everything by default."""
         groups: List = [
             value["group"]
             for key, value in patterns_dict.items()
@@ -178,25 +177,29 @@ class Sanitiser:
         return groups
 
     @log_decorator(
-        logger, "info", start="Initialising Sanitiser object", finish="Initialised Sanitiser object"
+        logger,
+        "info",
+        start="Initialising Sanitiser object",
+        finish="Initialised Sanitiser object",
     )
-    def __init__(self, input_data: Data) -> None:
+    def __init__(self, input_data: Data, pattern_groups: List = None) -> None:
         self.input_data: Data = input_data
         self.output_data: Data = input_data  # Will be changed by processes below
         self.overall_run_state = False
-        self.all_groups: List = self.update_group(self.patterns)
-        self.active_groups: List = self.update_group(self.patterns, [True])
-        self.inactive_groups: List = self.update_group(self.patterns, [False])
+        self.all_groups: List = self.groups_where(self.patterns)
+        if pattern_groups is not None:
+            self.select_groups(pattern_groups)  # Sets the patterns dict only if selection was made
+        self.update_groups()  # Sets self.all_groups, self.active_groups & self.inactive_groups using patterns dict
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
 
     @log_decorator(logger)
     def update_groups(self):
         """Uses update_group() to update all group references"""
-        # Storing all the available pattern groups in a distinct list for reference
-        self.all_groups: List = self.update_group(self.patterns)
-        self.active_groups: List = self.update_group(self.patterns, [True])
-        self.inactive_groups: List = self.update_group(self.patterns, [False])
+        # Storing all the available pattern groups in a distinct lists for reference
+        self.all_groups: List = self.groups_where(self.patterns)  # All groups
+        self.active_groups: List = self.groups_where(self.patterns, [True])  # Active groups
+        self.inactive_groups: List = self.groups_where(self.patterns, [False])  # Inactive groups
 
     @log_decorator(logger, "off")  # Runs for every row, logs off by default
     def update_match_counts(self):
@@ -240,10 +243,10 @@ class Sanitiser:
         return self
 
     @log_decorator(logger)
-    def select_groups(self, selection: List) -> "Sanitiser":
+    def select_groups(self, pattern_groups: List) -> "Sanitiser":
         """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
         # Check that each pattern exists
-        for x in selection:
+        for x in pattern_groups:
             if x not in self.all_groups:
                 log_and_raise_error(
                     logger,
@@ -253,7 +256,7 @@ class Sanitiser:
                 )
         # Update 'active' in the patterns dict based on that list
         for key, value in self.patterns.items():
-            if value["group"] in selection:
+            if value["group"] in pattern_groups:
                 value["active"] = True
             else:
                 value["active"] = False
@@ -292,7 +295,7 @@ class Sanitiser:
         self.sort_patterns()  # Sort patterns by rank
         self.update_groups()  # Update selected groups lists
 
-    @log_decorator(logger)
+    @log_decorator(logger, "info", start="Sanitising data", finish="Sanitised data")
     def sanitise(self):
         """Run all selected patterns in order, updating the 'raw_output_data'.
 
@@ -343,10 +346,19 @@ if __name__ == "__main__":
             r"I was born 15/12/1990, a file path is C:\Users\username\Pictures\BYG0Djh.png",
         ],
     }
-    santiser_obj = Sanitiser(data_example)
-    # Select to only run certain groups
-    santiser_obj.select_groups(selection=["number", "date", "email", "path", "url"])
-    # Replace placeholders
+    # Initialise the sanitiser object, selecting groups during initialisation (optional)
+    # If you don't add an argument it will use all of them
+    santiser_obj = Sanitiser(data_example, pattern_groups=["number", "date", "email"])
+    print("print(santiser_obj.all_groups) - per initialisation argument")
+    print(santiser_obj.all_groups)
+    print("print(santiser_obj.active_groups) - per initialisation argument")
+    print(santiser_obj.active_groups)
+    print("print(santiser_obj.inactive_groups) - per initialisation argument")
+    print(santiser_obj.inactive_groups)
+    # Run the select_groups function to change the selection
+    santiser_obj.select_groups(["number", "date", "email", "path", "url"])
+    # Replace placeholders (the text inserted in place of the sensitive text)
+    # Placeholders are cleaned up before insertion
     santiser_obj.set_placeholders(
         placeholder_dict={"email": "EMAILS>>", "date": "<DA>TES>"}
     )
@@ -359,11 +371,11 @@ if __name__ == "__main__":
         regex=r"jeans",
     )
     # Attributes showing group selections - shows that the new pattern group was added
-    print("print(santiser_obj.all_groups)")
+    print("print(santiser_obj.all_groups - with post-init changes)")
     print(santiser_obj.all_groups)
-    print("print(santiser_obj.active_groups)")
+    print("print(santiser_obj.active_groups) - with post-init changes")
     print(santiser_obj.active_groups)
-    print("print(santiser_obj.inactive_groups)")
+    print("print(santiser_obj.inactive_groups) - with post-init changes")
     print(santiser_obj.inactive_groups)
     # Runs the patterns
     print("santiser_obj.sanitise()")
