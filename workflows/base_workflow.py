@@ -27,40 +27,33 @@ def main():
     # Intialising a chain object, ready to have data appended
     chain = Chain()
 
-    # Initialising prepper object
-    prepared_data = Prepper(
+    # Initialising prepper object,
+    # Then loading, validating and preparing the data
+    prep = Prepper(
         file_path=source_file,
         file_type=source_file_type,
         encoding="ISO-8859-1",
         id_column="Row ID",
         data_columns=["Review Text"],
-    )
-    # Loading, validating and preparing the data
-    prepared_data.prepare()
-
-    # TODO Continue moving logs and abstracting code ahead of publishing
+    ).prepare()
 
     # Adding the prepared data to the chain object
     chain.append(
         title="prepared data",
-        data=prepared_data.output_data,
-        table=prepared_data.df,
-        table_id_column=prepared_data.id_column,
-        column_names=prepared_data.data_columns,
+        data=prep.output_data,
+        table=prep.df,
+        table_id_column=prep.id_column,
+        column_names=prep.data_columns,
     )
 
-    # Sanitising the connents of the 
-    sanitised = (
-        Sanitiser(chain.latest_data)
-        .select_groups(["date", "email", "path", "url", "number"])
-        .sanitise()
-    )
+    # Sanitising the data of sensitive information, on specified patterns
+    sanitised = Sanitiser(
+        chain.latest_data, pattern_groups=["date", "email", "path", "url", "number"]
+    ).sanitise()
 
     # Adding sanitised results to the chain
-    # Unspecified arguments (table, table_id_column, column_names) are inherited from the previous entry
-    chain.append(
-        title="sanitised data", data=sanitised.output_data
-    )
+    # Unspecified arguments (table, table_id_column, column_names) are inherited from the previous entry if referenced
+    chain.append(title="sanitised data", data=sanitised.output_data)
 
     with LogBlock("Preparing & appending LLMHandler output", logger):
         handler = LLMHandler(
