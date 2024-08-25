@@ -21,7 +21,7 @@ current_file_name = os.path.basename(__file__)
 @exception_logger(unhandled_errors_logger)
 def main():
     # Set file vars
-    source_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
+    source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
     source_file_type = source_file.split(".")[-1]
 
     # Intialising a chain object, ready to have data appended
@@ -49,15 +49,18 @@ def main():
         column_names=prepared_data.data_columns,
     )
 
-    with LogBlock("Preparing & appending Sanitiser output", logger):
-        sanitised = (
-            Sanitiser(chain.latest_data)
-            .select_groups(["date", "email", "path", "url", "number"])
-            .sanitise()
-        )
-        chain.append(
-            title="sanitised data", data=sanitised.output_data
-        )  # Other arguments are inherited now
+    # Sanitising the connents of the 
+    sanitised = (
+        Sanitiser(chain.latest_data)
+        .select_groups(["date", "email", "path", "url", "number"])
+        .sanitise()
+    )
+
+    # Adding sanitised results to the chain
+    # Unspecified arguments (table, table_id_column, column_names) are inherited from the previous entry
+    chain.append(
+        title="sanitised data", data=sanitised.output_data
+    )
 
     with LogBlock("Preparing & appending LLMHandler output", logger):
         handler = LLMHandler(
