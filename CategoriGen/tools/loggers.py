@@ -124,7 +124,7 @@ def log_decorator(
             if suffix_message is not None
             else start_message_list
         )
-        start_message = " - ".join(start_message_list)
+        start_message = " | ".join(start_message_list)
 
         finish_message_list = [prefix, func_name, finish]
         finish_message_list = (
@@ -289,7 +289,7 @@ class BaseLogger:
 
 # Logging levels - use the constant or edit in each class for more granular control
 # This sets the minimum level of logging each logger_arg will save to the file or print to the console
-# Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL -  orenter like logging.INFO
+# Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL -  or enter like logging.INFO
 
 
 # Loggers inheriting from the base logger_arg with their own logger_name and level controls
