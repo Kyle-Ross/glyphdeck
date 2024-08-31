@@ -374,10 +374,10 @@ class LLMHandler:
 
     def run(self):
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
-        logger.debug("Function - run() - Start")
+        logger.info("Function - run() - Start - Asynchronous data fetching from LLM or cache")
         if self.provider_clean == "openai":
             asyncio.run(self.await_coroutines(self.async_openai))
-        logger.debug("Function - run() - Finish - Returning self")
+        logger.info("Function - run() - Finish - Asynchronous data fetching from LLM or cache")
         return self
 
     def flatten_output_data(self, column_names: StrList):
