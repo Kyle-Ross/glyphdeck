@@ -15,8 +15,7 @@ class Prepper:
     @log_decorator(
         logger,
         "info",
-        start="Initialising Prepper object",
-        finish="Initialised Prepper object",
+        suffix_message="Initialise Prepper object",
     )
     def __init__(
         self,

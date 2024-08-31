@@ -32,9 +32,7 @@ logger = ChainLogger().setup()
 
 
 class Chain:
-    @log_decorator(
-        logger, "info", start="Initialising Chain object", finish="Initialised Chain object"
-    )
+    @log_decorator(logger, "info", suffix_message="Initialise Chain object")
     def __init__(self):
         """Common object for storing and passing the chained results of data processing."""
         self.expected_len = 0

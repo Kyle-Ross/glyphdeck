@@ -176,19 +176,16 @@ class Sanitiser:
         groups = list(set(groups))  # Remove duplicates
         return groups
 
-    @log_decorator(
-        logger,
-        "info",
-        start="Initialising Sanitiser object",
-        finish="Initialised Sanitiser object",
-    )
+    @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
     def __init__(self, input_data: Data, pattern_groups: List = None) -> None:
         self.input_data: Data = input_data
         self.output_data: Data = input_data  # Will be changed by processes below
         self.overall_run_state = False
         self.all_groups: List = self.groups_where(self.patterns)
         if pattern_groups is not None:
-            self.select_groups(pattern_groups)  # Sets the patterns dict only if selection was made
+            self.select_groups(
+                pattern_groups
+            )  # Sets the patterns dict only if selection was made
         self.update_groups()  # Sets self.all_groups, self.active_groups & self.inactive_groups using patterns dict
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
@@ -198,8 +195,12 @@ class Sanitiser:
         """Uses update_group() to update all group references"""
         # Storing all the available pattern groups in a distinct lists for reference
         self.all_groups: List = self.groups_where(self.patterns)  # All groups
-        self.active_groups: List = self.groups_where(self.patterns, [True])  # Active groups
-        self.inactive_groups: List = self.groups_where(self.patterns, [False])  # Inactive groups
+        self.active_groups: List = self.groups_where(
+            self.patterns, [True]
+        )  # Active groups
+        self.inactive_groups: List = self.groups_where(
+            self.patterns, [False]
+        )  # Inactive groups
 
     @log_decorator(logger, "off")  # Runs for every row, logs off by default
     def update_match_counts(self):
