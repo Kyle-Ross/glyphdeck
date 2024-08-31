@@ -24,11 +24,13 @@ from CategoriGen.tools.loggers import (
     LLMHandlerLogger,
     log_decorator,
 )
+from CategoriGen.logger_constants import log_output_data
 from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
 logger.debug(" | Step | llm_handler.py | Action | Initialised logger")
+
 
 class LLMHandler:
     """Write your docstring for the class here."""
@@ -191,7 +193,9 @@ class LLMHandler:
         # Preparing openai client
         if self.provider_clean == "openai":
             openai.api_key = os.getenv("OPENAI_API_KEY")
-            logger.debug(" | Step | LLMHandler.__init__() | Action | Set openai api key")
+            logger.debug(
+                " | Step | LLMHandler.__init__() | Action | Set openai api key"
+            )
 
             # Initialising the client
             # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
@@ -374,6 +378,9 @@ class LLMHandler:
                     " | Step | await_coroutines() | Start | In future loop, trying to await future"
                 )
                 result = await future
+                result = (
+                    result if log_output_data else "log_input_data == False"
+                )  # Include/Exclude log data per settings
                 logger.debug(
                     f" | Step | await_coroutines() | Finish | In future loop, successfully awaited future. Result = {result}"
                 )
