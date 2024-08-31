@@ -1,7 +1,7 @@
 import traceback
 import logging
 import os
-from typing import Type, Optional
+from typing import Type
 
 from CategoriGen.tools.directory_creators import check_logs_directory
 import CategoriGen.logger_constants as logger_constants
@@ -95,15 +95,15 @@ nesting_level = 0
 def log_decorator(
     logger_arg,
     level: str = "debug",
-    start: Optional[str] = None,
-    finish: Optional[str] = None,
+    start: str = "Start",
+    finish: str = "Finish",
+    suffix_message: str = None,
     is_static_method=False,
     is_property=False,
+    show_nesting=True,  # Include or exclude the nesting prefix
 ):
-    """Function decorator to log the start and end of a function with an optional suffix message"""
-    # Create the suffixes only if they were provided
-    start = " - " + start if start is not None else ""
-    finish = " - " + finish if finish is not None else ""
+    """Function decorator to log the start and end of a function with an optional suffixes & message"""
+
     # Set the prefix text
     if is_static_method:
         prefix = "Static method"
@@ -115,9 +115,24 @@ def log_decorator(
     levels = ["debug", "info", "warning", "error", "critical"]
 
     def outer_wrapper(func):
-        # Build the message
-        start_message = f"{prefix}: '{func.__name__}' - Start{start}"
-        finish_message = f"{prefix}: '{func.__name__}' - Finish{finish}"
+        # Build the messages
+        func_name = func.__name__ + "()"
+
+        start_message_list = [prefix, func_name, start]
+        start_message_list = (
+            start_message_list + [suffix_message]
+            if suffix_message is not None
+            else start_message_list
+        )
+        start_message = " - ".join(start_message_list)
+
+        finish_message_list = [prefix, func_name, finish]
+        finish_message_list = (
+            finish_message_list + [suffix_message]
+            if suffix_message is not None
+            else finish_message_list
+        )
+        finish_message = " - ".join(finish_message_list)
 
         def inner_wrapper(*args, **kwargs):
             def conditional_log(message):
@@ -141,7 +156,7 @@ def log_decorator(
             # Log before and after the function
             global nesting_level
             nesting_level += 1
-            nesting_prefix = f"Nest {nesting_level}: "
+            nesting_prefix = f"Nest {nesting_level}: " if show_nesting else ""
             conditional_log(nesting_prefix + start_message)
             result = func(*args, **kwargs)
             conditional_log(nesting_prefix + finish_message)
@@ -237,9 +252,7 @@ class BaseLogger:
         self.file_log_level: int = file_log_level
         self.console_log_level: int = console_log_level
         self.log_file_name: str = log_file_name
-        self.format_string: str = (
-            "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-        )
+        self.format_string: str = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 
         # Check if the log directory exists (returns Tuple[bool, str, str])
         log_dir_exists, log_message, log_directory = check_logs_directory()

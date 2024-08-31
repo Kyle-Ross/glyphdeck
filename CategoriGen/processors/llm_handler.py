@@ -19,7 +19,11 @@ from CategoriGen.validation.data_types import (
     StrList_or_None,
 )
 from CategoriGen.validation import validators
-from CategoriGen.tools.loggers import assert_and_log_error, LLMHandlerLogger
+from CategoriGen.tools.loggers import (
+    assert_and_log_error,
+    LLMHandlerLogger,
+    log_decorator,
+)
 from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
@@ -372,18 +376,27 @@ class LLMHandler:
             "Function - await_coroutines() - Finish - Looped over futures of coroutines"
         )
 
+    @log_decorator(
+        logger,
+        "info",
+        suffix_message="Asynchronous data fetching from LLM or cache",
+        show_nesting=False,
+    )
     def run(self):
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
-        logger.info("Function - run() - Start - Asynchronous data fetching from LLM or cache")
         if self.provider_clean == "openai":
             asyncio.run(self.await_coroutines(self.async_openai))
-        logger.info("Function - run() - Finish - Asynchronous data fetching from LLM or cache")
         return self
 
+    @log_decorator(
+        logger,
+        "info",
+        suffix_message="Convert output data for compatibility with chain class",
+        show_nesting=False,
+    )
     def flatten_output_data(self, column_names: StrList):
         """Flattens output data into a dictionary of lists for compatibility with the chain class.
         Also creates the new column names for the eventual output."""
-        logger.info("Function - flatten_output_data() - Start - Convert output data for compatibility with chain class")
         new_output_data = {}  # Storage for key: list pairs representing rows
         new_column_names = []  # Storing a list of the column names corresponding to the ordered list
 
@@ -415,8 +428,6 @@ class LLMHandler:
 
         self.new_output_data = new_output_data  # Save the new output data to self
         self.new_column_names = new_column_names  # Save the new column names to self
-
-        logger.info("Function - flatten_output_data() - Finish - Convert output data for compatibility with chain class")
         return self
 
 
