@@ -34,6 +34,12 @@ logger.debug("Initialised logger_arg")
 class LLMHandler:
     """Write your docstring for the class here."""
 
+    @log_decorator(
+        logger,
+        "debug",
+        suffix_message="Check class is an instance or inheritance of the Pydantic BaseValidatorModel class",
+        show_nesting=False,
+    )
     def check_validation_model(self):
         """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
         check: bool = issubclass(self.validation_model, validators.BaseValidatorModel)
