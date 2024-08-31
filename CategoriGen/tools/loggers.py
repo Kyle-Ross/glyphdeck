@@ -167,19 +167,21 @@ def exception_logger(
             except Exception as error:
                 # Handled exceptions should have the logger_name 'HandledError' (see log_and_raise_error())
                 # So if the exception has this logger_name, just re-raise it - it will already have logging
-                if type(error).__name__ == "HandledError":
+                error_name  = type(error).__name__
+                if error_name == "HandledError":
                     raise
                 # Otherwise, log the unhandled error as critical and then re-raise
                 else:
-                    # Conditionally log a more detailed message with the error traceback appended
-                    if include_traceback:
-                        # Flattens the traceback into a single line by replacing newlines
-                        error_message = f"{type(error).__name__}\\n{traceback.format_exc().replace('\n', '\\n')}"
-                    else:
-                        error_message = type(error).__name__
-                    # Log the message as CRITICAL and re-raise
-                    logger_arg.critical(error_message)
-                    raise
+                    # Build the log / error message
+                    error_message = f" | Function | exception_logger() | Exit | | {error_name}"
+                    if (
+                        include_traceback
+                    ):  # Include detailed traceback information in the log if specified
+                        error_message = (
+                            f"{error_message} | \\n{traceback.format_exc().replace('\n', '\\n')}"
+                        )
+                logger_arg.critical(error_message)
+                raise
 
         return wrapper
 
