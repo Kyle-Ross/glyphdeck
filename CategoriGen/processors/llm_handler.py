@@ -206,36 +206,38 @@ class LLMHandler:
         )
 
     @property
+    @log_decorator(
+        logger,
+        "debug",
+        is_property=True,
+        suffix_message="Checking if self.new_output_data is not none, indicating data has been flattened",
+        show_nesting=False,
+    )
     def output_data(self):
         """Accesses output data but only if the data has been flattened."""
-        logger.debug(
-            "Property - output_data() - Start - checking if self.new_output_data is not none, indicating data has been flattened"
-        )
         assert_and_log_error(
             logger,
             "error",
             self.new_output_data is not None,
             "output_data is empty, run self.flatten_output_data() first.",
         )
-        logger.debug(
-            "Property - output_data() - Finish - checking if self.new_output_data is not none, indicating data has been flattened"
-        )
         return self.new_output_data
 
     @property
+    @log_decorator(
+        logger,
+        "debug",
+        is_property=True,
+        suffix_message="Checking if self.new_column_names is not none, indicating data has been flattened",
+        show_nesting=False,
+    )
     def column_names(self):
         """Accesses column names but only if the new names have been generated during data flattening."""
-        logger.debug(
-            "Property - column_names() - Start - checking if self.new_column_names is not none, indicating data has been flattened"
-        )
         assert_and_log_error(
             logger,
             "error",
             self.new_column_names is not None,
             "column_names is empty, run self.flatten_output_data() first.",
-        )
-        logger.debug(
-            "Property - column_names() - Finish - checking if self.new_column_names is not none, indicating data has been flattened"
         )
         return self.new_column_names
 
