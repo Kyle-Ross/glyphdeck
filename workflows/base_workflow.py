@@ -1,5 +1,3 @@
-import os
-
 from CategoriGen.processors.sanitiser import Sanitiser
 from CategoriGen.processors.llm_handler import LLMHandler
 from CategoriGen.processors.prepper import Prepper
@@ -7,7 +5,6 @@ from CategoriGen.processors.chain import Chain
 from CategoriGen.tools.loggers import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
-    LogBlock,
     exception_logger,
 )
 from CategoriGen.tools.time import RuntimeLogBlock
@@ -15,7 +12,6 @@ from CategoriGen.validation import validators
 
 logger = BaseWorkflowLogger().setup()
 unhandled_errors_logger = UnhandledErrorsLogger().setup()
-current_file_name = os.path.basename(__file__)
 
 
 @exception_logger(unhandled_errors_logger)
@@ -90,7 +86,5 @@ def main():
 if (
     __name__ == "__main__"
 ):  # Run the main code, with decorators and context managers in effect
-    with RuntimeLogBlock(logger), LogBlock(
-        current_file_name, logger
-    ):  # These run nested, in order (outer to inner)
+    with RuntimeLogBlock(logger):  # These run nested, in order (outer to inner)
         main()

@@ -67,20 +67,6 @@ def assert_and_log_error(
         )
 
 
-class LogBlock:
-    """Context manager for 'with' blocks, logging the start and end with a specified process logger_name"""
-
-    def __init__(self, process_name: str, logger_arg: logging.Logger):
-        self.process_name: str = process_name
-        self.logger_arg: logging.Logger = logger_arg
-
-    def __enter__(self):  # What happens at the start of the 'with' block
-        self.logger_arg.info(f"Started: {self.process_name}")
-
-    def __exit__(self, exc_type, exc_value, exc_tb):  # What happens at the end
-        self.logger_arg.info(f"Finished: {self.process_name}")
-
-
 def check_logger_exists(logger_name: str):
     """Checks if a logger_arg with the provided logger_name exists"""
     existing_loggers = logging.Logger.manager.loggerDict.keys()
