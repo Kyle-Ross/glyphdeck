@@ -33,12 +33,12 @@ def log_and_raise_error(
         raise HandledError(error)
 
     # Build the log / error message
-    error_message = f"{error_type.__name__} - {message}"
+    error_message = f" | Function | log_and_raise_error() | Exit | {message} | {error_type.__name__}"
     if (
         include_traceback
     ):  # Include detailed traceback information in the log if specified
         error_message = (
-            f"{error_message}\\n{traceback.format_exc().replace('\n', '\\n')}"
+            f"{error_message} | \\n{traceback.format_exc().replace('\n', '\\n')}"
         )
 
     # Log the message at the specified level and re-raise the error
