@@ -201,8 +201,7 @@ class LLMHandler:
     def output_data(self):
         """Accesses output data but only if the data has been flattened."""
         logger.debug(
-            "Function - output_data() - Start - Checking if self.new_output_data is not none, "
-            "indicating data has been flattened"
+            "Property - output_data() - Start - checking if self.new_output_data is not none, indicating data has been flattened"
         )
         assert_and_log_error(
             logger,
@@ -211,7 +210,7 @@ class LLMHandler:
             "output_data is empty, run self.flatten_output_data() first.",
         )
         logger.debug(
-            "Function - output_data() - Finish - Returning self.new_output_data"
+            "Property - output_data() - Finish - checking if self.new_output_data is not none, indicating data has been flattened"
         )
         return self.new_output_data
 
