@@ -234,6 +234,12 @@ class LLMHandler:
         return self.new_column_names
 
     # Tenacity retry decorator for the following errors with exponential backoff
+    @log_decorator(
+        logger,
+        "debug",
+        suffix_message="Async coroutine generation with OpenAI",
+        show_nesting=False,
+    )
     @retry(
         retry=retry_if_exception_type(
             (
@@ -265,9 +271,6 @@ class LLMHandler:
         item_max_validation_retries: Optional[int] = None,
     ) -> tuple:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
-
-        logger.debug("Function - async_openai() - Start")
-
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
@@ -305,17 +308,15 @@ class LLMHandler:
             ],
         }
         logger.debug(
-            f"Function - async_openai() - Action - Set chat_params as: {chat_params}"
+            f"Step - async_openai() - Action - Set chat_params as: {chat_params}"
         )
 
         # Running the chat completion and saving as an instructor model
-        logger.debug("Function - async_openai() - Action - Attempting chat completion")
+        logger.debug("Step - async_openai() - Start -  Chat completion")
         instructor_model = await self.openai_client.chat.completions.create(
             **chat_params
         )
-        logger.debug(
-            "Function - async_openai() - Action - Chat completion success, saved to instructor_model"
-        )
+        logger.debug("Step - async_openai() - Finish - Chat completion")
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel
@@ -323,8 +324,7 @@ class LLMHandler:
 
         # Returning the response as a tuple (shorthand syntax)
         logger.debug(
-            f"Function - async_openai() - Finish - Returning (response, key, index) tuple: "
-            f"({response}, {key}, {index})"
+            f"Step - async_openai() - Action - Returning (response, key, index) = ({response}, {key}, {index})"
         )
         return response, key, index
 
