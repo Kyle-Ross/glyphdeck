@@ -328,10 +328,15 @@ class LLMHandler:
         )
         return response, key, index
 
+    @log_decorator(
+        logger,
+        "debug",
+        suffix_message="Create coroutines",
+        show_nesting=False,
+    )
     async def create_coroutines(self, func) -> list:
         """Creates coroutines for the provided input data, using the specified LLM function."""
         # Create and store the tasks across the whole variable in a list
-        logger.debug("Function - create_coroutines() - Start - Creating coroutines")
         coroutines = []
         for key, list_value in self.input_data.items():
             for index, item_value in enumerate(list_value):
@@ -339,41 +344,38 @@ class LLMHandler:
                 async with self.max_preprepared_coroutines_semaphore:
                     coroutine = func(input_text=item_value, key=key, index=index)
                     coroutines.append(coroutine)
-        logger.debug("Function - create_coroutines() - Finish - Returning coroutines")
         return coroutines
 
+    @log_decorator(
+        logger,
+        "debug",
+        suffix_message="Await coroutines,  returning in order of completion",
+        show_nesting=False,
+    )
     async def await_coroutines(self, func):
         """Await coroutines,  returning results in the order of completion, not the order they are run."""
-        logger.debug("Function - await_coroutines() - Start")
-        logger.debug(
-            "Function - await_coroutines() - Action - Running create_coroutines(func)"
-        )
         coroutines = await self.create_coroutines(func)
-        logger.debug(
-            "Function - await_coroutines() - Action - Ran and saved create_coroutines(func)"
-        )
         # Loop over the futures
         logger.debug(
-            "Function - await_coroutines() - Action - Looping over futures of coroutines using as_completed"
+            "Step - await_coroutines() - Start - Looping over futures of coroutines using as_completed()"
         )
         for future in asyncio.as_completed(coroutines):
             # Limiting the amount of coroutines running / waiting on the api (and taking up memory)
             # as_completed() above means the semaphore is released as the future is completed, in any order
             async with self.max_awaiting_coroutines_semaphore:
                 logger.debug(
-                    "Function - await_coroutines() - Action - Inside future loop - Trying to await future"
+                    "Step - await_coroutines() - Start - In future loop, trying to await future"
                 )
                 result = await future
                 logger.debug(
-                    f"Function - await_coroutines() - Action - Inside future loop - "
-                    f"Successfully awaited future, result is: {result}"
+                    f"Step - await_coroutines() - Finish - In future loop, successfully awaited future. Result = {result}"
                 )
                 response = result[0]
                 key = result[1]
                 index = result[2]
                 self.raw_output_data[key][index] = response
         logger.debug(
-            "Function - await_coroutines() - Finish - Looped over futures of coroutines"
+            "Step - await_coroutines() - Finish - Looping over futures of coroutines using as_completed()"
         )
 
     @log_decorator(
