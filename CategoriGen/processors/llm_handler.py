@@ -28,8 +28,7 @@ from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
-logger.debug("Initialised logger_arg")
-
+logger.debug("Step - llm_handler.py - Action - Initialised logger")
 
 class LLMHandler:
     """Write your docstring for the class here."""
