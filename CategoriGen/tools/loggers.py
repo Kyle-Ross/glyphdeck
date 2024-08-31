@@ -238,7 +238,7 @@ class BaseLogger:
         self.console_log_level: int = console_log_level
         self.log_file_name: str = log_file_name
         self.format_string: str = (
-            "%(asctime)s | %(levelname)s | %(name)s |  %(message)s"
+            "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
         )
 
         # Check if the log directory exists (returns Tuple[bool, str, str])
