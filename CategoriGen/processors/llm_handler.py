@@ -382,7 +382,7 @@ class LLMHandler:
                     result if log_output_data else "log_input_data == False"
                 )  # Include/Exclude log data per settings
                 logger.debug(
-                    f" | Step | await_coroutines() | Finish | In future loop, successfully awaited future. Result = {result}"
+                    f" | Step | await_coroutines() | Finish | In future loop, successfully awaited future. Result is '{result}'"
                 )
                 response = result[0]
                 key = result[1]
