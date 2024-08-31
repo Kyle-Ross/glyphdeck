@@ -141,7 +141,7 @@ class Prepper:
             ]
         return self
 
-    @log_decorator(logger, "info", start="Preparing data", finish="Prepared data")
+    @log_decorator(logger, "info", suffix_message="Prepare data")
     def prepare(self) -> "Prepper":
         """Abstraction method which runs all the Prepper methods, without separating the load and data dict step.
         Use this if no manual changes need to be made between the load_data() and set_data_dict() steps."""

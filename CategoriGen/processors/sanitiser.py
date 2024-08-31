@@ -296,7 +296,7 @@ class Sanitiser:
         self.sort_patterns()  # Sort patterns by rank
         self.update_groups()  # Update selected groups lists
 
-    @log_decorator(logger, "info", start="Sanitising data", finish="Sanitised data")
+    @log_decorator(logger, "info", suffix_message="Sanitise data")
     def sanitise(self):
         """Run all selected patterns in order, updating the 'raw_output_data'.
 
