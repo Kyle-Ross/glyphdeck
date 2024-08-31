@@ -67,9 +67,9 @@ class LLMHandler:
         # High values will run faster incrementally faster, but consume more memory
         max_awaiting_coroutines: int = 100,
     ):
-        """__init__ func which is run when the object is initialised."""
-
-        logger.debug("Function - __init__() - Start - Initialising LLMHandler object")
+        logger.debug(
+            "Function - LLMHandler.__init__() - Start - Initialising LLMHandler object"
+        )
 
         # Assert the variable type of the provided arguments
         assert_custom_type(
@@ -186,16 +186,18 @@ class LLMHandler:
         # Preparing openai client
         if self.provider_clean == "openai":
             openai.api_key = os.getenv("OPENAI_API_KEY")
-            logger.debug("Function - __init__() - Action - Set openai api key")
+            logger.debug("Step - LLMHandler.__init__() - Action - Set openai api key")
 
             # Initialising the client
             # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
             self.openai_client = instructor.patch(openai.AsyncOpenAI())
             logger.debug(
-                "Function - __init__() - Action - Set openai_client and patched with instructor"
+                "Step - LLMHandler.__init__() - Action - Set openai_client and patched with instructor"
             )
 
-        logger.debug("Function - __init__() - Finish - Initialised LLMHandler object")
+        logger.debug(
+            "Function - LLMHandler.__init__() - Finish - Initialising LLMHandler object"
+        )
 
     @property
     def output_data(self):
