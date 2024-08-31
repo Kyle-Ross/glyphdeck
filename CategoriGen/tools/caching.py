@@ -9,7 +9,7 @@ from CategoriGen.tools.loggers import CacheLogger, log_decorator
 logger = CacheLogger().setup()
 
 
-@log_decorator(logger)
+@log_decorator(logger, suffix_message="Check or create cache, return object and path")
 def cache_creator(cache_dir: str, max_mb_size: int):
     """Checks if a cache exists, if not, creates it. Returns the cache object and file path afterwards."""
     # Creates the caches directory and returns the full cache file path within
@@ -20,7 +20,7 @@ def cache_creator(cache_dir: str, max_mb_size: int):
     return cache, full_cache_dir
 
 
-@log_decorator(logger)
+@log_decorator(logger, suffix_message="Grab OpenAI completions if in cache, otherwise API")
 def openai_cache(cache_dir, max_mb_size: int = 1000):
     """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
     cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
@@ -61,17 +61,16 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             if self_use_cache:
                 if key in cache:
                     completions += 1
-                    logger.info(
-                        f"CACHE - Key: {key_arg} - Index: {index_arg} - "
-                        f"#{completions} - '{full_cache_dir}'"
-                    )
+                    cache_message = f" | Step | openai_cache() | Action | Completion success | | | | | CACHE | {key_arg} | {index_arg} | {completions} | {full_cache_dir}"
+                    logger.info(cache_message)
                     return cache[key]
 
             # Otherwise, call the function and store the result in the cache
             result = await func(self, *args, **kwargs)
             cache[key] = result
             completions += 1
-            logger.info(f"API  - Key: {key_arg} - Index: {index_arg} - #{completions}")
+            api_message = f" | Step | {func.__name__}() | Action | Completion success | | | | | API | {key_arg} | {index_arg} | {completions}"
+            logger.info(api_message)
 
             # Return the result
             return result
