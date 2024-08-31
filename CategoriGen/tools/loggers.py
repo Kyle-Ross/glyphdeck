@@ -355,7 +355,7 @@ class UnhandledErrorsLogger(BaseLogger):
 class CacheLogger(BaseLogger):
     def __init__(self):
         super().__init__(
-            logger_name="processors.llm_handler <---> tools.caching",
+            logger_name="processors.LLMHandler <---> tools.caching",
             file_log_level=logger_constants.cache_file_log_level,
             console_log_level=logger_constants.cache_console_log_level,
         )
