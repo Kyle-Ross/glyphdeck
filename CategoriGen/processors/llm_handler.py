@@ -28,7 +28,7 @@ from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
-logger.debug("Step - llm_handler.py - Action - Initialised logger")
+logger.debug("Step | llm_handler.py | Action | Initialised logger")
 
 class LLMHandler:
     """Write your docstring for the class here."""
@@ -73,7 +73,7 @@ class LLMHandler:
         max_awaiting_coroutines: int = 100,
     ):
         logger.debug(
-            "Function - LLMHandler.__init__() - Start - Initialising LLMHandler object"
+            "Function | LLMHandler.__init__() | Start | Initialising LLMHandler object"
         )
 
         # Assert the variable type of the provided arguments
@@ -191,17 +191,17 @@ class LLMHandler:
         # Preparing openai client
         if self.provider_clean == "openai":
             openai.api_key = os.getenv("OPENAI_API_KEY")
-            logger.debug("Step - LLMHandler.__init__() - Action - Set openai api key")
+            logger.debug("Step | LLMHandler.__init__() | Action | Set openai api key")
 
             # Initialising the client
             # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
             self.openai_client = instructor.patch(openai.AsyncOpenAI())
             logger.debug(
-                "Step - LLMHandler.__init__() - Action - Set openai_client and patched with instructor"
+                "Step | LLMHandler.__init__() | Action | Set openai_client and patched with instructor"
             )
 
         logger.debug(
-            "Function - LLMHandler.__init__() - Finish - Initialising LLMHandler object"
+            "Function | LLMHandler.__init__() | Finish | Initialising LLMHandler object"
         )
 
     @property
@@ -315,15 +315,15 @@ class LLMHandler:
             ],
         }
         logger.debug(
-            f"Step - async_openai() - Action - Set chat_params as: {chat_params}"
+            f"Step | async_openai() | Action | Set chat_params as: {chat_params}"
         )
 
         # Running the chat completion and saving as an instructor model
-        logger.debug("Step - async_openai() - Start -  Chat completion")
+        logger.debug("Step | async_openai() | Start | Chat completion")
         instructor_model = await self.openai_client.chat.completions.create(
             **chat_params
         )
-        logger.debug("Step - async_openai() - Finish - Chat completion")
+        logger.debug("Step | async_openai()  | Finish | Chat completion")
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel
@@ -331,7 +331,7 @@ class LLMHandler:
 
         # Returning the response as a tuple (shorthand syntax)
         logger.debug(
-            f"Step - async_openai() - Action - Returning (response, key, index) = ({response}, {key}, {index})"
+            f"Step | async_openai() | Action | Returning (response, key, index) = ({response}, {key}, {index})"
         )
         return response, key, index
 
@@ -364,25 +364,25 @@ class LLMHandler:
         coroutines = await self.create_coroutines(func)
         # Loop over the futures
         logger.debug(
-            "Step - await_coroutines() - Start - Looping over futures of coroutines using as_completed()"
+            "Step | await_coroutines() | Start | Looping over futures of coroutines using as_completed()"
         )
         for future in asyncio.as_completed(coroutines):
             # Limiting the amount of coroutines running / waiting on the api (and taking up memory)
             # as_completed() above means the semaphore is released as the future is completed, in any order
             async with self.max_awaiting_coroutines_semaphore:
                 logger.debug(
-                    "Step - await_coroutines() - Start - In future loop, trying to await future"
+                    "Step | await_coroutines() | Start | In future loop, trying to await future"
                 )
                 result = await future
                 logger.debug(
-                    f"Step - await_coroutines() - Finish - In future loop, successfully awaited future. Result = {result}"
+                    f"Step | await_coroutines() | Finish | In future loop, successfully awaited future. Result = {result}"
                 )
                 response = result[0]
                 key = result[1]
                 index = result[2]
                 self.raw_output_data[key][index] = response
         logger.debug(
-            "Step - await_coroutines() - Finish - Looping over futures of coroutines using as_completed()"
+            "Step | await_coroutines() | Finish | Looping over futures of coroutines using as_completed()"
         )
 
     @log_decorator(

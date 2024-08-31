@@ -132,7 +132,7 @@ def log_decorator(
             if suffix_message is not None
             else finish_message_list
         )
-        finish_message = " - ".join(finish_message_list)
+        finish_message = " | ".join(finish_message_list)
 
         def inner_wrapper(*args, **kwargs):
             def conditional_log(message):
@@ -156,7 +156,7 @@ def log_decorator(
             # Log before and after the function
             global nesting_level
             nesting_level += 1
-            nesting_prefix = f"Nest {nesting_level}: " if show_nesting else ""
+            nesting_prefix = f"Nest {nesting_level} | " if show_nesting else " | "
             conditional_log(nesting_prefix + start_message)
             result = func(*args, **kwargs)
             conditional_log(nesting_prefix + finish_message)
