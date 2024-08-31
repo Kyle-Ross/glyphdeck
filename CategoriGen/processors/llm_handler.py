@@ -219,8 +219,7 @@ class LLMHandler:
     def column_names(self):
         """Accesses column names but only if the new names have been generated during data flattening."""
         logger.debug(
-            "Function - column_names() - Start - checking if self.new_output_data is not none, "
-            "indicating data has been flattened"
+            "Property - column_names() - Start - checking if self.new_column_names is not none, indicating data has been flattened"
         )
         assert_and_log_error(
             logger,
@@ -229,17 +228,17 @@ class LLMHandler:
             "column_names is empty, run self.flatten_output_data() first.",
         )
         logger.debug(
-            "Function - column_names() - Finish - Returning self.new_column_names"
+            "Property - column_names() - Finish - checking if self.new_column_names is not none, indicating data has been flattened"
         )
         return self.new_column_names
 
-    # Tenacity retry decorator for the following errors with exponential backoff
     @log_decorator(
         logger,
         "debug",
         suffix_message="Async coroutine generation with OpenAI",
         show_nesting=False,
     )
+    # Tenacity retry decorator for the following errors with exponential backoff
     @retry(
         retry=retry_if_exception_type(
             (
