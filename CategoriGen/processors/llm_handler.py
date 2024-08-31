@@ -383,7 +383,7 @@ class LLMHandler:
     def flatten_output_data(self, column_names: StrList):
         """Flattens output data into a dictionary of lists for compatibility with the chain class.
         Also creates the new column names for the eventual output."""
-        logger.debug("Function - flatten_output_data() - Start")
+        logger.info("Function - flatten_output_data() - Start - Convert output data for compatibility with chain class")
         new_output_data = {}  # Storage for key: list pairs representing rows
         new_column_names = []  # Storing a list of the column names corresponding to the ordered list
 
@@ -416,7 +416,7 @@ class LLMHandler:
         self.new_output_data = new_output_data  # Save the new output data to self
         self.new_column_names = new_column_names  # Save the new column names to self
 
-        logger.debug("Function - flatten_output_data() - Finish - Returning self")
+        logger.info("Function - flatten_output_data() - Finish - Convert output data for compatibility with chain class")
         return self
 
 
