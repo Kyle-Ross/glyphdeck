@@ -319,11 +319,11 @@ class LLMHandler:
         )
 
         # Running the chat completion and saving as an instructor model
-        logger.debug("Step | async_openai() | Start | Chat completion")
+        logger.debug(" | Step | async_openai() | Start | Chat completion")
         instructor_model = await self.openai_client.chat.completions.create(
             **chat_params
         )
-        logger.debug("Step | async_openai()  | Finish | Chat completion")
+        logger.debug(" | Step | async_openai()  | Finish | Chat completion")
 
         # Storing the response object (as made by the patched openai_client)
         # Extracting a dict of the fields using the pydantic basemodel
