@@ -55,38 +55,36 @@ def main():
     # Unspecified arguments (table, table_id_column, column_names) are inherited from the previous entry if referenced
     chain.append(title="sanitised data", data=sanitised.output_data)
 
-    with LogBlock("Preparing & appending LLMHandler output", logger):
-        handler = LLMHandler(
-            chain.latest_data,
-            provider="OpenAI",
-            model="gpt-3.5-turbo",
-            role="An expert customer feedback analyst nlp system",
-            request="Analyse the feedback and return results in the correct format",
-            validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
-            cache_identifier="NLPPerCategorySentimentAndOverallSentimentWomensClothesReview",
-            use_cache=True,
-            temperature=0.2,
-            max_validation_retries=3,
-            max_preprepared_coroutines=10,
-            max_awaiting_coroutines=100,
-        )
-        handler.run()
-        handler.flatten_output_data(column_names=chain.latest_column_names)
-        chain.append(
-            title="llmoutput",
-            data=handler.output_data,
-            column_names=handler.column_names,
-            update_expected_len=True,
-        )  # Updating len since the validators can produce multiple columns per input
+    handler = LLMHandler(
+        chain.latest_data,
+        provider="OpenAI",
+        model="gpt-3.5-turbo",
+        role="An expert customer feedback analyst nlp system",
+        request="Analyse the feedback and return results in the correct format",
+        validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
+        cache_identifier="NLPPerCategorySentimentAndOverallSentimentWomensClothesReview",
+        use_cache=True,
+        temperature=0.2,
+        max_validation_retries=3,
+        max_preprepared_coroutines=10,
+        max_awaiting_coroutines=100,
+    )
+    handler.run()
+    handler.flatten_output_data(column_names=chain.latest_column_names)
+    chain.append(
+        title="llmoutput",
+        data=handler.output_data,
+        column_names=handler.column_names,
+        update_expected_len=True,
+    )  # Updating len since the validators can produce multiple columns per input
 
-    with LogBlock("Generating & writing output file(s)", logger):
-        chain.output(
-            records=[chain.latest_title],
-            file_type="xlsx",
-            name_prefix="Chain Test",
-            rejoin=True,
-            split=False,
-        )
+    chain.output(
+        records=[chain.latest_title],
+        file_type="xlsx",
+        name_prefix="Chain Test",
+        rejoin=True,
+        split=False,
+    )
 
 
 if (
