@@ -16,9 +16,9 @@ def create_directory(directory, directory_name, logger_arg) -> str:
     """Function to check a directory and create it if it doesn't exist, logging the outcome & returning the directory"""
     if not os.path.exists(directory):
         os.makedirs(directory)
-        logger_arg.info(f"'{directory}' - {directory_name} directory created")
+        logger_arg.info(f" | Function | create_directory() | Action | {directory}' - {directory_name} directory created")
     else:
-        logger_arg.debug(f"'{directory}' - {directory_name} directory  exists")
+        logger_arg.info(f" | Function | create_directory() | Check | {directory}' - {directory_name} directory exists")
     return directory
 
 
@@ -47,8 +47,8 @@ def check_logs_directory() -> Tuple[bool, str, str]:
     if not os.path.exists(OUTPUT_LOGS_DIR):
         os.makedirs(OUTPUT_LOGS_DIR)
         log_dir_exists = False
-        log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder created"
+        log_message = f" | Function | check_logs_directory() | Action | '{OUTPUT_LOGS_DIR}' - Logs folder created"
     else:
         log_dir_exists = True
-        log_message = f"'{OUTPUT_LOGS_DIR}' - Logs folder exists"
+        log_message = f" | Function | check_logs_directory() | Check | '{OUTPUT_LOGS_DIR}' - Logs folder exists"
     return log_dir_exists, log_message, OUTPUT_LOGS_DIR
