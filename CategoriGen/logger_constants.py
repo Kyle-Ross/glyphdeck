@@ -9,6 +9,12 @@ file_log_level_default: int = 10
 console_log_level_default: int = 10
 
 # -----------------
+# Private Information Control
+# -----------------
+log_input_data: bool = False
+log_output_data: bool = False
+
+# -----------------
 # Granular Control
 # -----------------
 
