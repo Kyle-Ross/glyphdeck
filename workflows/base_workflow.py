@@ -17,7 +17,7 @@ unhandled_errors_logger = UnhandledErrorsLogger().setup()
 @exception_logger(unhandled_errors_logger)
 def main():
     # Set file vars
-    source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx"
+    source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 100.csv"
     source_file_type = source_file.split(".")[-1]
 
     # Intialising a chain object, ready to have data appended
@@ -59,7 +59,7 @@ def main():
         request="Analyse the feedback and return results in the correct format",
         validation_model=validators.SubCategoriesWithPerItemSentimentAndOverallSentiment,
         cache_identifier="NLPPerCategorySentimentAndOverallSentimentWomensClothesReview",
-        use_cache=True,
+        use_cache=False,
         temperature=0.2,
         max_validation_retries=3,
         max_preprepared_coroutines=10,
