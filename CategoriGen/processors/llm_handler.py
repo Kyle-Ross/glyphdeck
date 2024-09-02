@@ -24,7 +24,7 @@ from CategoriGen.tools.loggers import (
     LLMHandlerLogger,
     log_decorator,
 )
-from CategoriGen.logger_constants import log_output_data
+from CategoriGen.logger_constants import log_output_data, log_input_data
 from CategoriGen.tools.strings import string_cleaner
 from CategoriGen.tools.caching import openai_cache
 
@@ -315,11 +315,15 @@ class LLMHandler:
             "temperature": item_temperature,
             "messages": [
                 {"role": "system", "content": item_role},
-                {"role": "user", "content": item_request + " " + str(input_text)},
+                {"role": "user", "content": f"{item_request} {str(input_text)}"},
             ],
         }
+        # Log the chat_params, including or including the input text depending on the settings
+        chat_params_log = chat_params
+        if not log_input_data:
+            chat_params_log["messages"][1]["content"] = f"{item_request} <INPUT_TEXT>"
         logger.debug(
-            f" | Step | async_openai() | Action | Set chat_params as: {chat_params}"
+            f" | Step | async_openai() | Action | chat_params = {chat_params_log}"
         )
 
         # Running the chat completion and saving as an instructor model
@@ -333,10 +337,14 @@ class LLMHandler:
         # Extracting a dict of the fields using the pydantic basemodel
         response = dict(instructor_model)
 
-        # Returning the response as a tuple (shorthand syntax)
+        # Submit a log, including or excluding the output depending on settings
+        completion_log = (
+            f" = ({response}, {key}, {index})" if log_output_data else ""
+        )  # Include/Exclude log data per settings
         logger.debug(
-            f" | Step | async_openai() | Action | Returning (response, key, index) = ({response}, {key}, {index})"
+            f" | Step | async_openai() | Action | Returning (response, key, index){completion_log}"
         )
+        # Returning the response as a tuple (shorthand syntax)
         return response, key, index
 
     @log_decorator(
@@ -378,11 +386,11 @@ class LLMHandler:
                     " | Step | await_coroutines() | Start | In future loop, trying to await future"
                 )
                 result = await future
-                result = (
-                    result if log_output_data else "log_input_data == False"
+                result_log = (
+                    f", result = {result}" if log_output_data else ""
                 )  # Include/Exclude log data per settings
                 logger.debug(
-                    f" | Step | await_coroutines() | Finish | In future loop, successfully awaited future. Result is '{result}'"
+                    f" | Step | await_coroutines() | Finish | In future loop, successfully awaited future{result_log}"
                 )
                 response = result[0]
                 key = result[1]
