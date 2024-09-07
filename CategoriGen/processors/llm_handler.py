@@ -1,6 +1,7 @@
-import os
-import asyncio
 from typing import Optional
+import asyncio
+import copy
+import os
 
 import instructor
 import openai
@@ -319,12 +320,19 @@ class LLMHandler:
             ],
         }
         # Log the chat_params, including or including the input text depending on the settings
-        chat_params_log = chat_params.copy()  # Copy ensures changes don't flow the wrong way
-        if not log_input_data:
+        
+        # Log the parameters unchanged if log_input_data = True
+        if log_input_data:
+            logger.debug(
+                f" | Step | async_openai() | Action | chat_params = {chat_params}"
+            )
+        # Log the parameters with the input information removed otherwise
+        else:
+            chat_params_log = copy.deepcopy(chat_params)  # Make a deepcopy of the dict, overwise changes will flow back
             chat_params_log["messages"][1]["content"] = f"{item_request} <INPUT_TEXT>"
-        logger.debug(
-            f" | Step | async_openai() | Action | chat_params = {chat_params_log}"
-        )
+            logger.debug(
+                f" | Step | async_openai() | Action | chat_params = {chat_params_log}"
+            )
 
         # Running the chat completion and saving as an instructor model
         logger.debug(" | Step | async_openai() | Start | Chat completion")
