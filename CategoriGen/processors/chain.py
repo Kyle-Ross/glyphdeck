@@ -6,18 +6,21 @@ import os
 import pandas as pd
 
 from CategoriGen.validation.data_types import (
-    Record,
-    Records,
     Data,
-    IntStr,
-    dFrame,
-    dFrame_or_None,
     IntList,
-    StrList,
-    StrList_or_None,
+    IntStr,
     List_or_Str,
-    IntStrNone,
+    Optional_IntStr,
+    Optional_StrList,
+    Optional_dFrame,
+    Record,
     RecordList,
+    Records,
+    StrList,
+    Str_or_StrList,
+    Str_or_dFrame,
+    dFrame,
+    dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
     ChainLogger,
@@ -25,6 +28,7 @@ from CategoriGen.tools.loggers import (
     log_and_raise_error,
     log_decorator,
 )
+from CategoriGen.tools.prepper import type_conditional_prepare
 from CategoriGen.tools.directory_creators import create_files_directory
 from CategoriGen.path_constants import OUTPUT_FILES_DIR
 
@@ -33,8 +37,17 @@ logger = ChainLogger().setup()
 
 class Chain:
     @log_decorator(logger, "info", suffix_message="Initialise Chain object")
-    def __init__(self):
+    def __init__(
+        self,
+        data_source: Str_or_dFrame,
+        id_column: str,
+        data_columns: Str_or_StrList,
+        encoding: str = "utf-8",
+        sheet_name: IntStr = 0,
+    ):
         """Common object for storing and passing the chained results of data processing."""
+
+        # Initialise the records and expected_len variables
         self.expected_len = 0
         self.records: Records = {
             0: {
@@ -44,9 +57,27 @@ class Chain:
                 "data": {},
                 "table": None,
                 "table_id_column": None,
-                "column_names": None,  # Names of the columns, in order
+                "column_names": None,
             }
         }
+
+        # Prepare the data depending on the data_source type
+        prep_results: dFrame_and_Data_Tuple = type_conditional_prepare(
+            data_source, id_column, data_columns, encoding, sheet_name
+        )
+        source_table: dFrame = prep_results[0]
+        prepared_data: Data = prep_results[1]
+
+        # Finally, save this as the first record, while updating the expected length
+        # This is that becomes the initial record
+        self.append(
+            title="prepared",
+            data=prepared_data,
+            table=source_table,
+            table_id_column=id_column,
+            column_names=data_columns,
+            update_expected_len=True,
+        )
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
@@ -93,7 +124,7 @@ class Chain:
         return self.record(key)["table"]
 
     @log_decorator(logger)
-    def table_id_column(self, key: IntStr) -> IntStrNone:
+    def table_id_column(self, key: IntStr) -> Optional_IntStr:
         """Returns the table corresponding to the provided record_identifier number."""
         return self.record(key)["table_id_column"]
 
@@ -139,13 +170,13 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_table(self) -> dFrame_or_None:
+    def latest_table(self) -> Optional_dFrame:
         """Returns the latest 'table' from the latest 'record' in 'records'."""
         return self.table(self.latest_key)
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_table_id_column(self) -> IntStrNone:
+    def latest_table_id_column(self) -> Optional_IntStr:
         """Returns the latest 'table_id_column' from the latest 'record' in 'records'."""
         return self.table_id_column(self.latest_key)
 
@@ -200,13 +231,13 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def initial_table(self) -> dFrame_or_None:
+    def initial_table(self) -> Optional_dFrame:
         """Returns the initial 'table' from the latest 'record' in 'records'."""
         return self.table(self.initial_key)
 
     @property
     @log_decorator(logger, is_property=True)
-    def initial_table_id_column(self) -> IntStrNone:
+    def initial_table_id_column(self) -> Optional_IntStr:
         """Returns the initial 'table_id_column' from the latest 'record' in 'records'."""
         return self.table_id_column(self.initial_key)
 
@@ -303,9 +334,9 @@ class Chain:
         self,
         title: str,
         data: Data,
-        table: dFrame_or_None = None,
-        table_id_column: IntStrNone = None,
-        column_names: StrList_or_None = None,
+        table: Optional_dFrame = None,
+        table_id_column: Optional_IntStr = None,
+        column_names: Optional_StrList = None,
         update_expected_len: bool = False,
     ):
         """Adds a new record to the 'records' dictionary."""
