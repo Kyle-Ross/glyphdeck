@@ -319,7 +319,7 @@ class LLMHandler:
             ],
         }
         # Log the chat_params, including or including the input text depending on the settings
-        chat_params_log = chat_params
+        chat_params_log = chat_params.copy()  # Copy ensures changes don't flow the wrong way
         if not log_input_data:
             chat_params_log["messages"][1]["content"] = f"{item_request} <INPUT_TEXT>"
         logger.debug(
