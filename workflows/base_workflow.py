@@ -1,6 +1,5 @@
 from CategoriGen.processors.sanitiser import Sanitiser
 from CategoriGen.processors.llm_handler import LLMHandler
-from CategoriGen.processors.prepper import Prepper  # noqa: F401 TODO
 from CategoriGen.processors.chain import Chain
 from CategoriGen.tools.loggers import (
     BaseWorkflowLogger,
@@ -16,33 +15,6 @@ unhandled_errors_logger = UnhandledErrorsLogger().setup()
 
 @exception_logger(unhandled_errors_logger)
 def main():
-    # # Set file vars
-    # source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 100.csv"
-    # source_file_type = source_file.split(".")[-1]
-
-    # # Intialising a chain object, ready to have data appended
-    # chain = Chain()
-
-    # # Initialising prepper object,
-    # # Then loading, validating and preparing the data
-    # prep = Prepper(
-    #     file_path=source_file,
-    #     file_type=source_file_type,
-    #     encoding="ISO-8859-1",
-    #     id_column="Row ID",
-    #     data_columns=["Review Text"],
-    # ).prepare()
-
-    # # Adding the prepared data to the chain object
-    # chain.append(
-    #     title="prepared data",
-    #     data=prep.output_data,
-    #     table=prep.df,
-    #     table_id_column=prep.id_column,
-    #     column_names=prep.data_columns,
-    # )
-
-    # ----------------------------------------
 
     # Set file vars
     source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 100.csv"
