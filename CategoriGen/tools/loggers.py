@@ -165,8 +165,8 @@ def exception_logger(
             try:
                 return func(*args, **kwargs)  # Try the function that was passed in
             except Exception as error:
-                # Handled exceptions should have the logger_name 'HandledError' (see log_and_raise_error())
-                # So if the exception has this logger_name, just re-raise it - it will already have logging
+                # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
+                # So if the exception has this name, just re-raise it - it will already have logging
                 error_name = type(error).__name__
                 if error_name == "HandledError":
                     raise

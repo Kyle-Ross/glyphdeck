@@ -24,7 +24,7 @@ class Sanitiser:
     email_pattern: re.Pattern[str] = re.compile(email_regex)
 
     # Folder Paths
-    # Gets any folder path, but doesn't work when the file logger_name has a space
+    # Gets any folder path, but doesn't work when the file name has a space
     folder_path_regex: str = (
         r"(?:[a-zA-Z]:|\\\\[\w\.]+\\[\w.$]+)\\(?:[\s\w-]+\\)*([\w.-])*"
     )

@@ -482,11 +482,11 @@ class Chain:
         def make_path(source_record: Record) -> str:
             """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-            # Conditionally setting the title to be used in the logger_name
+            # Conditionally setting the title to be used in the name
             if file_type == "csv" and split:
                 title = source_record[
                     "title"
-                ]  # Each individual file has the title logger_name
+                ]  # Each individual file has the title name
             elif file_type == "xlsx" and split:
                 title = "split"  # The containing excel file has 'split'
             elif split:
