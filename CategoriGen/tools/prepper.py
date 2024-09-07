@@ -3,6 +3,7 @@ from typing import Union, List
 import pandas as pd
 
 from CategoriGen.tools.loggers import PrepperLogger, log_decorator, assert_and_log_error
+from CategoriGen.tools.file_importers import get_xlsx, get_csv
 from CategoriGen.validation.data_types import Data
 
 logger = PrepperLogger().setup()
@@ -10,10 +11,10 @@ logger = PrepperLogger().setup()
 
 @log_decorator(
     logger,
-    "info",
+    "debug",
     suffix_message="Run the dataframe prepper",
 )
-def prepper(
+def prepare_df(
     df: pd.DataFrame, id_column: str, data_columns: Union[str, List[str]]
 ) -> Data:
     """Prepares a dataframe into the common data dict where keys are ids and values are lists of selected data column values.
@@ -70,3 +71,25 @@ def prepper(
     for _, row in df.iterrows():
         output_data[row[id_column]] = [row[column] for column in data_columns]
     return output_data
+
+
+@log_decorator(
+    logger,
+    "info",
+    suffix_message="Running dataframe prepper via xslx",
+)
+def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> Data:
+    """Wrapper for prepare_df() that loads data from an xlsx file."""
+    df = get_xlsx(file_path, **kwargs)
+    return prepare_df(df, id_column, data_columns)
+
+
+@log_decorator(
+    logger,
+    "info",
+    suffix_message="Running dataframe prepper via csv",
+)
+def prepare_df_from_csv(file_path, id_column, data_columns, **kwargs) -> Data:
+    """Wrapper for prepare_df() that loads data from a csv file."""
+    df = get_csv(file_path, **kwargs)
+    return prepare_df(df, id_column, data_columns)
