@@ -24,7 +24,7 @@ def assert_and_log_error_path(path, function_name):
 def get_xlsx(file_path, **kwargs):
     """Wrapper for pd.read_excel with additional logic"""
     assert_and_log_error_path(file_path, "get_xlsx()")
-    return pd.read_excel(file_path, **kwargs)
+    return pd.read_excel(file_path, engine="openpyxl", **kwargs)
 
 
 @log_decorator(logger)
