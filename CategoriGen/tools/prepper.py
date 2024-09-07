@@ -89,7 +89,7 @@ def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> Data:
     "info",
     suffix_message="Running dataframe prepper via csv",
 )
-def prepare_df_from_csv(file_path, id_column, data_columns, **kwargs) -> Data:
+def prepare_csv(file_path, id_column, data_columns, **kwargs) -> Data:
     """Wrapper for prepare_df() that loads data from a csv file."""
     df = get_csv(file_path, **kwargs)
     return prepare_df(df, id_column, data_columns)
