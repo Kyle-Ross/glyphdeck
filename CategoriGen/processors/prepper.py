@@ -148,27 +148,3 @@ class Prepper:
         self.load_data()
         self.set_data_dict()
         return self
-
-
-if __name__ == "__main__":
-    """Only runs below if script is run directly, not on import, so this is for testing purposes"""
-    test_file = r"C:\Users\kylec\Documents\GitHub\CategoriGen\scratch\Kaggle - Coronavirus tweets NLP - Text Classification\Corona_NLP_test.csv"
-    # Initialise the object
-    prepper = Prepper(
-        file_path=test_file,
-        file_type="csv",
-        encoding="ISO-8859-1",
-        id_column="UserName",
-        data_columns=["OriginalTweet", "Location"],
-    )
-    # Prepare the data
-    prepper.prepare()
-
-    print("print(prepper.output_data)")
-    print(prepper.output_data)
-    print("print(prepper.df)")
-    print(prepper.df)
-    print("print(prepper.id_column)")
-    print(prepper.id_column)
-    print("print(prepper.data_columns)")
-    print(prepper.data_columns)
