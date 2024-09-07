@@ -293,7 +293,7 @@ class DataTypesLogger(BaseLogger):
 class PrepperLogger(BaseLogger):
     def __init__(self):
         super().__init__(
-            logger_name="processors.Prepper",
+            logger_name="tools.prepper",
             file_log_level=logger_constants.prepper_file_log_level,
             console_log_level=logger_constants.prepper_console_log_level,
         )
