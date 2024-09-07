@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -12,17 +12,21 @@ logger = DataTypesLogger().setup()
 Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 Records = Dict[int, Record]
 IntStr = Union[int, str]
-IntStrNone = Union[int, str, None]
+Optional_IntStr = Optional[Union[int, str]]
 Data = Dict[IntStr, List]
-Data_or_None = Union[Data, None]
+Optional_Data = Optional[Data]
 dFrame = pd.DataFrame
-dFrame_or_None = Union[dFrame, None]
+Optional_dFrame = Optional[dFrame]
 IntList = List[int]
 StrList = List[str]
 dfList = List[pd.DataFrame]
 RecordList = List[Record]
-StrList_or_None = Union[StrList, None]
+Optional_StrList = Optional[StrList]
 List_or_Str = Union[str, list]
+Str_or_StrList = Union[str, StrList]
+Str_or_dFrame = Union[str, dFrame]
+Optional_Str = Optional[str]
+dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
 
 
 def assert_custom_type(variable: Data, custom_type: str, var_name: str):
