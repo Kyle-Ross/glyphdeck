@@ -58,12 +58,12 @@ def assert_and_log_error(
     level: str,
     condition: bool,
     message: str,
-    traceback_message: bool = False,
+    include_traceback: bool = False,
 ) -> None:
     """Asserts a condition and logs the specified error"""
     if not condition:
         log_and_raise_error(
-            logger_arg, level, AssertionError, message, traceback_message
+            logger_arg, level, AssertionError, message, include_traceback
         )
 
 
