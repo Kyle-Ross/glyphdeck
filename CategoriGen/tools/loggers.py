@@ -167,19 +167,19 @@ def exception_logger(
             except Exception as error:
                 # Handled exceptions should have the logger_name 'HandledError' (see log_and_raise_error())
                 # So if the exception has this logger_name, just re-raise it - it will already have logging
-                error_name  = type(error).__name__
+                error_name = type(error).__name__
                 if error_name == "HandledError":
                     raise
                 # Otherwise, log the unhandled error as critical and then re-raise
                 else:
                     # Build the log / error message
-                    error_message = f" | Function | exception_logger() | Exit | | {error_name}"
+                    error_message = (
+                        f" | Function | exception_logger() | Exit | | {error_name}"
+                    )
                     if (
                         include_traceback
                     ):  # Include detailed traceback information in the log if specified
-                        error_message = (
-                            f"{error_message} | \\n{traceback.format_exc().replace('\n', '\\n')}"
-                        )
+                        error_message = f"{error_message} | \\n{traceback.format_exc().replace('\n', '\\n')}"
                 logger_arg.critical(error_message)
                 raise
 
@@ -377,4 +377,13 @@ class TimeToolsLogger(BaseLogger):
             logger_name="tools.time",
             file_log_level=logger_constants.tools_time_file_log_level,
             console_log_level=logger_constants.tools_time_console_log_level,
+        )
+
+
+class FileImportersToolsLogger(BaseLogger):
+    def __init__(self):
+        super().__init__(
+            logger_name="tools.file_importers",
+            file_log_level=logger_constants.tools_file_importers_file_log_level,
+            console_log_level=logger_constants.tools_file_importers_console_log_level,
         )

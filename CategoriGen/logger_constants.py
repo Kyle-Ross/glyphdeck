@@ -61,3 +61,7 @@ tools_strings_console_log_level: int = console_log_level_default
 # tools/time.py
 tools_time_file_log_level: int = file_log_level_default
 tools_time_console_log_level: int = console_log_level_default
+
+# tools/file_importers.py
+tools_file_importers_file_log_level: int = file_log_level_default
+tools_file_importers_console_log_level: int = console_log_level_default
