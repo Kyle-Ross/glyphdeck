@@ -9,9 +9,9 @@ from CategoriGen.processors.chain import Chain
 
 class TestChain(unittest.TestCase):
     def setUp(self):
+        
         # Disable logging during the test
         logging.disable(logging.CRITICAL)
-        self.chain = Chain()
 
         # Set up test data
         self.test_data = {
@@ -19,26 +19,34 @@ class TestChain(unittest.TestCase):
             2: ["carrot", "party", "alpha"],
             3: ["carrot", "party", "alpha"],
         }
-        self.test_df = pd.DataFrame.from_dict(self.test_data, orient="index")
-        self.test_df = self.test_df.reset_index()
-        self.test_df.columns = ["Word ID", "Word1", "Word2", "Word3"]
 
-        # Set up Chain object, and append two records
-        # Initialise
-        self.chain = Chain()
-        # Add record 1 (will become 'initial')
+        # Create the test DataFrame
+        test_df = pd.DataFrame.from_dict(self.test_data, orient="index")
+        test_df = test_df.reset_index()  # Adds the index as a column
+        test_df.columns = ["Word ID", "Word1", "Word2", "Word3"]  # Rename cols
+
+        # Initialise, 
+        # Creates a blank initialisation (record key 0), then appends the initial record (record key 1)
+        self.chain = Chain(
+            test_df,  # csv and xlsx inputs are tested elsewhere
+            "Word ID",
+            ["Word1", "Word2", "Word3"],
+        )
+
+        # Append two more records
+        # (record key 2)
+        # The table, id and data_columns only needs to be added in the first step, but can be included again to update them
+        # Otherwise each record will refer to the last time each was defined, which is the original record until set otherwise
         self.chain.append(
             title="Example1",
             data={
                 1: ["potato", "steak", "party"],
                 2: ["carrot", "party", "alpha"],
                 3: ["carrot", "party", "alpha"],
-            },
-            table=self.test_df,
-            table_id_column="Word ID",
-            column_names=["Food1", "Food2", "Food3"],
+            }
         )
-        # Add record 2 (will become 'latest')
+        # (record key 2)
+        # Becomes the 'latest'
         self.chain.append(
             title="Example2",
             data={
@@ -68,7 +76,7 @@ class TestChain(unittest.TestCase):
                 3: ["bananas", "beast", "jeffery"],
             },
         )
-        self.assertEqual(self.chain.latest_key, 3)
+        self.assertEqual(self.chain.latest_key, 4)
         self.assertEqual(self.chain.latest_title, "Example3")
 
     def test_initial_key(self):
@@ -78,7 +86,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(self.chain.initial_record, self.chain.records[1])
 
     def test_initial_title(self):
-        self.assertEqual(self.chain.initial_title, "Example1")
+        self.assertEqual(self.chain.initial_title, "prepared")
 
     def test_initial_dt(self):
         self.assertIsInstance(self.chain.initial_dt, datetime)
@@ -100,10 +108,10 @@ class TestChain(unittest.TestCase):
         )
 
     def test_latest_key(self):
-        self.assertEqual(self.chain.latest_key, 2)
+        self.assertEqual(self.chain.latest_key, 3)
 
     def test_latest_record(self):
-        self.assertEqual(self.chain.latest_record, self.chain.records[2])
+        self.assertEqual(self.chain.latest_record, self.chain.records[3])
 
     def test_latest_title(self):
         self.assertEqual(self.chain.latest_title, "Example2")
@@ -112,7 +120,7 @@ class TestChain(unittest.TestCase):
         self.assertIsInstance(self.chain.latest_dt, datetime)
 
     def test_latest_data(self):
-        self.assertEqual(self.chain.latest_data, self.chain.records[2]["data"])
+        self.assertEqual(self.chain.latest_data, self.chain.records[3]["data"])
 
     def test_latest_table(self):
         self.assertTrue(self.chain.latest_table.equals(self.chain.records[2]["table"]))
