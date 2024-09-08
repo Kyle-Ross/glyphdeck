@@ -135,6 +135,11 @@ class TestChain(unittest.TestCase):
             self.chain.latest_column_names, self.chain.records[2]["column_names"]
         )
 
+    def test_sanitiser_data(self):
+        self.assertEqual(
+            self.chain.latest_data, self.chain.sanitiser.input_data
+        )
+
     def test_missing_value_append(self):
         with self.assertRaises(ValueError):
             self.chain.append(
