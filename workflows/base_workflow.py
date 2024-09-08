@@ -1,4 +1,3 @@
-from CategoriGen.processors.llm_handler import LLMHandler
 from CategoriGen.processors.chain import Chain
 from CategoriGen.tools.loggers import (
     BaseWorkflowLogger,
@@ -14,7 +13,6 @@ unhandled_errors_logger = UnhandledErrorsLogger().setup()
 
 @exception_logger(unhandled_errors_logger)
 def main():
-
     # Set file vars
     source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 100.csv"
 
@@ -23,15 +21,14 @@ def main():
         data_source=source_file,
         id_column="Row ID",
         data_columns=["Review Text"],
-        encoding="ISO-8859-1"
+        encoding="ISO-8859-1",
     )
 
     # Sanitising the data of sensitive information, on default patterns and appends the result
-    chain.sanitiser.run()  
+    chain.sanitiser.run()
 
-    # LLM Handler
-    handler = LLMHandler(
-        chain.latest_data,
+    # Set the LLM Handler for this chain instance
+    chain.set_llm_handler(
         provider="OpenAI",
         model="gpt-3.5-turbo",
         role="An expert customer feedback analyst nlp system",
@@ -44,15 +41,11 @@ def main():
         max_preprepared_coroutines=10,
         max_awaiting_coroutines=100,
     )
-    handler.run()
-    handler.flatten_output_data(column_names=chain.latest_column_names)
-    chain.append(
-        title="llmoutput",
-        data=handler.output_data,
-        column_names=handler.column_names,
-        update_expected_len=True,
-    )  # Updating len since the validators can produce multiple columns per input
 
+    # Run the llm_handler
+    chain.llm_handler.run()
+
+    # Output the result in the specified format
     chain.output(
         records=[chain.latest_title],
         file_type="xlsx",
