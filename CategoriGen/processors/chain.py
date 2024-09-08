@@ -214,7 +214,8 @@ class Chain:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
 
-    @log_decorator(logger)
+    @property
+    @log_decorator(logger, is_property=True)
     def sanitiser(self):
         """Alias for the sanitiser object, which also updates with provided or latest data, then returns sanitiser"""
 
