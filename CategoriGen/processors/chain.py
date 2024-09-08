@@ -87,14 +87,13 @@ class Chain:
         class Sanitise(Sanitiser):
             @log_decorator(logger, "info", suffix_message="chain.sanitiser object")
             def __init__(self, outer_chain: Chain, **kwargs):
-                super(Sanitise, self).__init__(
-                    **kwargs
-                )  # Pass all arguments to superclass
+                # Pass all arguments to superclass
+                super(Sanitise, self).__init__(**kwargs)
                 self.outer_chain: Chain = outer_chain
                 self.use_selected: bool = False
-                self.selected_data: Optional_Data = (
-                    None  # Data to use if use_selected = True, otherwise use latest
-                )
+
+                # Data to use if use_selected = True, otherwise use latest
+                self.selected_data: Optional_Data = None
 
             @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
             def run(self, title="sanitised"):
@@ -114,15 +113,16 @@ class Chain:
     class Handler(LLMHandler):
         @log_decorator(logger, "info", suffix_message="chain.llm_handler object")
         def __init__(self, *args, **kwargs):
-            outer_chain = kwargs["outer_chain"]  # Take the outer chain reference
-            kwargs.pop(
-                "outer_chain"
-            )  # And remove it before using it in the super().__init__
-            super().__init__(*args, **kwargs)  # Pass all arguments to superclass
+            # Take the outer chain reference
+            outer_chain = kwargs["outer_chain"]
+            # And remove it before using it in the super().__init__
+            kwargs.pop("outer_chain")
+
+            # Pass all arguments to superclass
+            super().__init__(*args, **kwargs)
 
             # Save the outer_chain reference to self
             self.outer_chain: Chain = outer_chain
-
             # Set the selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
             self.selected_column_names = self.outer_chain.latest_column_names
 
@@ -217,15 +217,19 @@ class Chain:
     @log_decorator(logger)
     def sanitiser(self):
         """Alias for the sanitiser object, which also updates with provided or latest data, then returns sanitiser"""
+
+        # Define the data to used based on settings
         new_data = (
             self.initial_sanitiser.selected_data
             if self.initial_sanitiser.use_selected
             else self.latest_data
         )
         self.initial_sanitiser.input_data = new_data
-        self.initial_sanitiser.output_data = copy.deepcopy(
-            new_data
-        )  # Since sanitise runs on the output_data attribute
+
+        # Since sanitise runs on the output_data attribute, make deepcopy
+        self.initial_sanitiser.output_data = copy.deepcopy(new_data)
+
+        # Return the changed sanitiser
         return self.initial_sanitiser
 
     @log_decorator(logger)
@@ -456,14 +460,12 @@ class Chain:
             self.set_expected_len(len(data[next(iter(data))]))
         else:
             # Check if the list of column names is of the correct length
+            # Uses the latest if none were set
             if column_names is None:
-                column_names_len = len(
-                    self.latest_column_names
-                )  # Uses the latest if none were set
+                column_names_len = len(self.latest_column_names)
             else:
-                column_names_len = len(
-                    column_names
-                )  # Otherwise, get the length from the provided list
+                # Otherwise, get the length from the provided list
+                column_names_len = len(column_names)
             assert_and_log_error(
                 logger,
                 "error",
@@ -506,10 +508,8 @@ class Chain:
 
         # Looping over selected records and making changes
         for record in selected_records:
-            # Creating dataframes and in each of the records
-            df = pd.DataFrame.from_dict(
-                record["data"], orient="index"
-            )  # Treats the index as the row_id
+            # Creating dataframes and in each of the records, treating the index as the row_id
+            df = pd.DataFrame.from_dict(record["data"], orient="index")
             # Renaming columns
             if use_suffix:  # Includes suffixes when there are multiple selections to avoid concatenation errors
                 df.columns = [
@@ -619,9 +619,8 @@ class Chain:
                 df.to_csv(path, index=False)
 
         if file_type == "xlsx":
-            path = make_path(
-                self.latest_record
-            )  # Argument may not be used in certain conditions
+            # Argument may not be used in certain conditions
+            path = make_path(self.latest_record)
             with pd.ExcelWriter(path) as writer:
                 for record in (
                     records_list
