@@ -13,6 +13,7 @@ from CategoriGen.validation.data_types import (
     Optional_IntStr,
     Optional_StrList,
     Optional_dFrame,
+    Optional_Data,
     Record,
     RecordList,
     Records,
@@ -28,6 +29,7 @@ from CategoriGen.tools.loggers import (
     log_and_raise_error,
     log_decorator,
 )
+from CategoriGen.processors.sanitiser import Sanitiser
 from CategoriGen.tools.prepper import type_conditional_prepare
 from CategoriGen.tools.directory_creators import create_files_directory
 from CategoriGen.path_constants import OUTPUT_FILES_DIR
@@ -78,6 +80,10 @@ class Chain:
             column_names=data_columns,
             update_expected_len=True,
         )
+
+        # Initialise the sanitiser - in __init__y 'latest_data' is set to it's initialised value
+        # A wrapper property will access and update this with new data
+        self.initial_sanitiser = Sanitiser(self.latest_data)
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
@@ -137,6 +143,15 @@ class Chain:
     def column_names(self, key: IntStr) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
+    
+    # Initialise an instance of the sanitiser class with all patterns on by default
+    @property
+    @log_decorator(logger, is_property=True)
+    def sanitiser(self, data: Optional_Data = None):
+        """Updates sanitiser object with provided or latest data, than returns sanitiser"""
+        new_data = self.latest_data if data is None else data
+        self.initial_sanitiser.input_data = new_data
+        return self.initial_sanitiser
 
     @property
     @log_decorator(logger, is_property=True)
@@ -226,25 +241,25 @@ class Chain:
     @property
     @log_decorator(logger, is_property=True)
     def initial_data(self) -> Data:
-        """Returns the initial 'data' from the latest 'record' in 'records'."""
+        """Returns the initial 'data' from 'records'."""
         return self.data(self.initial_key)
 
     @property
     @log_decorator(logger, is_property=True)
     def initial_table(self) -> Optional_dFrame:
-        """Returns the initial 'table' from the latest 'record' in 'records'."""
+        """Returns the initial 'table' from 'records'."""
         return self.table(self.initial_key)
 
     @property
     @log_decorator(logger, is_property=True)
     def initial_table_id_column(self) -> Optional_IntStr:
-        """Returns the initial 'table_id_column' from the latest 'record' in 'records'."""
+        """Returns the initial 'table_id_column' from 'records'."""
         return self.table_id_column(self.initial_key)
 
     @property
     @log_decorator(logger, is_property=True)
     def initial_column_names(self) -> StrList:
-        """Returns the initial 'column_names' from the latest 'record' in 'records'."""
+        """Returns the initial 'column_names' from 'records'."""
         return self.column_names(self.initial_key)
 
     @property
