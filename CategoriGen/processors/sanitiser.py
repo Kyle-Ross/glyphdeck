@@ -1,5 +1,7 @@
-import re
 from typing import Union, Tuple, List, Dict, Any
+import copy
+import re
+
 
 import pandas as pd
 
@@ -180,7 +182,7 @@ class Sanitiser:
     @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
     def __init__(self, input_data: Data, pattern_groups: List = None) -> None:
         self.input_data: Data = input_data
-        self.output_data: Data = input_data  # Will be changed by processes below
+        self.output_data: Data = copy.deepcopy(input_data)  # Will be changed by processes below
         self.overall_run_state = False
         self.all_groups: List = self.groups_where(self.patterns)
         if pattern_groups is not None:
