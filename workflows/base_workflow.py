@@ -1,4 +1,3 @@
-from CategoriGen.processors.sanitiser import Sanitiser
 from CategoriGen.processors.llm_handler import LLMHandler
 from CategoriGen.processors.chain import Chain
 from CategoriGen.tools.loggers import (
