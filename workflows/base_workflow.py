@@ -46,7 +46,7 @@ def main():
         request="Analyse the feedback and return results in the correct format",
         validation_model=validators.SubCategories,
         cache_identifier="WomensClothesReview_Comment_Sub_Categories",
-        use_cache=False,
+        use_cache=True,
         temperature=0.2,
         max_validation_retries=3,
         max_preprepared_coroutines=10,
