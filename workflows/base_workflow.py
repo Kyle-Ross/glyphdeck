@@ -27,17 +27,10 @@ def main():
         encoding="ISO-8859-1"
     )
 
-    # ----------------------------------------
+    # Sanitising the data of sensitive information, on default patterns and appends the result
+    chain.sanitiser.run()  
 
-    # Sanitising the data of sensitive information, on specified patterns
-    sanitised = Sanitiser(
-        chain.latest_data, pattern_groups=["date", "email", "path", "url", "number"]
-    ).sanitise()
-
-    # Adding sanitised results to the chain
-    # Unspecified arguments (table, table_id_column, column_names) are inherited from the previous entry if referenced
-    chain.append(title="sanitised data", data=sanitised.output_data)
-
+    # LLM Handler
     handler = LLMHandler(
         chain.latest_data,
         provider="OpenAI",
