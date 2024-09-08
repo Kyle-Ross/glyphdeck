@@ -84,15 +84,17 @@ class Chain:
 
         # Inherit the sanitiser class and add new run method which writes records by default
         class Sanitise(Sanitiser):
+            @log_decorator(logger, "info", suffix_message="chain.sanitiser object")
             def __init__(self, outer_chain: Chain, **kwargs):
                 super(Sanitise, self).__init__(**kwargs)  # Pass all arguments to superclass
                 self.outer_chain: Chain = outer_chain
                 self.use_selected: bool = False
                 self.selected_data: Optional_Data = None  # Data to use if use_selected = True, otherwise use latest
-            def run(self):
+            @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
+            def run(self, title="sanitised"):
                 """Runs the sanitiser and appends the result to the chain."""
                 self.sanitise()
-                self.outer_chain.append(title="sanitised", data=self.output_data)
+                self.outer_chain.append(title=title, data=self.output_data)
                 return self
 
         # Initialise the sanitiser - in __init__ 'latest_data' is set to it's initialised value - which won't update
