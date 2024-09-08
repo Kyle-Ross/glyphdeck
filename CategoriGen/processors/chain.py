@@ -99,6 +99,7 @@ class Chain:
 
         # Initialise the sanitiser - in __init__ 'latest_data' is set to it's initialised value - which won't update
         # So a wrapper property will access and update this with new data
+        # Call this using the self.sanitiser property so input_data is updated with the default latest data
         self.initial_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
 
     @log_decorator(logger)
