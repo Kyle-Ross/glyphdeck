@@ -31,6 +31,7 @@ from CategoriGen.tools.loggers import (
     log_decorator,
 )
 from CategoriGen.processors.sanitiser import Sanitiser
+from CategoriGen.processors.llm_handler import LLMHandler
 from CategoriGen.tools.prepper import type_conditional_prepare
 from CategoriGen.tools.directory_creators import create_files_directory
 from CategoriGen.path_constants import OUTPUT_FILES_DIR
@@ -82,14 +83,19 @@ class Chain:
             update_expected_len=True,
         )
 
-        # Inherit the sanitiser class and add new run method which writes records by default
+        # Inherit the sanitiser class and add new run method which writes records and uses the latest_data by default
         class Sanitise(Sanitiser):
             @log_decorator(logger, "info", suffix_message="chain.sanitiser object")
             def __init__(self, outer_chain: Chain, **kwargs):
-                super(Sanitise, self).__init__(**kwargs)  # Pass all arguments to superclass
+                super(Sanitise, self).__init__(
+                    **kwargs
+                )  # Pass all arguments to superclass
                 self.outer_chain: Chain = outer_chain
                 self.use_selected: bool = False
-                self.selected_data: Optional_Data = None  # Data to use if use_selected = True, otherwise use latest
+                self.selected_data: Optional_Data = (
+                    None  # Data to use if use_selected = True, otherwise use latest
+                )
+
             @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
             def run(self, title="sanitised"):
                 """Runs the sanitiser and appends the result to the chain."""
@@ -101,6 +107,53 @@ class Chain:
         # So a wrapper property will access and update this with new data
         # Call this using the self.sanitiser property so input_data is updated with the default latest data
         self.initial_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
+
+    # Inherit the LLMHandler class and add new run method which writes records and uses the latest_data by default
+    # Abstractions required intricate juggling of args and kwargs to pass the context of the current chain instance...
+    # ... as well as implement a reference to that instance's self.latest_data property
+    class Handler(LLMHandler):
+        @log_decorator(logger, "info", suffix_message="chain.llm_handler object")
+        def __init__(self, *args, **kwargs):
+            outer_chain = kwargs["outer_chain"]  # Take the outer chain reference
+            kwargs.pop(
+                "outer_chain"
+            )  # And remove it before using it in the super().__init__
+            super().__init__(*args, **kwargs)  # Pass all arguments to superclass
+
+            # Save the outer_chain reference to self
+            self.outer_chain: Chain = outer_chain
+
+            # Set the selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
+            self.selected_column_names = self.outer_chain.latest_column_names
+
+        def use_latest(self):
+            """Replaces the llm_handler.input_data with a reference to the latest data in the chain.
+            - This is the default state.
+            - Resets selected columns
+            - Would only need to run this if you had previous ran use_selected, then wanted to go back."""
+            self.input_data = self.outer_chain.latest_data
+            self.selected_column_names = self.outer_chain.latest_column_names
+
+        def use_selected(
+            self, selected_data: Data, column_names: Optional_StrList = None
+        ):
+            """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
+            self.selected_column_names = (
+                self.selected_column_names if column_names is None else column_names
+            )
+            self.input_data = selected_data
+
+        @log_decorator(logger, "info", suffix_message="Use chain.llm_handler.run()")
+        def run(self, title="llm output"):
+            """Runs the llm_handler and appends the result to the chain."""
+            self.run_async()
+            self.flatten_output_data(self.outer_chain.latest_column_names)
+            self.outer_chain.append(
+                title=title,
+                data=self.output_data,
+                update_expected_len=True,  # Updating len since the llm validators can produce multiple columns per input
+            )
+            return self
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
@@ -161,14 +214,39 @@ class Chain:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
 
-    @property
-    @log_decorator(logger, is_property=True)
+    @log_decorator(logger)
     def sanitiser(self):
         """Alias for the sanitiser object, which also updates with provided or latest data, then returns sanitiser"""
-        new_data = self.initial_sanitiser.selected_data if self.initial_sanitiser.use_selected else self.latest_data
+        new_data = (
+            self.initial_sanitiser.selected_data
+            if self.initial_sanitiser.use_selected
+            else self.latest_data
+        )
         self.initial_sanitiser.input_data = new_data
-        self.initial_sanitiser.output_data = copy.deepcopy(new_data)  # Since sanitise runs on the output_data attribute
+        self.initial_sanitiser.output_data = copy.deepcopy(
+            new_data
+        )  # Since sanitise runs on the output_data attribute
         return self.initial_sanitiser
+
+    @log_decorator(logger)
+    def set_llm_handler(self, *args, **kwargs):
+        """Creates the LLMHandler / Handler object as self.llm_handler, passing in self.llm_handler.latest_data as the input.
+
+        Differences to parent class LLMHandler:
+        - Rather than taking a input_data argument, it inserts self.latest_data at the front of the args
+            - The handler will then always run on the latest data
+            - This can be changed with self.llm_handler.use_selected(elected_data), and back with self.llm_handler.use_latest()
+        - Passes a reference to the current chain instance up through the kwargs
+            - This is removed from the kwargs before reaching LLMHandler"""
+
+        # Grab the latest_data and put it in front of the args (which won't include it)
+        updated_args = (self.latest_data,) + args
+
+        # Adding self (aka the current chain into the kwargs)
+        kwargs["outer_chain"] = self  # noqa: E402
+
+        # Set the llm_handler using the adapted arguments
+        self.llm_handler = self.Handler(*updated_args, **kwargs)
 
     @property
     @log_decorator(logger, is_property=True)
