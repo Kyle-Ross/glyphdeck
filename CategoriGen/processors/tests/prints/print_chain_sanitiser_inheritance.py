@@ -93,14 +93,45 @@ ic(chain.initial_sanitiser.inactive_groups)
 # Print off all the generated values
 # Without a loop so ic will show the contents
 
+print("\nIs the sanitiser referencing the correct chain?")
+ic(chain)
+ic(chain.initial_sanitiser.outer_chain)
+ic(chain == chain.initial_sanitiser.outer_chain)
+
+print(
+    "\nAppending with the sanitiser representation of the chain shows changes in the normal chain (Record Key 4)"
+)
+# (Record Key 4)
+chain.sanitiser.outer_chain.append(
+    title="Via Sanitiser",
+    data={
+        1: ["Yellow", "Blue", "Green"],
+        2: ["Red", "Purple", "Brown"],
+        3: ["Black", "White", "Grey"],
+    },
+)
+ic(chain.record(4))
+ic(chain.latest_data)
+ic(chain.sanitiser.input_data)
+ic(chain.initial_sanitiser.input_data)
+
+print("\nSanitiser input_data can be changed directly")
+ic(chain.sanitiser.input_data)
+
+print("Setting target input to record 1")
+print("chain.sanitiser.use_selected = True")
+chain.sanitiser.use_selected = True
+print("chain.sanitiser.selected_data = chain.record(1)")
+chain.sanitiser.selected_data = chain.record(1)
+
+ic(chain.latest_data)
+ic(chain.sanitiser.selected_data)
+ic(chain.sanitiser.input_data)
+
 # Attributes and properites of the whole chain
 print("\nThe whole chain")
 ic(chain.records)
 
-print("Is the sanitiser referencing the correct chain?")
-ic(chain)
-ic(chain.sanitiser.outer_chain)
-ic(chain == chain.sanitiser.outer_chain)
 
 # Re-enable logging
 logging.disable(logging.NOTSET)

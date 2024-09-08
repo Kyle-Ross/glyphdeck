@@ -9,7 +9,6 @@ from CategoriGen.processors.chain import Chain
 
 class TestChain(unittest.TestCase):
     def setUp(self):
-        
         # Disable logging during the test
         logging.disable(logging.CRITICAL)
 
@@ -25,7 +24,7 @@ class TestChain(unittest.TestCase):
         test_df = test_df.reset_index()  # Adds the index as a column
         test_df.columns = ["Word ID", "Word1", "Word2", "Word3"]  # Rename cols
 
-        # Initialise, 
+        # Initialise,
         # Creates a blank initialisation (record key 0), then appends the initial record (record key 1)
         self.chain = Chain(
             test_df,  # csv and xlsx inputs are tested elsewhere
@@ -43,7 +42,7 @@ class TestChain(unittest.TestCase):
                 1: ["potato", "steak", "party"],
                 2: ["carrot", "party", "alpha"],
                 3: ["carrot", "party", "alpha"],
-            }
+            },
         )
         # (record key 2)
         # Becomes the 'latest'
