@@ -320,7 +320,7 @@ class LLMHandler:
             ],
         }
         # Log the chat_params, including or including the input text depending on the settings
-        
+
         # Log the parameters unchanged if log_input_data = True
         if log_input_data:
             logger.debug(
@@ -328,7 +328,9 @@ class LLMHandler:
             )
         # Log the parameters with the input information removed otherwise
         else:
-            chat_params_log = copy.deepcopy(chat_params)  # Make a deepcopy of the dict, overwise changes will flow back
+            chat_params_log = copy.deepcopy(
+                chat_params
+            )  # Make a deepcopy of the dict, overwise changes will flow back
             chat_params_log["messages"][1]["content"] = f"{item_request} <INPUT_TEXT>"
             logger.debug(
                 f" | Step | async_openai() | Action | chat_params = {chat_params_log}"
@@ -414,7 +416,7 @@ class LLMHandler:
         suffix_message="Asynchronous data fetching from LLM or cache",
         show_nesting=False,
     )
-    def run(self):
+    def run_async(self):
         """Asynchronously query the selected LLM across the whole variable and save results to the output"""
         if self.provider_clean == "openai":
             asyncio.run(self.await_coroutines(self.async_openai))
@@ -509,6 +511,6 @@ if __name__ == "__main__":
         max_preprepared_coroutines=10,
     )
 
-    handler.run()
+    handler.run_async()
     handler.flatten_output_data(["Col1", "Col2", "Col3", "Col4", "Col5"])
     print(handler.output_data)
