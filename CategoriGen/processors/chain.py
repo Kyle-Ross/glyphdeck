@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
+import copy
 import re
 import os
 
@@ -86,13 +87,16 @@ class Chain:
             def __init__(self, outer_chain: Chain, **kwargs):
                 super(Sanitise, self).__init__(**kwargs)  # Pass all arguments to superclass
                 self.outer_chain: Chain = outer_chain
+                self.use_selected: bool = False
+                self.selected_data: Optional_Data = None  # Data to use if use_selected = True, otherwise use latest
             def run(self):
+                """Runs the sanitiser and appends the result to the chain."""
                 self.sanitise()
                 self.outer_chain.append(title="sanitised", data=self.output_data)
                 return self
 
-        # Initialise the sanitiser - in __init__y 'latest_data' is set to it's initialised value
-        # A wrapper property will access and update this with new data
+        # Initialise the sanitiser - in __init__ 'latest_data' is set to it's initialised value - which won't update
+        # So a wrapper property will access and update this with new data
         self.initial_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
 
     @log_decorator(logger)
@@ -156,10 +160,11 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def sanitiser(self, data: Optional_Data = None):
-        """Updates sanitiser object with provided or latest data, then returns sanitiser"""
-        new_data = self.latest_data if data is None else data
+    def sanitiser(self):
+        """Alias for the sanitiser object, which also updates with provided or latest data, then returns sanitiser"""
+        new_data = self.initial_sanitiser.selected_data if self.initial_sanitiser.use_selected else self.latest_data
         self.initial_sanitiser.input_data = new_data
+        self.initial_sanitiser.output_data = copy.deepcopy(new_data)  # Since sanitise runs on the output_data attribute
         return self.initial_sanitiser
 
     @property
