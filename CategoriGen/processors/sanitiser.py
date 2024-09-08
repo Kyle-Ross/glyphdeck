@@ -118,6 +118,7 @@ class Sanitiser:
     }
 
     # Add some keys with default values to each entry in the pattern dict to avoid repeating above
+    # Setting all to active here is what makes all patterns on by default
     for key, values in patterns.items():
         values["active"] = True
         values["run_state"] = False
