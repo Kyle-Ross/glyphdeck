@@ -81,9 +81,19 @@ class Chain:
             update_expected_len=True,
         )
 
+        # Inherit the sanitiser class and add new run method which writes records by default
+        class Sanitise(Sanitiser):
+            def __init__(self, outer_chain: Chain, **kwargs):
+                super(Sanitise, self).__init__(**kwargs)  # Pass all arguments to superclass
+                self.outer_chain: Chain = outer_chain
+            def run(self):
+                self.sanitise()
+                self.outer_chain.append(title="sanitised", data=self.output_data)
+                return self
+
         # Initialise the sanitiser - in __init__y 'latest_data' is set to it's initialised value
         # A wrapper property will access and update this with new data
-        self.initial_sanitiser = Sanitiser(self.latest_data)
+        self.initial_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
@@ -143,12 +153,11 @@ class Chain:
     def column_names(self, key: IntStr) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
-    
-    # Initialise an instance of the sanitiser class with all patterns on by default
+
     @property
     @log_decorator(logger, is_property=True)
     def sanitiser(self, data: Optional_Data = None):
-        """Updates sanitiser object with provided or latest data, than returns sanitiser"""
+        """Updates sanitiser object with provided or latest data, then returns sanitiser"""
         new_data = self.latest_data if data is None else data
         self.initial_sanitiser.input_data = new_data
         return self.initial_sanitiser

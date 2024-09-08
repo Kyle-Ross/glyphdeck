@@ -27,11 +27,19 @@ chain = Chain(
     "Word ID",
     ["Word1", "Word2", "Word3"],
     # encoding="utf-8",  # Needed if you provided a .csv path
-    sheet_name="Sheet1"  # Needed if you provided a .xlsx path
+    sheet_name="Sheet1",  # Needed if you provided a .xlsx path
 )
 ic(chain.record(1))
 ic(chain.latest_data)
 ic(chain.sanitiser.input_data)
+ic(chain.initial_sanitiser.input_data)
+ic("select_groups() - used in init")
+ic(chain.sanitiser.all_groups)
+ic(chain.sanitiser.active_groups)
+ic(chain.sanitiser.inactive_groups)
+ic(chain.initial_sanitiser.all_groups)
+ic(chain.initial_sanitiser.active_groups)
+ic(chain.initial_sanitiser.inactive_groups)
 
 # (record key 2)
 # The table only needs to be added in the first step, but can be included again to add a new one
@@ -43,11 +51,20 @@ chain.append(
         1: ["potato", "steak", "party"],
         2: ["carrot", "party", "alpha"],
         3: ["carrot", "party", "alpha"],
-    }
+    },
 )
 ic(chain.record(2))
 ic(chain.latest_data)
 ic(chain.sanitiser.input_data)
+ic(chain.sanitiser.select_groups(["number"]))
+ic(chain.sanitiser.all_groups)
+ic(chain.sanitiser.active_groups)
+ic(chain.sanitiser.inactive_groups)
+ic(chain.initial_sanitiser.input_data)
+ic(chain.initial_sanitiser.select_groups(["number"]))
+ic(chain.initial_sanitiser.all_groups)
+ic(chain.initial_sanitiser.active_groups)
+ic(chain.initial_sanitiser.inactive_groups)
 
 # (record key 3)
 # Since table is not assigned table will just be the last table
@@ -63,12 +80,27 @@ chain.append(
 ic(chain.record(3))
 ic(chain.latest_data)
 ic(chain.sanitiser.input_data)
+ic(chain.sanitiser.select_groups(["number", "date"]))
+ic(chain.sanitiser.all_groups)
+ic(chain.sanitiser.active_groups)
+ic(chain.sanitiser.inactive_groups)
+ic(chain.initial_sanitiser.input_data)
+ic(chain.initial_sanitiser.select_groups(["number", "date"]))
+ic(chain.initial_sanitiser.all_groups)
+ic(chain.initial_sanitiser.active_groups)
+ic(chain.initial_sanitiser.inactive_groups)
 
 # Print off all the generated values
 # Without a loop so ic will show the contents
 
 # Attributes and properites of the whole chain
+print("\nThe whole chain")
 ic(chain.records)
+
+print("Is the sanitiser referencing the correct chain?")
+ic(chain)
+ic(chain.sanitiser.outer_chain)
+ic(chain == chain.sanitiser.outer_chain)
 
 # Re-enable logging
 logging.disable(logging.NOTSET)
