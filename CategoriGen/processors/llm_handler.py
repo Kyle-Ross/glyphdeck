@@ -14,7 +14,7 @@ from tenacity import (
 
 from CategoriGen.validation.data_types import (
     Data,
-    assert_custom_type,
+    assert_type_is_data,
     StrList,
     Optional_Data,
     Optional_StrList,
@@ -81,7 +81,7 @@ class LLMHandler:
 
         # Assert the variable type of the provided arguments
         # Check the custom data type 'Data'
-        assert_custom_type(input_data, "Data", "input_data")
+        assert_type_is_data(input_data, "input_data")
         assert_and_log_error(
             logger,
             "error",
