@@ -7,8 +7,8 @@ import os
 import pandas as pd
 
 from CategoriGen.validation.data_types import (
-    assert_type_is_data,
-    assert_type_is_none_or_strlist,
+    assert_and_log_type_is_data,
+    assert_and_log_type_is_strlist,
     Data,
     IntList,
     IntStr,
@@ -156,8 +156,8 @@ class Chain:
             self, selected_data: Data, column_names: Optional_StrList = None
         ):
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
-            assert_type_is_data(selected_data, "selected_data")
-            assert_type_is_none_or_strlist(column_names, "column_names")
+            assert_and_log_type_is_data(selected_data, "selected_data")
+            assert_and_log_type_is_strlist(column_names, "column_names")
             self.selected_column_names = (
                 self.selected_column_names if column_names is None else column_names
             )

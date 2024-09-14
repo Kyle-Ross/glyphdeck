@@ -29,7 +29,7 @@ Optional_Str = Optional[str]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
 
 
-def assert_type_is_data(variable: Data, var_name: str):
+def assert_and_log_type_is_data(variable: Data, var_name: str):
     """Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type"""
     assert_and_log_error(
         logger,
@@ -54,7 +54,7 @@ def assert_type_is_data(variable: Data, var_name: str):
         )
 
 
-def assert_type_is_none_or_strlist(variable: Optional_StrList, var_name: str):
+def assert_and_log_type_is_strlist(variable: Optional_StrList, var_name: str):
     """Assert and log that a variable is either None or a list of only strings"""
     variable_is_list = isinstance(variable, list)
     # Check if it is a list or None
