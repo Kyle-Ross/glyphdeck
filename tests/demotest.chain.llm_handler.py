@@ -73,6 +73,7 @@ ic(
     )
 )
 ic(chain.llm_handler.active_input_data)
+ic(chain.llm_handler.active_record_title)
 
 # -------------------------------------------------------------------------
 
@@ -92,6 +93,7 @@ ic(
     )
 )
 ic(chain.latest_data)
+ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_input_data)
 
 print(
@@ -121,6 +123,7 @@ ic(
         # Not specifying the column names means the latest column names will be used
     )
 )
+ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_column_names)
 ic(chain.llm_handler.active_input_data)
 print("\nRun it again, with the new data")
@@ -137,6 +140,7 @@ print(
     """Select data for the llm_handler using only a record key or title, like record 1"""
 )
 ic(chain.llm_handler.use_record(1))
+ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_input_data)
 print("\nRun it again, with the data selected with the record id")
 ic(chain.llm_handler.run("HandlerOutput3"))
