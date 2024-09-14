@@ -35,7 +35,7 @@ def assert_type_is_data(variable: Data, var_name: str):
         logger,
         "error",
         isinstance(variable, dict),
-        f"Expected custom 'Data' type in '{var_name}', instead got '{type(variable)}'",
+        f"Expected 'Data' type 'Dict[IntStr, List]' in '{var_name}', instead got '{type(variable)}'",
     )
     for key, value in variable.items():
         assert_and_log_error(
@@ -52,3 +52,24 @@ def assert_type_is_data(variable: Data, var_name: str):
             f"Expected list dict value in custom 'Data' type variable "
             f"'{var_name}', instead got {type(value)}",
         )
+
+
+def assert_type_is_none_or_strlist(variable: Optional_StrList, var_name: str):
+    """Assert and log that a variable is either None or a list of only strings"""
+    variable_is_list = isinstance(variable, list)
+    # Check if it is a list or None
+    assert_and_log_error(
+        logger,
+        "error",
+        variable_is_list or variable is None,
+        f"Expected type 'None' or 'List[str]' in '{var_name}', instead got '{type(variable)}'",
+    )
+    # Iterate through the values if it is a list
+    if variable_is_list:
+        for value in variable:
+            assert_and_log_error(
+                logger,
+                "error",
+                isinstance(value, str),
+                f"Expected all items in list argument '{var_name}' to be str, instead got {type(value)}",
+            )
