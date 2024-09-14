@@ -98,7 +98,7 @@ ic(chain.llm_handler.active_input_data)
 
 print("\n(Record Key 4)")
 print(
-    "\nRun the llm_handler (on latest_data, aka record 3), which creates and appends a record with the results"
+    "Run the llm_handler (on latest_data, aka record 3), which creates and appends a record with the results"
 )
 ic(chain.llm_handler.run("HandlerOutput1"))
 ic(chain.latest_data)
