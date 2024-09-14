@@ -1,5 +1,5 @@
 import pandas as pd
-import openpyxl  # noqa: F401
+import openpyxl  # noqa: F401  -- Not referenced, but avoids errors with pd.read_excel()
 
 from CategoriGen.tools.loggers import (
     FileImportersToolsLogger,
