@@ -30,7 +30,8 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
 
     # Define the actual decorator function
     def decorator(func):
-        completions = 0  # counter for the amount of completions
+        # counter for the amount of completions
+        completions = 0  
 
         async def wrapper(self, *args, **kwargs):
             nonlocal completions
@@ -52,6 +53,7 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
                 f"{self_cache_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|"
                 f"{self_validation_model}|{self_model}|{self_role}|{self_request}"
             )
+
             # Hashing the key, decreasing size and potentially speeding up lookups
             # Deterministically creates the same hash for any given string
             hash_object = hashlib.sha256(cache_key.encode())
