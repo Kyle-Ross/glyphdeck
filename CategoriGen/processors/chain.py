@@ -17,6 +17,7 @@ from CategoriGen.validation.data_types import (
     Optional_StrList,
     Optional_dFrame,
     Optional_Data,
+    Optional_Str,
     Record,
     RecordList,
     Records,
@@ -100,13 +101,18 @@ class Chain:
             @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
             def run(self, title: str = "sanitised"):
                 """Runs the sanitiser and appends the result to the chain."""
+                # Check argument type
                 assert_and_log_error(
                     logger,
                     "error",
                     type(title) is str,
                     f"Provided title argument '{title}' is not a string",
                 )
+                # Check new title is unique
+                self.outer_chain.title_validator(title)
+                # Sanitise the data
                 self.sanitise()
+                # Append and return self
                 self.outer_chain.append(title=title, data=self.output_data)
                 return self
 
@@ -131,43 +137,175 @@ class Chain:
 
             # Save the outer_chain reference to self
             self.outer_chain: Chain = outer_chain
-            # Set the selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
-            self.selected_column_names = self.outer_chain.latest_column_names
+
+            # Values to be set post-initialisation, containing the result of methods setting custom targets
+
+            # Activates or disables the use of manually 'selected' chain parts
+            self.use_selected: bool = False
+            # Actives all selections to be based on selected record key
+            self.use_selected_of_record: bool = False
+            # The key or title of the record to be accessed for use
+            self.selected_record_key: Optional_IntStr = None
+            # Input data which is used by llm_handler.run_async()
+            self.selected_input_data: Optional_Data = None
+            # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
+            self.selected_column_names: Optional_StrList = None
+            # Contains the name of the selected record title, which is appended to the cache identifier to keep it unique
+            self.selected_record_title: Optional_Str = None
+
+        @property
+        @log_decorator(logger, is_property=True)
+        def active_record_key(self) -> IntStr:
+            """Returns the selected record key when self.use_selected_of_record is True.
+            Otherwise returns the key of the latest record"""
+            # Use the selected key to access the record
+            if self.use_selected_of_record:
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    self.selected_record_key is not None,
+                    "self.selected_record_key has not been set",
+                )
+                key = self.selected_record_key
+            # Otherwise use the latest key
+            else:
+                key = self.outer_chain.latest_key
+            return key
+
+        @property
+        @log_decorator(logger, is_property=True)
+        def active_column_names(self) -> StrList:
+            """Returns the selected column names when self.use_selected is True.
+            Otherwise returns columns names of the active record key"""
+            # Use column names stored in self.selected_column_names
+            if self.use_selected:
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    self.selected_column_names is not None,
+                    "self.use_selected is True, but self.selected_column_names has not been set",
+                )
+                assert_and_log_type_is_strlist(
+                    self.selected_column_names, "selected_column_names"
+                )
+                column_names = self.selected_column_names
+            # Otherwise use the active record key to access the column names
+            else:
+                column_names = self.outer_chain.column_names(self.active_record_key)
+            # Return the outcome
+            return column_names
+
+        @property
+        @log_decorator(logger, is_property=True)
+        def active_input_data(self) -> Data:
+            """Returns the selected data when self.use_selected is True.
+            Otherwise returns data from the active record key"""
+            # Use data stored in self.selected_column_names
+            if self.use_selected:
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    self.selected_input_data is not None,
+                    "self.use_selected is True, self.selected_input_data has not been set",
+                )
+                assert_and_log_type_is_data(
+                    self.selected_input_data, "selected_input_data"
+                )
+                input_data = self.selected_input_data
+            # Otherwise use the active record key to access the data
+            else:
+                input_data = self.outer_chain.data(self.active_record_key)
+            # Return the outcome
+            return input_data
+
+        @property
+        @log_decorator(logger, is_property=True)
+        def active_record_title(self) -> str:
+            """Returns the selected title when self.use_selected is True.
+            Otherwise returns the title using the active record key"""
+            # Use data stored in self.selected_column_names
+            if self.use_selected:
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    self.selected_record_title is not None,
+                    "self.use_selected is True, self.selected_title has not been set",
+                )
+                title = self.selected_record_title
+            # Otherwise use the title from the active record key
+            else:
+                title = self.outer_chain.title(self.active_record_key)
+            # Return the outcome
+            return title
 
         @log_decorator(
             logger,
             "info",
-            suffix_message="reset chain.llm_handler.input_data target to chain.latest_data",
+            suffix_message="Set chain.llm_handler to use the latest record",
         )
         def use_latest(self):
-            """Replaces the llm_handler.input_data with a reference to the latest data in the chain.
-            - This is the default state.
-            - Resets selected columns
-            - Would only need to run this if you had previously ran use_selected, then wanted to go back."""
-            self.input_data = self.outer_chain.latest_data
-            self.selected_column_names = self.outer_chain.latest_column_names
+            """Sets chain.llm_handler to use the latest record"""
+            # Reset selection state, leading control flow to use latest values for all chain.llm_handler access properties
+            self.use_selected: bool = False
+            self.use_selected_of_record: bool = False
 
         @log_decorator(
             logger,
             "info",
-            suffix_message="updated chain.llm_handler.input_data with chain.llm_handler.use_selected",
+            suffix_message="Set chain.llm_handler to use a specified record",
         )
-        def use_selected(
-            self, selected_data: Data, column_names: Optional_StrList = None
+        def use_record(self, record_key: IntStr):
+            """Sets chain.llm_handler to use a specified record"""
+            # Assert the input type and assign the new record key
+            assert_and_log_error(
+                logger,
+                "error",
+                isinstance(record_key, (int, str)),
+                "record_key key must be int or str",
+            )
+            self.selected_record_key: IntStr = record_key
+            # Set selection state
+            self.use_selected: bool = False
+            self.use_selected_of_record: bool = True
+            # Assign values
+            self.selected_column_names = self.outer_chain.column_names(
+                self.active_record_key
+            )
+            self.selected_input_data = self.outer_chain.data(self.active_record_key)
+
+        @log_decorator(
+            logger,
+            "info",
+            suffix_message="Sets chain.llm_handler to use specified data and columns",
+        )
+        def use_selection(
+            self, data: Data, record_title: str, column_names: Optional_StrList = None
         ):
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
-            assert_and_log_type_is_data(selected_data, "selected_data")
+            # Assert argument types, and check record title is unique
+            assert_and_log_type_is_data(data, "data")
             assert_and_log_type_is_strlist(column_names, "column_names")
+            self.outer_chain.title_validator(record_title)
+            # Set selection state
+            self.use_selected: bool = True
+            self.use_selected_of_record: bool = False
+            # Assign values
             self.selected_column_names = (
-                self.selected_column_names if column_names is None else column_names
+                self.active_column_names if column_names is None else column_names
             )
-            self.input_data = selected_data
+            self.selected_input_data = data
+            self.selected_record_title = record_title
 
         @log_decorator(logger, "info", suffix_message="Use chain.llm_handler.run()")
         def run(self, title="llm output"):
             """Runs the llm_handler and appends the result to the chain."""
+            # Check the new title is unique before proceeding
+            self.outer_chain.title_validator(title)
+            # Run the llm_handler
             self.run_async()
-            self.flatten_output_data(self.outer_chain.latest_column_names)
+            # Flatten and pivot the data into the Data format
+            self.flatten_output_data(self.active_column_namess)
+            # Perform the append action and return self
             self.outer_chain.append(
                 title=title,
                 data=self.output_data,
@@ -466,6 +604,27 @@ class Chain:
             log_and_raise_error(logger, "error", ValueError, data_validator_message)
 
     @log_decorator(logger)
+    def title_validator(self, potential_title: str):
+        """Checks that a given title str does not already exist in the records,
+        which is necessary to maintain the uniqueness of the cache per-accessed record
+        across the lifetime of a chain instance."""
+        # Check argument type
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(potential_title, str),
+            "record titles must be str",
+        )
+        # Check provided title against all existing titles
+        for key, record in self.records.items():
+            assert_and_log_error(
+                logger,
+                "error",
+                record["title"] != potential_title,
+                f"record title '{potential_title} already exists'",
+            )
+
+    @log_decorator(logger)
     def append(
         self,
         title: str,
@@ -497,6 +656,10 @@ class Chain:
                 f"self.append(update_expected_len=True), otherwise review your data.",
             )
 
+        # Check that the provided title doesn't exist yet
+        self.title_validator(title)
+
+        # Build the record
         now: datetime = datetime.now()
         delta: timedelta = now - self.latest_dt
         new_key = self.latest_key + 1
