@@ -21,19 +21,20 @@ class RuntimeLogBlock:
 
     message = "in RuntimeLogBlock class"
 
+    # Prepare the logger on initialisation
     @log_decorator(logger, show_nesting=False, suffix_message=message)
     def __init__(self, logger_arg: logging.Logger):
         self.logger = logger_arg
 
+    # On entry, record the time at the start of the block
     @log_decorator(logger, show_nesting=False, suffix_message=message)
-    def __enter__(self):  # Record the time at the start of the block
+    def __enter__(self):
         self.start_time: float = time.time()
         return self
 
+    # On exit, compare the end time with the start and log the result
     @log_decorator(logger, show_nesting=False, suffix_message=message)
-    def __exit__(
-        self, exc_type, exc_value, exc_tb
-    ):  # Compare that to the time at the end and log the result
+    def __exit__(self, exc_type, exc_value, exc_tb):
         self.end_time: float = time.time()
         self.elapsed_time: float = self.end_time - self.start_time
         self.elapsed_time_seconds: str = format(self.elapsed_time, ",.4f")
