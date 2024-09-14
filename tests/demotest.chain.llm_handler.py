@@ -66,7 +66,7 @@ ic(
         request="Analyse the foods and provide a primary category representing their country of origin",
         validation_model=validators.PrimaryCategory,
         cache_identifier="chain_llm_print_test_primary_category_food_country",
-        use_cache=False,
+        use_cache=True,
         temperature=0.2,
         max_validation_retries=3,
         max_preprepared_coroutines=10,
@@ -96,6 +96,7 @@ ic(chain.latest_data)
 ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_input_data)
 
+print("\n(Record Key 4)")
 print(
     "\nRun the llm_handler (on latest_data, aka record 3), which creates and appends a record with the results"
 )
@@ -104,7 +105,7 @@ ic(chain.latest_data)
 
 # -------------------------------------------------------------------------
 
-print("\n(Record Key 4)")
+print("\n(Record Key 5)")
 print(
     """Change the selected llm_handler data to something specific,
 like a specifed Data object, or a literal dictionary"""
@@ -135,7 +136,7 @@ ic(chain.latest_data)
 
 # -------------------------------------------------------------------------
 
-print("\n(Record Key 5)")
+print("\n(Record Key 6)")
 print(
     """Select data for the llm_handler using only a record key or title, like record 1"""
 )
@@ -145,6 +146,13 @@ ic(chain.llm_handler.active_input_data)
 print("\nRun it again, with the data selected with the record id")
 ic(chain.llm_handler.run("HandlerOutput3"))
 ic(chain.latest_data)
+
+print("\nSwap it back to using the latest data")
+ic(chain.llm_handler.use_latest())
+ic(chain.llm_handler.active_record_title)
+ic(chain.llm_handler.active_record_key)
+ic(chain.llm_handler.active_column_names)
+ic(chain.llm_handler.active_input_data)
 
 # Re-enable logging
 logging.disable(logging.NOTSET)
