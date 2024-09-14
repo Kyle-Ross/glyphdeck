@@ -56,10 +56,6 @@ class TestChain(unittest.TestCase):
             },
         )
 
-    def tearDown(self):
-        # Re-enable logging
-        logging.disable(logging.NOTSET)
-
     def test_delta(self):
         self.assertIsInstance(self.chain.delta, timedelta)
 
