@@ -5,12 +5,10 @@ logging.disable(logging.CRITICAL)
 
 from icecream import ic  # noqa: E402
 import pandas as pd  # noqa: E402
-import numpy as np  # noqa: E402
 
 from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
 
-# Create an example DataFrame
-np.random.seed(0)
+print("\nCreate example dataframe")
 df = pd.DataFrame(
     {
         "id": [1, 2, 3, 4, 5],  # ID column
@@ -21,14 +19,15 @@ df = pd.DataFrame(
         "revenue3": [350.70, 400.85, 500.90, 650.30, 700.80],
     }
 )
+ic(df)
 
-print("Prepare directly on the dataframe")
+print("\nPrepare directly on the dataframe")
 ic(prepare_df(df, "id", ["data1", "data2"]))
 
-print("Prepare via xlsx file")
+print("\nPrepare via xlsx file")
 ic(
     prepare_xlsx(
-        r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.xlsx",
+        r"tests\testdata.clothingreviews.xlsx",
         "Row ID",
         [
             "Review Text",
@@ -37,10 +36,10 @@ ic(
     )
 )
 
-print("Prepare via csv file")
+print("\nPrepare via csv file")
 ic(
     prepare_csv(
-        r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 1000.csv",
+        r"tests\testdata.clothingreviews.csv",
         "Row ID",
         "Review Text",
         encoding="ISO-8859-1",
