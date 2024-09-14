@@ -69,8 +69,8 @@ def prepare_df(
         f"'data_columns' argument '{data_columns}' must be type 'str' or 'List[str]'",
     )
 
-    # Check that no duplicate names are in the data_columns argument
-    if isinstance(data_columns, list):  # Only for lists
+    # For lists, check that no duplicate names are in the data_columns argument
+    if isinstance(data_columns, list):
         assert_and_log_error(
             logger,
             "error",
@@ -110,6 +110,7 @@ def prepare_csv(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Data
 def type_conditional_prepare(
     data_source: Str_or_dFrame, id_column, data_columns, encoding, sheet_name
 ) -> dFrame_and_Data_Tuple:
+    """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
     # Initialising variables
     source_table: Optional_dFrame = None  # The source as a df
     prepared_data: Optional_Data = None  # The data in the 'Data' type
@@ -162,7 +163,5 @@ def type_conditional_prepare(
             AssertionError,
             f"'Provided data_source argument '{data_source}' is of type '{type(data_source)}' - only DataFrames and file paths are supported",
         )
-
-    # if source_type ==
 
     return (source_table, prepared_data)
