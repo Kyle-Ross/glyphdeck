@@ -286,25 +286,27 @@ class Chain:
             assert_and_log_type_is_data(data, "data")
             assert_and_log_type_is_strlist(column_names, "column_names")
             self.outer_chain.title_validator(record_title)
-            # Set selection state
-            self.use_selected: bool = True
-            self.use_selected_of_record: bool = False
             # Assign values
             self.selected_column_names = (
                 self.active_column_names if column_names is None else column_names
             )
+            # Set selection state
+            self.use_selected: bool = True
+            self.use_selected_of_record: bool = False
             self.selected_input_data = data
             self.selected_record_title = record_title
 
         @log_decorator(logger, "info", suffix_message="Use chain.llm_handler.run()")
-        def run(self, title="llm output"):
+        def run(self, title):
             """Runs the llm_handler and appends the result to the chain."""
             # Check the new title is unique before proceeding
             self.outer_chain.title_validator(title)
+            # Set self.input_data (used by run_async) to the active_input_data
+            self.input_data = self.active_input_data
             # Run the llm_handler
             self.run_async()
             # Flatten and pivot the data into the Data format
-            self.flatten_output_data(self.active_column_namess)
+            self.flatten_output_data(self.active_column_names)
             # Perform the append action and return self
             self.outer_chain.append(
                 title=title,
