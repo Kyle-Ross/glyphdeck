@@ -29,26 +29,26 @@ Optional_Str = Optional[str]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
 
 
-def assert_custom_type(variable: Data, custom_type: str, var_name: str):
-    if custom_type.lower() == "data":
+def assert_type_is_data(variable: Data, var_name: str):
+    """Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type"""
+    assert_and_log_error(
+        logger,
+        "error",
+        isinstance(variable, dict),
+        f"Expected custom 'Data' type in '{var_name}', instead got '{type(variable)}'",
+    )
+    for key, value in variable.items():
         assert_and_log_error(
             logger,
             "error",
-            isinstance(variable, dict),
-            f"Expected custom 'Data' type in '{var_name}', instead got '{type(variable)}'",
+            isinstance(key, (int, str)),
+            f"Expected int or str dict key in custom 'Data' type variable "
+            f"'{var_name}', instead got {type(key)}",
         )
-        for key, value in variable.items():
-            assert_and_log_error(
-                logger,
-                "error",
-                isinstance(key, (int, str)),
-                f"Expected int or str dict key in custom 'Data' type variable "
-                f"'{var_name}', instead got {type(key)}",
-            )
-            assert_and_log_error(
-                logger,
-                "error",
-                isinstance(value, list),
-                f"Expected list dict value in custom 'Data' type variable "
-                f"'{var_name}', instead got {type(value)}",
-            )
+        assert_and_log_error(
+            logger,
+            "error",
+            isinstance(value, list),
+            f"Expected list dict value in custom 'Data' type variable "
+            f"'{var_name}', instead got {type(value)}",
+        )
