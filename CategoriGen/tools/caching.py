@@ -37,6 +37,8 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used
             self_cache_identifier = self.cache_identifier
+            self_record_identifier = self.active_record_title
+            self_cache_and_record_identifier = f"{self_cache_identifier} | {self_record_identifier}"
             self_use_cache = self.use_cache
             self_provider = self.provider
             self_model = self.model
@@ -48,9 +50,9 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             key_arg = args[2] if len(args) > 2 else kwargs.get("key")
             index_arg = args[3] if len(args) > 3 else kwargs.get("index")
 
-            # Building a string key out the accessible information
+            # Building a string key out of the accessible information
             cache_key = (
-                f"{self_cache_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|"
+                f"{self_cache_and_record_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|"
                 f"{self_validation_model}|{self_model}|{self_role}|{self_request}"
             )
 
