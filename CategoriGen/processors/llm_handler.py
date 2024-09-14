@@ -178,12 +178,12 @@ class LLMHandler:
         self.role: str = role
         self.request: str = request
         self.validation_model = validation_model
-        self.cache_identifier: str = (
-            cache_identifier  # Referenced in lru_cache by accessing self
-        )
-        self.use_cache: bool = use_cache  # Referenced in lru_cache by accessing sel
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
+
+        # Referenced in lru_cache by accessing self
+        self.cache_identifier: str = cache_identifier
+        self.use_cache: bool = use_cache
 
         # Checks that model comes from customer Pydantic BaseValidatorModel class
         self.check_validation_model()
@@ -262,7 +262,8 @@ class LLMHandler:
         ),
         # Waits for (sec) 0.9375, 1.875, 3.75, 7.5, 15, 30, 60 (max)
         wait=wait_exponential(multiplier=2, min=0.9375, max=60),
-        stop=stop_after_attempt(300),  # About 5 hours of retries!
+        # About 5 hours of retries!
+        stop=stop_after_attempt(300),
     )
     # Can overwrite other args here which otherwise use default values
     @openai_cache("async_openai_cache")
@@ -315,7 +316,6 @@ class LLMHandler:
                 {"role": "user", "content": f"{item_request} {str(input_text)}"},
             ],
         }
-        # Log the chat_params, including or including the input text depending on the settings
 
         # Log the parameters unchanged if log_input_data = True
         if log_input_data:
@@ -424,36 +424,39 @@ class LLMHandler:
     def flatten_output_data(self, column_names: StrList):
         """Flattens output data into a dictionary of lists for compatibility with the chain class.
         Also creates the new column names for the eventual output."""
-        new_output_data = {}  # Storage for key: list pairs representing rows
-        new_column_names = []  # Storing a list of the column names corresponding to the ordered list
+        # Storage for key: list pairs representing rows
+        new_output_data = {}
+        # Storing a list of the column names corresponding to the ordered list
+        new_column_names = []
 
-        for row_key, values_list in self.raw_output_data.items():  # For each row
+        for row_key, values_list in self.raw_output_data.items():
+            # For each row
             new_row_values = []
-            for col_index, col_value in enumerate(values_list):  # For each column
+            for col_index, col_value in enumerate(values_list):
+                # For each column
                 for (
                     returned_data_key,
                     returned_data_value,
-                ) in col_value.items():  # For each returned value
+                ) in col_value.items():
+                    # For each returned value
                     full_column_name = column_names[col_index] + "_" + returned_data_key
-                    if (
-                        full_column_name not in new_column_names
-                    ):  # Add the column to the list if it isn't there
+                    # Add the column to the list if it isn't there
+                    if full_column_name not in new_column_names:
                         new_column_names.append(full_column_name)
-                    if (
-                        type(returned_data_value) is list
-                    ):  # Flatten lists into comma delimited strings
-                        returned_data_value = [
-                            str(x) for x in returned_data_value
-                        ]  # Ensuring items are strings
+                    # Flatten lists into comma delimited strings
+                    if type(returned_data_value) is list:
+                        # Ensuring items are strings
+                        returned_data_value = [str(x) for x in returned_data_value]
                         returned_data_value = ",".join(returned_data_value)
                     # Storing the value (in order) to the new list
                     new_row_values.append(returned_data_value)
-            new_output_data[row_key] = (
-                new_row_values  # Storing the flattened list of values
-            )
+            # Storing the flattened list of values
+            new_output_data[row_key] = new_row_values
 
-        self.new_output_data = new_output_data  # Save the new output data to self
-        self.new_column_names = new_column_names  # Save the new column names to self
+        # Save the new output data to self
+        self.new_output_data = new_output_data
+        # Save the new column names to self
+        self.new_column_names = new_column_names
         return self
 
 
