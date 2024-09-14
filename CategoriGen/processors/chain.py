@@ -7,6 +7,8 @@ import os
 import pandas as pd
 
 from CategoriGen.validation.data_types import (
+    assert_type_is_data,
+    assert_type_is_none_or_strlist,
     Data,
     IntList,
     IntStr,
@@ -96,8 +98,14 @@ class Chain:
                 self.selected_data: Optional_Data = None
 
             @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
-            def run(self, title="sanitised"):
+            def run(self, title: str = "sanitised"):
                 """Runs the sanitiser and appends the result to the chain."""
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    type(title) is str,
+                    f"Provided title argument '{title}' is not a string",
+                )
                 self.sanitise()
                 self.outer_chain.append(title=title, data=self.output_data)
                 return self
@@ -126,18 +134,30 @@ class Chain:
             # Set the selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
             self.selected_column_names = self.outer_chain.latest_column_names
 
+        @log_decorator(
+            logger,
+            "info",
+            suffix_message="reset chain.llm_handler.input_data target to chain.latest_data",
+        )
         def use_latest(self):
             """Replaces the llm_handler.input_data with a reference to the latest data in the chain.
             - This is the default state.
             - Resets selected columns
-            - Would only need to run this if you had previous ran use_selected, then wanted to go back."""
+            - Would only need to run this if you had previously ran use_selected, then wanted to go back."""
             self.input_data = self.outer_chain.latest_data
             self.selected_column_names = self.outer_chain.latest_column_names
 
+        @log_decorator(
+            logger,
+            "info",
+            suffix_message="updated chain.llm_handler.input_data with chain.llm_handler.use_selected",
+        )
         def use_selected(
             self, selected_data: Data, column_names: Optional_StrList = None
         ):
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
+            assert_type_is_data(selected_data, "selected_data")
+            assert_type_is_none_or_strlist(column_names, "column_names")
             self.selected_column_names = (
                 self.selected_column_names if column_names is None else column_names
             )
@@ -151,7 +171,8 @@ class Chain:
             self.outer_chain.append(
                 title=title,
                 data=self.output_data,
-                update_expected_len=True,  # Updating len since the llm validators can produce multiple columns per input
+                # Updating len since the llm validators can produce multiple columns per input
+                update_expected_len=True,
             )
             return self
 
@@ -484,9 +505,8 @@ class Chain:
             "dt": now,
             "delta": delta,
             "data": data,
-            "table": self.latest_table
-            if table is None
-            else table,  # References previous values if none
+            # References previous values if none
+            "table": self.latest_table if table is None else table,
             "table_id_column": self.latest_table_id_column
             if table_id_column is None
             else table_id_column,
@@ -594,14 +614,15 @@ class Chain:
             """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
             # Conditionally setting the title to be used in the name
+            # Each individual file has the title name
             if file_type == "csv" and split:
-                title = source_record[
-                    "title"
-                ]  # Each individual file has the title name
+                title = source_record["title"]
+            # The containing excel file has 'split'
             elif file_type == "xlsx" and split:
-                title = "split"  # The containing excel file has 'split'
+                title = "split"
+            # Should be unreachable
             elif split:
-                title = "split"  # Shouldn't be possible but just in case
+                title = "split"
             else:
                 title = "combined"
 
