@@ -70,9 +70,8 @@ def assert_and_log_error(
 def check_logger_exists(logger_name: str):
     """Checks if a logger_arg with the provided logger_name exists"""
     existing_loggers = logging.Logger.manager.loggerDict.keys()
-    return (
-        logger_name in existing_loggers
-    )  # To be evaluated as True if it exists at all
+    # To be evaluated as True if it exists at all
+    return logger_name in existing_loggers
 
 
 nesting_level = 0
@@ -163,7 +162,8 @@ def exception_logger(
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
-                return func(*args, **kwargs)  # Try the function that was passed in
+                # Try the function that was passed in
+                return func(*args, **kwargs)
             except Exception as error:
                 # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
                 # So if the exception has this name, just re-raise it - it will already have logging
