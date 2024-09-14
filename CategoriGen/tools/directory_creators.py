@@ -16,9 +16,13 @@ def create_directory(directory, directory_name, logger_arg) -> str:
     """Function to check a directory and create it if it doesn't exist, logging the outcome & returning the directory"""
     if not os.path.exists(directory):
         os.makedirs(directory)
-        logger_arg.info(f" | Function | create_directory() | Action | {directory}' - {directory_name} directory created")
+        logger_arg.info(
+            f" | Function | create_directory() | Action | {directory}' - {directory_name} directory created"
+        )
     else:
-        logger_arg.info(f" | Function | create_directory() | Check | {directory}' - {directory_name} directory exists")
+        logger_arg.info(
+            f" | Function | create_directory() | Check | {directory}' - {directory_name} directory exists"
+        )
     return directory
 
 
