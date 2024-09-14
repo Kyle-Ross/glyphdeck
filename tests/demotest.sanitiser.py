@@ -1,11 +1,12 @@
-from icecream import ic
 import logging
-
-from CategoriGen.processors.sanitiser import Sanitiser
-from CategoriGen.validation.data_types import Data
 
 # Disable logging for duration
 logging.disable(logging.CRITICAL)
+
+from icecream import ic  # noqa: E402
+
+from CategoriGen.processors.sanitiser import Sanitiser  # noqa: E402
+from CategoriGen.validation.data_types import Data  # noqa: E402
 
 # Example data with targets for removal
 data_example: Data = {

@@ -1,17 +1,18 @@
-from datetime import datetime, timedelta
-
 import logging
-import unittest
-import pandas as pd
 
-from CategoriGen.processors.chain import Chain
+# Disable logging during the test
+logging.disable(logging.CRITICAL)
+
+from datetime import datetime, timedelta  # noqa: E402
+
+import unittest  # noqa: E402
+import pandas as pd  # noqa: E402
+
+from CategoriGen.processors.chain import Chain  # noqa: E402
 
 
 class TestChain(unittest.TestCase):
     def setUp(self):
-        # Disable logging during the test
-        logging.disable(logging.CRITICAL)
-
         # Set up test data
         self.test_data = {
             1: ["potato", "steak", "party"],
@@ -135,9 +136,7 @@ class TestChain(unittest.TestCase):
         )
 
     def test_sanitiser_data(self):
-        self.assertEqual(
-            self.chain.latest_data, self.chain.sanitiser.input_data
-        )
+        self.assertEqual(self.chain.latest_data, self.chain.sanitiser.input_data)
 
     def test_missing_value_append(self):
         with self.assertRaises(ValueError):

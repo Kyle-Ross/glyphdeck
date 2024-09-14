@@ -41,3 +41,6 @@ print(
 )
 ic(handler.flatten_output_data(["Col1", "Col2", "Col3"]))
 ic(handler.output_data)
+
+# Re-enable logging
+logging.disable(logging.NOTSET)

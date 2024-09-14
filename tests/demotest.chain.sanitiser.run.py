@@ -1,14 +1,15 @@
-from icecream import ic
 import logging
-import copy
-
-import pandas as pd
-
-from CategoriGen.processors.chain import Chain
-from CategoriGen.validation.data_types import Data
 
 # Disable logging for duration
 logging.disable(logging.CRITICAL)
+
+from icecream import ic  # noqa: E402
+import copy  # noqa: E402
+
+import pandas as pd  # noqa: E402
+
+from CategoriGen.processors.chain import Chain  # noqa: E402
+from CategoriGen.validation.data_types import Data  # noqa: E402
 
 # Example data with targets for removal
 data_record1: Data = {
@@ -79,10 +80,18 @@ ic(chain_default.sanitiser.run())
 ic(chain_default.latest_data)
 
 # With the custom settings
-print("\nRunning Sanitiser WITH customisations, using specified pattern groups as default")
+print(
+    "\nRunning Sanitiser WITH customisations, using specified pattern groups as default"
+)
 print("Before updating pattern groups")
 ic(chain_custom.sanitiser.active_groups)
-ic(chain_custom.sanitiser.select_groups(["date",]))
+ic(
+    chain_custom.sanitiser.select_groups(
+        [
+            "date",
+        ]
+    )
+)
 print("After updating pattern groups")
 ic(chain_custom.sanitiser.active_groups)
 print("Before sanitisation")
@@ -90,3 +99,6 @@ ic(chain_custom.latest_data)
 print("After sanitisation")
 ic(chain_custom.sanitiser.run())
 ic(chain_custom.latest_data)
+
+# Re-enable logging
+logging.disable(logging.NOTSET)

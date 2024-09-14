@@ -1,11 +1,13 @@
-from icecream import ic
-import pandas as pd
-import numpy as np
 import logging
-from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv
 
 # Disable logging for duration
 logging.disable(logging.CRITICAL)
+
+from icecream import ic  # noqa: E402
+import pandas as pd  # noqa: E402
+import numpy as np  # noqa: E402
+
+from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
 
 # Create an example DataFrame
 np.random.seed(0)

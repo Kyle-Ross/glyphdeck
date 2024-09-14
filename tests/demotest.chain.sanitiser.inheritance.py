@@ -1,11 +1,12 @@
-import pandas as pd
-from icecream import ic
 import logging
-
-from CategoriGen.processors.chain import Chain
 
 # Disable logging for duration
 logging.disable(logging.CRITICAL)
+
+import pandas as pd  # noqa: E402
+from icecream import ic  # noqa: E402
+
+from CategoriGen.processors.chain import Chain  # noqa: E402
 
 # Establish test data
 test_data = {
@@ -131,7 +132,6 @@ ic(chain.sanitiser.input_data)
 # Attributes and properites of the whole chain
 print("\nThe whole chain")
 ic(chain.records)
-
 
 # Re-enable logging
 logging.disable(logging.NOTSET)

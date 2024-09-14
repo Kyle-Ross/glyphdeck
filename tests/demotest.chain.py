@@ -1,11 +1,12 @@
-import pandas as pd
-from icecream import ic
 import logging
-
-from CategoriGen.processors.chain import Chain
 
 # Disable logging for duration
 logging.disable(logging.CRITICAL)
+
+import pandas as pd  # noqa: E402
+from icecream import ic  # noqa: E402
+
+from CategoriGen.processors.chain import Chain  # noqa: E402
 
 # Establish test data
 test_data = {
@@ -26,7 +27,7 @@ chain = Chain(
     "Word ID",
     ["Word1", "Word2", "Word3"],
     # encoding="utf-8",  # Needed if you provided a .csv path
-    sheet_name="Sheet1"  # Needed if you provided a .xlsx path
+    sheet_name="Sheet1",  # Needed if you provided a .xlsx path
 )
 
 # (record key 2)
@@ -38,7 +39,7 @@ chain.append(
         1: ["potato", "steak", "party"],
         2: ["carrot", "party", "alpha"],
         3: ["carrot", "party", "alpha"],
-    }
+    },
 )
 
 # (record key 3)
