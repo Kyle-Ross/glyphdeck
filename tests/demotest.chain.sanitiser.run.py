@@ -55,7 +55,7 @@ test_df.columns = ["Person Id", "Comment1", "Comment2", "Comment3"]  # Rename co
 
 # (Record Key 1)
 # Initialise, preparing the first record
-chain_default = Chain(
+chain = Chain(
     test_df,
     "Person Id",
     ["Comment1", "Comment2", "Comment3"],
@@ -66,18 +66,18 @@ chain_default = Chain(
 # (record key 2)
 # The table only needs to be added in the first step, but can be included again to add a new one
 # Otherwise the table will be the last time 'table' was assigned, or the original source data as a dataframe
-chain_default.append(title="data_record2", data=data_record2)
+chain.append(title="data_record2", data=data_record2)
 
 # Making a copy of the chain for testing a custom set up below, rather than the default values
-chain_custom = copy.deepcopy(chain_default)
+chain_custom = copy.deepcopy(chain)
 
 # With the default settings
 print("\nRunning Sanitiser WIHTOUT customisations, using all pattern groups as default")
 print("Before sanitisation")
-ic(chain_default.latest_data)
+ic(chain.latest_data)
 print("After sanitisation")
-ic(chain_default.sanitiser.run())
-ic(chain_default.latest_data)
+ic(chain.sanitiser.run())
+ic(chain.latest_data)
 
 # With the custom settings
 print(
