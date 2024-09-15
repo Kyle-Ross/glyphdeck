@@ -763,14 +763,15 @@ class Chain:
         return combined_record
 
     @log_decorator(logger)
-    def output(
+    def write_output(
         self,
         records: List_or_Str,
         file_type: str,
-        name_prefix: str,
+        file_name_prefix: str,
         rejoin: bool = True,
         split: bool = False,
     ):
+        """Writes the output of the selected records to a file."""
         # Checking file_type is in allowed list
         allowed_file_types = ["csv", "xlsx"]
         assert_and_log_error(
@@ -819,7 +820,7 @@ class Chain:
             else:
                 title = "combined"
 
-            file_name = f"{name_prefix} - {title} - {formatted_time}.{file_type}"
+            file_name = f"{file_name_prefix} - {title} - {formatted_time}.{file_type}"
             file_path = os.path.join(OUTPUT_FILES_DIR, file_name)
             return file_path
 

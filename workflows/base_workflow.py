@@ -45,10 +45,10 @@ def main():
     chain.llm_handler.run("HandlerOutput1")
 
     # Output the result in the specified format
-    chain.output(
+    chain.write_output(
         records=[chain.latest_title],
         file_type="xlsx",
-        name_prefix="Chain Test",
+        file_name_prefix="Chain Test",
         rejoin=True,
         split=False,
     )

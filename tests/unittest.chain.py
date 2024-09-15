@@ -180,10 +180,10 @@ class TestChain(unittest.TestCase):
 
     def test_output(self):
         # This test assumes that the output function correctly writes files to the specified directory
-        self.chain.output(
+        self.chain.write_output(
             records=["Example1"],
             file_type="csv",
-            name_prefix="Test",
+            file_name_prefix="Test",
             rejoin=True,
             split=False,
         )

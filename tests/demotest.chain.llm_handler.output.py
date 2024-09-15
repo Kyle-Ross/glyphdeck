@@ -23,8 +23,6 @@ chain = Chain(
     meals_df,
     "Meal Id",
     ["Meal1", "Meal2", "Meal3"],
-    # encoding="utf-8",  # Needed if you provided a .csv path
-    # sheet_name="Sheet1"  # Needed if you provided a .xlsx path
 )
 
-chain.set_llm_handler()
+chain.write_output()
