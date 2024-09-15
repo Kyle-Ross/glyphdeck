@@ -150,7 +150,7 @@ print("\nRun it again, with the data selected with the record id")
 ic(chain.llm_handler.run("HandlerOutput3"))
 ic(chain.latest_data)
 
-print("\nSwap it back to using the latest data")
+print("\nSwap it back to using the latest data, which is the recently created handler output")
 ic(chain.llm_handler.use_latest())
 ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_record_key)
