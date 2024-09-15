@@ -45,10 +45,11 @@ def main():
     chain.llm_handler.run("HandlerOutput1")
 
     # Output the result in the specified format
+    # Latest record is used by default, but we specify it here
     chain.write_output(
-        records=[chain.latest_title],
         file_type="xlsx",
         file_name_prefix="Chain Test",
+        records=["HandlerOutput1"],
         rejoin=True,
         split=False,
     )

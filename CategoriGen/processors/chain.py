@@ -18,6 +18,7 @@ from CategoriGen.validation.data_types import (
     Optional_dFrame,
     Optional_Data,
     Optional_Str,
+    Optional_IntStrList,
     Record,
     RecordList,
     Records,
@@ -765,10 +766,11 @@ class Chain:
     @log_decorator(logger)
     def write_output(
         self,
-        records: List_or_Str,
         file_type: str,
         file_name_prefix: str,
+        records: Optional_IntStrList = None,
         rejoin: bool = True,
+        rejoin_on_record: Optional_IntStr = None,
         split: bool = False,
     ):
         """Writes the output of the selected records to a file."""
@@ -780,7 +782,12 @@ class Chain:
             file_type in allowed_file_types,
             f"'{file_type}' is not in allowed list {allowed_file_types}.",
         )
-        # Use the separate or combined records
+        # Sub in reference to the latest record if None was provided
+        if records is None:
+            records = self.latest_key
+        if rejoin_on_record is None:
+            rejoin_on_record = self.latest_key
+        # Create records separately or combine
         if split:
             records_list: RecordList = self.selector(records, use_suffix=False)
         else:
@@ -788,10 +795,10 @@ class Chain:
         # Use the dataframes as is, or left join each back onto the initial source
         if rejoin:
             for record in records_list:
-                record["output_df"] = self.initial_table.merge(
+                record["output_df"] = self.table(rejoin_on_record).merge(
                     record["output_df"],
                     how="left",
-                    left_on=self.initial_table_id_column,
+                    left_on=self.table_id_column(rejoin_on_record),
                     right_index=True,
                 )
 
@@ -801,7 +808,8 @@ class Chain:
             # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
             if record["table_id_column"] not in df.columns:
                 df.insert(0, record["table_id_column"], df.index)
-            df.sort_values(record["table_id_column"])  # Sort by the id column ascending
+            # Sort by the id column ascending
+            df.sort_values(record["table_id_column"])  
             record["output_df"] = df
 
         def make_path(source_record: Record) -> str:

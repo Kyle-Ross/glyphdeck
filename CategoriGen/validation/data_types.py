@@ -27,6 +27,7 @@ Str_or_StrList = Union[str, StrList]
 Str_or_dFrame = Union[str, dFrame]
 Optional_Str = Optional[str]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
+Optional_IntStrList = Optional[Union[List[IntStr], IntStr]]
 
 
 def assert_and_log_type_is_data(variable: Data, var_name: str):

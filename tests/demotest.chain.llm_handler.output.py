@@ -25,4 +25,4 @@ chain = Chain(
     ["Meal1", "Meal2", "Meal3"],
 )
 
-chain.write_output()
+# chain.write_output()

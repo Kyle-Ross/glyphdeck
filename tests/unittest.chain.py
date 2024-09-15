@@ -181,9 +181,9 @@ class TestChain(unittest.TestCase):
     def test_output(self):
         # This test assumes that the output function correctly writes files to the specified directory
         self.chain.write_output(
-            records=["Example1"],
             file_type="csv",
             file_name_prefix="Test",
+            records=["Example1"],
             rejoin=True,
             split=False,
         )
