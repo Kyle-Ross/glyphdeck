@@ -62,8 +62,11 @@ ic(
     chain.set_llm_handler(
         provider="OpenAI",
         model="gpt-3.5-turbo",
-        role="An expert food country identication system",
-        request="Analyse the foods and provide a primary category representing their country of origin",
+        system_message=(
+            "You are an expert food country identication system. "
+            "Analyse the foods and provide a primary category "
+            "representing their country of origin."
+        ),
         validation_model=validators.PrimaryCategory,
         cache_identifier="chain_llm_print_test_primary_category_food_country",
         use_cache=True,

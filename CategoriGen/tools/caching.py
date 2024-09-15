@@ -37,13 +37,14 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used
             self_cache_identifier = self.cache_identifier
-            self_record_identifier = self.active_record_title
+            # self.active_record_title only exists when this wrapper is used in the chain.llm_handler inheritance of LLMHandler
+            # So if we don't find it, we replace with a default value
+            self_record_identifier = getattr(self, 'active_record_title', 'no_active_chain_record')
             self_cache_and_record_identifier = f"{self_cache_identifier} | {self_record_identifier}"
             self_use_cache = self.use_cache
             self_provider = self.provider
             self_model = self.model
-            self_role = self.role
-            self_request = self.request
+            self_system_message = self.system_message
             self_validation_model = self.validation_model.__name__
 
             # Accessing individual args and kwargs if they exist, for use in logs
@@ -53,7 +54,7 @@ def openai_cache(cache_dir, max_mb_size: int = 1000):
             # Building a string key out of the accessible information
             cache_key = (
                 f"{self_cache_and_record_identifier}|{str(key_arg)}|{str(index_arg)}|{self_provider}|"
-                f"{self_validation_model}|{self_model}|{self_role}|{self_request}"
+                f"{self_validation_model}|{self_model}|{self_system_message}"
             )
 
             # Hashing the key, decreasing size and potentially speeding up lookups

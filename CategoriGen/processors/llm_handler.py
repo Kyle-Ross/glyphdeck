@@ -58,8 +58,7 @@ class LLMHandler:
         input_data: Data,  # Input variable of the custom 'Data' type
         provider: str,  # The provider of the llm
         model: str,  # The model of the llm
-        role: str,  # The role to provide the llm in the prompts
-        request: str,  # The request to make to the llm
+        system_message: str,  # The system message to provide the llm in the prompts
         validation_model,  # Pydantic class to use for validating output, checked by check_validation_model()
         cache_identifier: str,  # A Unique string used to identify discrete jobs and avoid cache mixing
         use_cache: bool = True,  # Set whether to check the cache for values or not
@@ -95,13 +94,10 @@ class LLMHandler:
             "'model' argument must be type 'str'",
         )
         assert_and_log_error(
-            logger, "error", isinstance(role, str), "'role' argument must be type 'str'"
-        )
-        assert_and_log_error(
             logger,
             "error",
-            isinstance(request, str),
-            "'request' argument must be type 'str'",
+            isinstance(system_message, str),
+            "'system_message' argument must be type 'str'",
         )
         assert_and_log_error(
             logger,
@@ -175,8 +171,7 @@ class LLMHandler:
 
         # Object level llm information that serves as the default value if tools don't specify customisations
         self.model: str = model
-        self.role: str = role
-        self.request: str = request
+        self.system_message: str = system_message
         self.validation_model = validation_model
         self.temperature: float = temperature
         self.max_validation_retries = max_validation_retries
@@ -273,8 +268,7 @@ class LLMHandler:
         key,
         index: int,
         item_model: Optional[str] = None,
-        item_role: Optional[str] = None,
-        item_request: Optional[str] = None,
+        item_system_message: Optional[str] = None,
         item_validation_model=None,
         item_temperature: Optional[float] = None,
         item_max_validation_retries: Optional[int] = None,
@@ -284,10 +278,8 @@ class LLMHandler:
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
             item_model = self.model
-        if item_role is None:
-            item_role = self.role
-        if item_request is None:
-            item_request = self.request
+        if item_system_message is None:
+            item_system_message = self.system_message
         if item_validation_model is None:
             item_validation_model = self.validation_model
         if item_temperature is None:
@@ -312,8 +304,8 @@ class LLMHandler:
             "max_retries": item_max_validation_retries,
             "temperature": item_temperature,
             "messages": [
-                {"role": "system", "content": item_role},
-                {"role": "user", "content": f"{item_request} {str(input_text)}"},
+                {"role": "system", "content": item_system_message},
+                {"role": "user", "content": str(input_text)},
             ],
         }
 
@@ -326,7 +318,7 @@ class LLMHandler:
         else:
             # Make a deepcopy of the dict, overwise changes will flow back
             chat_params_log = copy.deepcopy(chat_params)
-            chat_params_log["messages"][1]["content"] = f"{item_request} <INPUT_TEXT>"
+            chat_params_log["messages"][1]["content"] = "<INPUT_TEXT>"
             logger.debug(
                 f" | Step | async_openai() | Action | chat_params = {chat_params_log}"
             )

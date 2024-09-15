@@ -22,8 +22,11 @@ handler = LLMHandler(
     test_data,
     provider="OpenAI",
     model="gpt-3.5-turbo",
-    role="An expert word categorisation system",
-    request="Analyse the words and provide a primary category representing the animal most likely to eat them",
+    system_message=(
+        "You are an expert word categorisation system. "
+        "Analyse the words and provide a primary category "
+        "representing the animal most likely to eat them."
+        ),
     validation_model=validators.PrimaryCategory,
     cache_identifier="chain_llm_print_test_primary_category",
     use_cache=False,

@@ -31,8 +31,7 @@ def main():
     chain.set_llm_handler(
         provider="OpenAI",
         model="gpt-3.5-turbo",
-        role="An expert customer feedback analyst nlp system",
-        request="Analyse the feedback and return results in the correct format",
+        system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
         validation_model=validators.SubCategories,
         cache_identifier="WomensClothesReview_Comment_Sub_Categories",
         use_cache=True,
@@ -43,7 +42,7 @@ def main():
     )
 
     # Run the llm_handler
-    chain.llm_handler.run()
+    chain.llm_handler.run("HandlerOutput1")
 
     # Output the result in the specified format
     chain.output(
