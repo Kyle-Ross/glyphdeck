@@ -764,6 +764,60 @@ class Chain:
         return combined_record
 
     @log_decorator(logger)
+    def output(
+        self,
+        records: Optional_IntStrList = None,
+        rejoin: bool = True,
+        rejoin_on_record: Optional_IntStr = None,
+        combine: bool = True,
+    ):
+        """Writes prepared dataframe into the "output_df" key of the selected records."""
+
+        # Sub in references to the latest record if None was provided
+        if records is None:
+            records = self.latest_key
+        if rejoin_on_record is None:
+            rejoin_on_record = self.latest_key
+
+        # Set the "output_df" key for selected records
+
+        # (combine = True) Return a single, new record which is a combination of all the selected records, with a result df in the "output_df" key
+        if combine:
+            records_list: RecordList = self.combiner(records)
+        # (combine = False) Create the "output_df" in each of the selected records
+        else:
+            records_list: RecordList = self.selector(records, use_suffix=False)
+        # Both return a list of the records for the next step
+        # TODO - change access to be key based, rather than copies of the records
+        # TODO - update type hints for each of combiner and selector methods
+        # TODO - rename to something reflecting that it generates the output_df key
+        # TODO - Update the generated combined record to be more complete, including a data key and active references
+        # TODO - Have the combined record automatically append to the chain (include title setting var)
+        # TODO - Have this function return a list of the records that were created or iterated over
+        # TODO - When all done, use this to seperate the df creation process from the output writing function
+
+        # Use the dataframes as is, or left join each back onto the target record dataframe
+        # Essentially gives us the original table with the llm output as new columns
+        if rejoin:
+            for record in records_list:
+                record["output_df"] = self.table(rejoin_on_record).merge(
+                    record["output_df"],
+                    how="left",
+                    left_on=self.table_id_column(rejoin_on_record),
+                    right_index=True,
+                )
+
+        # Final changes to the output_df
+        for record in records_list:
+            df = record["output_df"]
+            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
+            if record["table_id_column"] not in df.columns:
+                df.insert(0, record["table_id_column"], df.index)
+            # Sort by the id column ascending
+            df.sort_values(record["table_id_column"])
+            record["output_df"] = df
+
+    @log_decorator(logger)
     def write_output(
         self,
         file_type: str,
@@ -809,7 +863,7 @@ class Chain:
             if record["table_id_column"] not in df.columns:
                 df.insert(0, record["table_id_column"], df.index)
             # Sort by the id column ascending
-            df.sort_values(record["table_id_column"])  
+            df.sort_values(record["table_id_column"])
             record["output_df"] = df
 
         def make_path(source_record: Record) -> str:
