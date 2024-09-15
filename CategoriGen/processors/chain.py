@@ -395,7 +395,21 @@ class Chain:
         return self.initial_sanitiser
 
     @log_decorator(logger)
-    def set_llm_handler(self, *args, **kwargs):
+    # WARNING!!! ON CHANGES - Manually syncronise these arguments, type hints and defaults with LLMHandler
+    # Until such time you figure out how to have a function and a class share the same signature
+    def set_llm_handler(
+        self,
+        provider: str,
+        model: str,
+        system_message: str,
+        validation_model,
+        cache_identifier: str,
+        use_cache: bool = True,
+        temperature: float = 0.2,
+        max_validation_retries: int = 2,
+        max_preprepared_coroutines: int = 10,
+        max_awaiting_coroutines: int = 100,
+    ):
         """Creates the LLMHandler / Handler object as self.llm_handler, passing in self.llm_handler.latest_data as the input.
 
         Differences to parent class LLMHandler:
@@ -406,13 +420,27 @@ class Chain:
             - This is removed from the kwargs before reaching LLMHandler"""
 
         # Grab the latest_data and put it in front of the args (which won't include it)
-        updated_args = (self.latest_data,) + args
+        args = (
+            self.latest_data,
+            provider,
+            model,
+            system_message,
+            validation_model,
+            cache_identifier,
+        )
+        kwargs = {
+            "use_cache": use_cache,
+            "temperature": temperature,
+            "max_validation_retries": max_validation_retries,
+            "max_preprepared_coroutines": max_preprepared_coroutines,
+            "max_awaiting_coroutines": max_awaiting_coroutines,
+        }
 
         # Adding self (aka the current chain into the kwargs)
         kwargs["outer_chain"] = self  # noqa: E402
 
         # Set the llm_handler using the adapted arguments
-        self.llm_handler = self.Handler(*updated_args, **kwargs)
+        self.llm_handler = self.Handler(*args, **kwargs)
 
     @property
     @log_decorator(logger, is_property=True)

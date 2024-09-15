@@ -53,6 +53,8 @@ class LLMHandler:
             f"Pydantic BaseValidatorModel class",
         )
 
+    # WARNING!!! ON CHANGES - Manually syncronise these args, type hints & defaults with chain.set_llm_handler() function
+    # Until such time you figure out how to have a function and a class share the same signature
     def __init__(
         self,
         input_data: Data,  # Input variable of the custom 'Data' type
