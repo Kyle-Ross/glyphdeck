@@ -401,7 +401,7 @@ class Chain:
         Differences to parent class LLMHandler:
         - Rather than taking a input_data argument, it inserts self.latest_data at the front of the args
             - The handler will then always run on the latest data
-            - This can be changed with self.llm_handler.use_selected(elected_data), and back with self.llm_handler.use_latest()
+            - This can be changed with self.llm_handler.use_selection() or use_record(), and back with self.llm_handler.use_latest()
         - Passes a reference to the current chain instance up through the kwargs
             - This is removed from the kwargs before reaching LLMHandler"""
 
