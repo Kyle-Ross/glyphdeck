@@ -1,5 +1,4 @@
 from typing import Union, List
-import os
 
 import pandas as pd
 
@@ -9,7 +8,7 @@ from CategoriGen.tools.loggers import (
     assert_and_log_error,
     log_and_raise_error,
 )
-from CategoriGen.tools.file_importers import get_xlsx, get_csv
+from CategoriGen.tools.file_importers import get_xlsx, get_csv, file_validation
 from CategoriGen.validation.data_types import (
     Data,
     Optional_Data,
@@ -123,36 +122,19 @@ def type_conditional_prepare(
 
     # 2 - If it is a string
     elif data_source_type is str:
-        # 2.1 - the string is a findable file path
-        if os.path.isfile(data_source):
-            # 2.1.1 - if the file is a .csv
-            if data_source.endswith(".csv"):
-                source_table, prepared_data = prepare_csv(
-                    data_source, id_column, data_columns, encoding=encoding
-                )
+        # Check file exists, validate type, return type
+        file_type = file_validation(data_source)
 
-            # 2.1.2 - if the file is an .xlsx
-            elif data_source.endswith(".xlsx"):
-                source_table, prepared_data = prepare_xlsx(
-                    data_source, id_column, data_columns, sheet_name=sheet_name
-                )
+        # 2.1 - if the file is an .csv
+        if file_type == "csv":
+            source_table, prepared_data = prepare_csv(
+                data_source, id_column, data_columns, encoding=encoding
+            )
 
-            # 2.1.3 - if the file was valid, but not a supported type
-            else:
-                log_and_raise_error(
-                    logger,
-                    "error",
-                    AssertionError,
-                    f"'Provided data_source file path '{data_source}' is not one of the supported file types",
-                )
-
-        # 2.2
-        else:
-            log_and_raise_error(
-                logger,
-                "error",
-                AssertionError,
-                f"'Provided data_source file path '{data_source}' does not exist",
+        # 2.2 - if the file is an .xlsx
+        if file_type == "xlsx":
+            source_table, prepared_data = prepare_xlsx(
+                data_source, id_column, data_columns, sheet_name=sheet_name
             )
 
     # 3 - If it is neither a dataframe or a string

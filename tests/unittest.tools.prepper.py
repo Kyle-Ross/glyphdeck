@@ -7,7 +7,7 @@ import unittest  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
+from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv, type_conditional_prepare  # noqa: E402
 from CategoriGen.validation.data_types import assert_and_log_type_is_data  # noqa: E402
 
 
@@ -46,6 +46,21 @@ class TestPrepper(unittest.TestCase):
             "Review Text",
             encoding="ISO-8859-1",
         )
+        self.assertIsInstance(df, pd.DataFrame)
+        assert_and_log_type_is_data(data, "data")
+
+    def test_type_conditional_prepare_df(self):
+        df, data = type_conditional_prepare(self.df, "id", ["data1", "data2"], None, None)
+        self.assertIsInstance(df, pd.DataFrame)
+        assert_and_log_type_is_data(data, "data")
+
+    def test_type_conditional_prepare_csv(self):
+        df, data = type_conditional_prepare(r"tests\testdata.clothingreviews.csv", "Row ID", "Review Text", "ISO-8859-1", None)
+        self.assertIsInstance(df, pd.DataFrame)
+        assert_and_log_type_is_data(data, "data")
+
+    def test_type_conditional_prepare_xlsx(self):
+        df, data = type_conditional_prepare(r"tests\testdata.clothingreviews.xlsx", "Row ID", "Review Text", None, "Sheet1")
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 
