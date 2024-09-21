@@ -335,11 +335,17 @@ class Chain:
     @log_decorator(logger)
     def record(self, record_identifier: IntStr) -> Record:
         """Returns the record corresponding to the provided record number or record title."""
-        key_type = type(record_identifier)
-        if key_type is int:
+        if isinstance(record_identifier, int):
             return self.records[record_identifier]
-        if key_type is str:
+        elif isinstance(record_identifier, str):
             return self.records[self.title_key(record_identifier)]
+        else:
+            log_and_raise_error(
+                logger,
+                "info",
+                TypeError,
+                f"self.record() accepts either record keys (int) or record titles (str), not {type(record_identifier)}",
+            )
 
     @log_decorator(logger)
     def title(self, key: IntStr) -> str:
