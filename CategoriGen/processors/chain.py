@@ -9,7 +9,7 @@ import pandas as pd
 
 from CategoriGen.validation.data_types import (
     assert_and_log_type_is_data,
-    assert_and_log_type_is_strlist,
+    assert_and_log_is_type_or_list_of,
     Data,
     IntList,
     IntStr,
@@ -21,7 +21,6 @@ from CategoriGen.validation.data_types import (
     Optional_Str,
     Optional_IntStrList,
     Record,
-    RecordList,
     Records,
     StrList,
     Str_or_StrList,
@@ -188,8 +187,8 @@ class Chain:
                     self.selected_column_names is not None,
                     "self.use_selected is True, but self.selected_column_names has not been set",
                 )
-                assert_and_log_type_is_strlist(
-                    self.selected_column_names, "selected_column_names"
+                assert_and_log_is_type_or_list_of(
+                    self.selected_column_names, "selected_column_names", [str]
                 )
                 column_names = self.selected_column_names
             # Otherwise use the active record key to access the column names
@@ -287,7 +286,9 @@ class Chain:
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
             # Assert argument types, and check record title is unique
             assert_and_log_type_is_data(data, "data")
-            assert_and_log_type_is_strlist(column_names, "column_names")
+            assert_and_log_is_type_or_list_of(
+                column_names, "column_names", [str], allow_none=True
+            )
             self.outer_chain.title_validator(record_title)
             # Assign values
             self.selected_column_names = (
@@ -710,11 +711,9 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def combine_records(
-        self, new_record_title: str, target_records: list, recreate=False
-    ) -> Self:
-        """Creates a new record by combining multiple records, then appends it to the chain.
-        While recreate is False, only creates the dataframes it needs if they didn't already exist in the records."""
+    def get_combined(self, target_records: list, recreate=False) -> pd.DataFrame:
+        """Combines a list of records and returns them as a dataframe.
+        Does not append anything to the chain."""
 
         # Create dataframes in the selected records
         self.create_dataframes(target_records, use_suffix=True, recreate=recreate)
@@ -729,34 +728,30 @@ class Chain:
             lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dataframes
         )
 
-        # Generate the required arguments to append the combined_df to the chain
-
-        # Use every column except the id as a data column
-        combined_data_columns = [
-            col for col in combined_df.columns if col != self._base_id_column
-        ]
-
-        # Use the prepare function on the combined_df, and get the data object from the returned tuple
-        combined_data = type_conditional_prepare(
-            combined_df, self._base_id_column, combined_data_columns
-        )[1]
-
-        # Append these to the chain
-        self.append(
-            title=new_record_title,
-            data=combined_data,
-            column_names=combined_data_columns,
-            update_expected_len=True,
-        )
-
-        return self
+        return combined_df
 
     @log_decorator(logger)
-    def get_rebase(self, key: IntStr) -> pd.DataFrame:
-        """Returns the specified record joined onto the base dataframe.
+    def get_rebase(self, records: IntStrList, recreate=False) -> pd.DataFrame:
+        """Returns the specified records joined onto the base dataframe.
+        If multiple records are provided they will be combined first.
         Does not append anything to the chain and is intended as an easy way to get your final output."""
+
+        # Check the arguments
+        assert_and_log_is_type_or_list_of(records, "records", [str, int])
+
+        # Access a single df if the argument is str or int
+        if records is not list:
+            output_df = copy.deepcopy(self.df(records))
+        # Access a single record if the argument is a single item list
+        elif len(records) == 1:
+            output_df = copy.deepcopy(self.df(records[0]))
+        # Otherwise combine the records
+        else:
+            output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
+
+        # Join the output_df on the base _base_dataframe and return
         return self._base_dataframe.merge(
-            self.record(key),
+            output_df,
             how="left",
             left_on=self._base_id_column,
             right_index=True,
@@ -770,8 +765,13 @@ class Chain:
         record_keys: Optional_IntStrList = None,
         rebase: bool = True,
         split: bool = False,
+        recreate: bool = False,
     ) -> Self:
         """Writes the output of the selected records to a file."""
+        # Check the provided keys
+        assert_and_log_is_type_or_list_of(
+            record_keys, "record_keys", [str, int], allow_none=True
+        )
 
         # Checking file_type is in allowed list
         allowed_file_types = ["csv", "xlsx"]
@@ -784,56 +784,63 @@ class Chain:
 
         # Sub in reference to the latest record if None was provided
         if record_keys is None:
-            record_keys = self.latest_key
-
-        # Create the dataframes for each record if they don't exist yet
-        self.create_dataframes(record_keys)
-
-        # Set the list of target records conditionally
-        if split:
-            records_list: RecordList = self.create_dataframes(
-                record_keys, use_suffix=False
-            )
-        # Multiple records must be combined if only one output is desired
+            record_keys = [self.latest_key]
+        # If there was only 1 record_key provided as a str or int, put it in a list
         else:
-            records_list: RecordList = self.combine_records(record_keys)
+            if not isinstance(record_keys, list):
+                record_keys = [record_keys]
 
-        # Use the dataframes as is, or left join each back onto the initial source
-        if rebase:
-            for record in records_list:
-                record["df"] = self._base_dataframe.merge(
-                    record["df"],
-                    how="left",
-                    left_on=self._base_id_column,
-                    right_index=True,
-                )
+        # Prepare a list to contain processed dataframes and their titles
+        dataframes_lists = []
 
-        # Final changes to the df
-        for record in records_list:
-            df = record["df"]
-            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
+        # Then conditionally append to it
+
+        # Append every record
+        if not rebase and split:
+            for key in record_keys:
+                key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
+                dataframes_lists.append(key_df_pair)
+
+        # Combine all records, then append
+        if not rebase and not split:
+            title = (
+                self.title(record_keys[0])
+                if len(record_keys) == 1
+                else "combined"
+            )
+            key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
+            dataframes_lists.append(key_df_pair)
+
+        # Rebase, then append each record
+        if rebase and split:
+            for key in record_keys:
+                key_df_pair = [self.title(key), self.rebase(key, recreate=recreate)]
+                dataframes_lists.append(key_df_pair)
+
+        # Combine all records, then rebase, then append
+        if rebase and not split:
+            title = (
+                self.title(record_keys[0])
+                if len(record_keys) == 1
+                else "combined"
+            )
+            key_df_pair = [
+                title,
+                self.get_rebase(record_keys, recreate=recreate),
+            ]
+            dataframes_lists.append(key_df_pair)
+
+        # Actualising the index and sorting the dataframes
+        for title, df in dataframes_lists:
+            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rebasing)
             if self._base_id_column not in df.columns:
                 df.insert(0, self._base_id_column, df.index)
             # Sort by the id column ascending
             df.sort_values(self._base_id_column)
-            record["df"] = df
 
-        def make_path(source_record: Record) -> str:
+        def make_path(title: str) -> str:
             """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-            # Conditionally setting the title to be used in the name
-            # Each individual file has the title name
-            if file_type == "csv" and split:
-                title = source_record["title"]
-            # The containing excel file has 'split'
-            elif file_type == "xlsx" and split:
-                title = "split"
-            # Should be unreachable
-            elif split:
-                title = "split"
-            else:
-                title = "combined"
-
             file_name = f"{file_name_prefix} - {title} - {formatted_time}.{file_type}"
             file_path = os.path.join(OUTPUT_FILES_DIR, file_name)
             return file_path
@@ -842,22 +849,35 @@ class Chain:
         create_files_directory(logger)
 
         # Output the dataframes
-        if file_type == "csv":
-            for record in records_list:
-                df = record["df"]
-                path = make_path(record)
-                df.to_csv(path, index=False)
 
-        if file_type == "xlsx":
-            # Argument may not be used in certain conditions
-            path = make_path(self.latest_record)
+        # csv will always have multiple files for multiple inputs
+        if file_type == "csv":
+            for title, df in dataframes_lists:
+                df.to_csv(make_path(title), index=False)
+
+        # xlsx will only have multiple files if split is True
+        if file_type == "xlsx" and split:
+            for title, df in dataframes_lists:
+                with pd.ExcelWriter(make_path(title)) as writer:
+                    df.to_excel(writer, sheet_name=title, index=False)
+
+        # xlsx will put the multiple outputs in the sheets of a single file if split is False
+        if file_type == "xlsx" and not split:
+            # Set the path of the file containing the multiple sheets
+
+            # If len is 1, use the title of the record for the path, otherwise use 'split
+            file_title = (
+                self.title(record_keys[0])
+                if len(record_keys) == 1
+                else "split"
+            )
+            path = make_path(file_title)
+
+            # Writing each record to its own sheet in the same xlsx file
             with pd.ExcelWriter(path) as writer:
-                for record in (
-                    records_list
-                ):  # Writing each record to its own sheet in the same xlsx file
-                    sheet_df = record["df"]
+                for title, df in dataframes_lists:
                     invalid_chars = r'[\/:*?"<>|]'
-                    sheet_title = re.sub(invalid_chars, "", record["title"])
-                    sheet_df.to_excel(writer, sheet_name=sheet_title, index=False)
+                    sheet_title = re.sub(invalid_chars, "", title)
+                    df.to_excel(writer, sheet_name=sheet_title, index=False)
 
         return self
