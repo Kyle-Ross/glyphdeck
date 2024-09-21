@@ -174,7 +174,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(selected_records[0]["title"], "Example1")
 
     def test_combiner(self):
-        combined_records = self.chain.combine_records(["Example1"])
+        combined_records = self.chain.get_combined(["Example1"])
         self.assertEqual(len(combined_records), 1)
         self.assertEqual(combined_records[0]["title"], "combined")
 
