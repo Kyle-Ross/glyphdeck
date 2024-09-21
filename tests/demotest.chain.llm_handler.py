@@ -41,8 +41,6 @@ ic(chain.latest_data)
 
 print("\n(Record Key 2)")
 print("Appending record meals_data2")
-# The table only needs to be added in the first step, but can be included again to add a new one
-# Otherwise the table will be the last time 'table' was assigned, or the original source data as a dataframe
 ic(
     chain.append(
         title="meals_data2",
@@ -131,9 +129,6 @@ ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_column_names)
 ic(chain.llm_handler.active_input_data)
 print("\nRun it again, with the new data")
-print(
-    "Note: As of 2024-09-09 this may incorrectly re-use completions found in the cache, despite the input_data changing!"
-)  # TODO
 ic(chain.llm_handler.run("HandlerOutput2"))
 ic(chain.latest_data)
 
