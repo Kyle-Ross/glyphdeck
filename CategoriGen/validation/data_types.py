@@ -56,22 +56,41 @@ def assert_and_log_type_is_data(variable: Data, var_name: str):
         )
 
 
-def assert_and_log_type_is_strlist(variable: Optional_StrList, var_name: str):
-    """Assert and log that a variable is either None or a list of only strings"""
-    variable_is_list = isinstance(variable, list)
-    # Check if it is a list or None
+def assert_and_log_is_type_or_list_of(
+    variable: Optional_StrList,
+    var_name: str,
+    allowed_list_types: list,
+    allow_none: bool = False,
+):
+    """Assert and log that a variable is one of the allowed types, or a list containing only those allowed types"""
+
+    # Check if it is None,
+    if not allow_none:
+        assert_and_log_error(
+            logger,
+            "error",
+            variable is not None,
+            f"variable '{variable}' is 'None' while allow_none == False'",
+        )
+
+    # Set some common variables
+    variable_type = type(variable)
+    list_and_allowed_types = [list] + allowed_list_types
+
+    # Check if the argument type
     assert_and_log_error(
         logger,
         "error",
-        variable_is_list or variable is None,
-        f"Expected type 'None' or 'List[str]' in '{var_name}', instead got '{type(variable)}'",
+        variable_type in [list] + list_and_allowed_types,
+        f"variable '{var_name}' is not in allowed types '{list_and_allowed_types}', instead got '{variable_type}'",
     )
-    # Iterate through the values if it is a list
-    if variable_is_list:
+
+    # Check the values in the list if the argument is a list
+    if variable_type is list:
         for value in variable:
             assert_and_log_error(
                 logger,
                 "error",
                 isinstance(value, str),
-                f"Expected all items in list argument '{var_name}' to be str, instead got {type(value)}",
+                f"Expected all items in list argument '{var_name}' to in types '{allowed_list_types}', instead got '{value}' of type '{type(value)}'",
             )
