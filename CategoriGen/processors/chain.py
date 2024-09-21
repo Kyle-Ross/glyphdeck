@@ -716,6 +716,7 @@ class Chain:
         Does not append anything to the chain."""
 
         # Create dataframes in the selected records
+        # Use suffix ensures that all columns are suffixed with the record title, preventing duplicate columns
         self.create_dataframes(target_records, use_suffix=True, recreate=recreate)
 
         # Create a list of dataframes from the record keys
@@ -857,7 +858,6 @@ class Chain:
         # xlsx will put the multiple records in the sheets of a single file if xlsx_use_sheets split is True
         if file_type == "xlsx" and xlsx_use_sheets:
             # Set the path of the file containing the multiple sheets
-
             # If len is 1, use the title of the record for the path, otherwise use 'split
             file_title = (
                 self.title(record_keys[0]) if len(record_keys) == 1 else "split"
