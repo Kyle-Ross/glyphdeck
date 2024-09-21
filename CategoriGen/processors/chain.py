@@ -12,7 +12,7 @@ from CategoriGen.validation.data_types import (
     Data,
     IntList,
     IntStr,
-    List_or_Str,
+    IntStrList,
     Optional_IntStr,
     Optional_StrList,
     Optional_dFrame,
@@ -719,11 +719,23 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def selector(self, records: List_or_Str, use_suffix: bool) -> RecordList:
-        """Returns a list of clean DataFrames from the selected records. Adds column names back on."""
-        # Handling str input
-        if type(records) is str:
+    def selector(self, records: IntStrList, use_suffix: bool) -> RecordList:
+        """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
+        Returns the provided record keys afterwards."""
+        # Conditionally handling input based on type
+        arg_type = type(records)
+        if arg_type in (str, int):
             records = [records]
+        elif arg_type is list:
+            pass
+        else:
+            log_and_raise_error(
+                logger,
+                "info",
+                TypeError,
+                f"records argument must be a str, int, or list, it was {arg_type}",
+            )
+
         # Add only selected records to a list
         selected_records = [self.record(record) for record in records]
 
