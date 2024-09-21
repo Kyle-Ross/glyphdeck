@@ -169,12 +169,12 @@ class TestChain(unittest.TestCase):
             )
 
     def test_selector(self):
-        selected_records = self.chain.selector(["Example1"], use_suffix=False)
+        selected_records = self.chain.create_dataframes(["Example1"], use_suffix=False)
         self.assertEqual(len(selected_records), 1)
         self.assertEqual(selected_records[0]["title"], "Example1")
 
     def test_combiner(self):
-        combined_records = self.chain.combiner(["Example1"])
+        combined_records = self.chain.combined_record(["Example1"])
         self.assertEqual(len(combined_records), 1)
         self.assertEqual(combined_records[0]["title"], "combined")
 

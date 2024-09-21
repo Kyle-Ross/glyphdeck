@@ -66,6 +66,7 @@ class Chain:
                 "table": None,
                 "table_id_column": None,
                 "column_names": None,
+                "df": None,
             }
         }
 
@@ -719,15 +720,27 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def selector(self, records: IntStrList, use_suffix: bool) -> RecordList:
+    def create_dataframes(self, records: IntStrList, use_suffix: bool) -> IntList:
         """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
         Returns the provided record keys afterwards."""
-        # Conditionally handling input based on type
+
+        # Type assertions
+        assert_and_log_error(
+            logger,
+            "info",
+            isinstance(use_suffix, bool),
+            f"Expected bool for use_suffix argument, instead got '{type(use_suffix)}'",
+        )
+
+        # Conditionally handling input based on argument type
+        # Converts all record identifers to keys
         arg_type = type(records)
-        if arg_type in (str, int):
+        if arg_type is int:
             records = [records]
+        elif arg_type is str:
+            records = [self.title_key(records)]
         elif arg_type is list:
-            pass
+            records = [self.title_key(x) if isinstance(x, str) else x for x in records]
         else:
             log_and_raise_error(
                 logger,
@@ -736,50 +749,71 @@ class Chain:
                 f"records argument must be a str, int, or list, it was {arg_type}",
             )
 
-        # Add only selected records to a list
-        selected_records = [self.record(record) for record in records]
+        # Looping over selected records and creating the dataframes
+        for record_key in records:
+            # Get the needed items from the record
+            data = self.data(record_key)
+            title = self.title(record_key)
+            column_names = self.column_names(record_key)
 
-        # Looping over selected records and making changes
-        for record in selected_records:
-            # Creating dataframes and in each of the records, treating the index as the row_id
-            df = pd.DataFrame.from_dict(record["data"], orient="index")
+            # Creating a dataframe from the record data, treating the index as the row_id
+            df = pd.DataFrame.from_dict(data, orient="index")
+
             # Renaming columns
-            if use_suffix:  # Includes suffixes when there are multiple selections to avoid concatenation errors
-                df.columns = [
-                    name + "_" + record["title"] for name in record["column_names"]
-                ]
-            else:
-                df.columns = record["column_names"]
-            # Record the new df
-            record["output_df"] = df
+            # Includes suffixes if specified
+            # This helps with concat errors when multiple outputs are generated per column
+            df.columns = [
+                name + "_" + title if use_suffix else name for name in column_names
+            ]
 
-        # Returning the selected records
-        return selected_records
+            # Record the new "df" in the dictionary of the specified record
+            self.records[record_key]["df"] = df
+
+        # Returning the keys of the selected records
+        return records
 
     @log_decorator(logger)
-    def combiner(self, records: list) -> RecordList:
-        """Combines records into a single dataframe."""
-        # Grab the dataframes, combining them, and returning them
-        selected_records = self.selector(records, use_suffix=True)
-        selected_dfs = [record["output_df"] for record in selected_records]
-        # Using reduce to merge all DataFrames in selected_dfs on their indices
+    def combined_record(self, new_record_title: str, target_records: list) -> int:
+        """Creates a combined dataframe from multiple records, appends it to the chain,
+        and returns the key of the new record."""
+
+        # Create dataframes in the selected records
+        self.create_dataframes(target_records, use_suffix=True)
+
+        # Create a list of dataframes from the record keys
+        dataframes = []
+        for record_key in target_records:
+            dataframes.append(self.records[record_key]["df"])
+
+        # Using reduce to merge all Dataframes on their indices
         combined_df = reduce(
-            lambda x, y: pd.merge(x, y, left_index=True, right_index=True), selected_dfs
+            lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dataframes
         )
-        # Building into the record format to be used in the flow with the rest
-        combined_record: RecordList = [
-            {
-                "title": "combined",
-                "dt": datetime.now(),
-                "delta": datetime.now() - self.latest_dt,
-                "data": {},
-                "table": selected_records[0],
-                "output_df": combined_df,
-                "table_id_column": self.initial_table_id_column,  # Not really needed
-                "column_names": None,  # Not needed here - all different anyway
-            }
+
+        # Generate the required arguments to append the combined_df to the chain
+
+        # Use the core id column
+        id_column = self.initial_table_id_column
+
+        # Use every column except the id as a data column
+        combined_data_columns = [
+            col for col in combined_df.columns if col != self.initial_table_id_column
         ]
-        return combined_record
+
+        # Use the prepare function on the combined_df, and get the data object from the returned tuple
+        combined_data = type_conditional_prepare(
+            combined_df, id_column, combined_data_columns
+        )[1]
+
+        # Append these to the chain
+        self.append(
+            title=new_record_title,
+            data=combined_data,
+            column_names=combined_data_columns,
+            update_expected_len=True,
+        )
+
+        return self.latest_key
 
     @log_decorator(logger)
     def output(
@@ -801,10 +835,10 @@ class Chain:
 
         # (combine = True) Return a single, new record which is a combination of all the selected records, with a result df in the "output_df" key
         if combine:
-            records_list: RecordList = self.combiner(records)
+            records_list: RecordList = self.combined_record(records)
         # (combine = False) Create the "output_df" in each of the selected records
         else:
-            records_list: RecordList = self.selector(records, use_suffix=False)
+            records_list: RecordList = self.create_dataframes(records, use_suffix=False)
         # Both return a list of the records for the next step
         # TODO - change access to be key based, rather than copies of the records
         # TODO - update type hints for each of combiner and selector methods
@@ -861,9 +895,9 @@ class Chain:
             rejoin_on_record = self.latest_key
         # Create records separately or combine
         if split:
-            records_list: RecordList = self.selector(records, use_suffix=False)
+            records_list: RecordList = self.create_dataframes(records, use_suffix=False)
         else:
-            records_list: RecordList = self.combiner(records)
+            records_list: RecordList = self.combined_record(records)
         # Use the dataframes as is, or left join each back onto the initial source
         if rejoin:
             for record in records_list:
