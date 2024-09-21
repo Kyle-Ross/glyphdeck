@@ -704,7 +704,6 @@ class Chain:
                 df.columns = [
                     name + "_" + title if use_suffix else name for name in column_names
                 ]
-
                 # Record the new "df" in the dictionary of the specified record
                 self.records[record_key]["df"] = df
 
@@ -740,13 +739,20 @@ class Chain:
         # Check the arguments
         assert_and_log_is_type_or_list_of(records, "records", [str, int])
 
+        # Suffix added to column of non-base table fields if a duplicate exists in the merge
+        # Blank by default, and is only set when individual records are specified
+        suffix_on_duplicate = ""
+
         # Access a single df if the argument is str or int
         if records is not list:
             output_df = copy.deepcopy(self.df(records))
+            suffix_on_duplicate = self.title(records)
         # Access a single record if the argument is a single item list
         elif len(records) == 1:
             output_df = copy.deepcopy(self.df(records[0]))
-        # Otherwise combine the records
+            suffix_on_duplicate = self.title(records)
+        # Otherwise combine the records before rebasing
+        # Handles adding suffixes inside get_combined()
         else:
             output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
 
@@ -756,6 +762,7 @@ class Chain:
             how="left",
             left_on=self._base_id_column,
             right_index=True,
+            suffixes=('', f'_{suffix_on_duplicate}') 
         )
 
     @log_decorator(logger)
@@ -820,7 +827,7 @@ class Chain:
             title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
             key_df_pair = [
                 title,
-                self.get_rebase(record_keys, recreate=recreate),
+                self.get_rebase(record_keys[0], recreate=recreate),
             ]
             dataframes_lists.append(key_df_pair)
 
