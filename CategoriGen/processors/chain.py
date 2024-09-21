@@ -719,6 +719,31 @@ class Chain:
         return self
 
     @log_decorator(logger)
+    def create_record_df(self, record_identifier: IntStr, use_suffix: bool) -> int:
+        """Takes a record key or name then creates a dataframe using its data & column_names.
+        It applies that df to the record and records the key of the record"""
+        
+        # Grab the record
+        record = self.record(record_identifier)
+       
+        # Creating a dataframe from the data of the record
+        df = pd.DataFrame.from_dict(record["data"], orient="index")
+        
+        # Renaming columns in that df
+        # Include suffixes, important when there are multiple selections to avoid concatenation errors
+        if use_suffix:
+            df.columns = [
+                name + "_" + record["title"] for name in record["column_names"]
+            ]
+        
+        # Otherwise set the column names as is
+        else:
+            df.columns = record["column_names"]
+
+        # Set the dataframe in the record
+        record["output_df"] = df
+
+    @log_decorator(logger)
     def selector(self, records: List_or_Str, use_suffix: bool) -> RecordList:
         """Returns a list of clean DataFrames from the selected records. Adds column names back on."""
         # Handling str input
