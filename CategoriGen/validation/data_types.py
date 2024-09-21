@@ -93,6 +93,6 @@ def assert_and_log_is_type_or_list_of(
                 assert_and_log_error(
                     logger,
                     "error",
-                    isinstance(value, str),
+                    isinstance(value, tuple(allowed_list_types)),
                     f"Expected all items in list argument '{var_name}' to in types '{allowed_list_types}', instead got '{value}' of type '{type(value)}'",
                 )
