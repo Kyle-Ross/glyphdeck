@@ -660,7 +660,7 @@ class Chain:
         """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
         Returns the provided record keys afterwards.
         While recreate is False, only creates the dataframes if they didn't already exist in the record."""
-
+        
         # Type assertions
         assert_and_log_error(
             logger,
@@ -689,7 +689,7 @@ class Chain:
         # Looping over selected records and creating the dataframes if necessary
         for record_key in records:
             # Only if recreate is True or the df didn't exist yet
-            if recreate or record_key not in self.records:
+            if recreate or "df" not in self.records[record_key]:
                 # Get the needed items from the record
                 data = self.data(record_key)
                 title = self.title(record_key)
