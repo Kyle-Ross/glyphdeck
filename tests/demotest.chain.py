@@ -31,8 +31,6 @@ chain = Chain(
 )
 
 # (record key 2)
-# The table only needs to be added in the first step, but can be included again to add a new one
-# Otherwise the table will be the last time 'table' was assigned, or the original source data as a dataframe
 chain.append(
     title="Example1",
     data={
@@ -43,7 +41,6 @@ chain.append(
 )
 
 # (record key 3)
-# Since table is not assigned table will just be the last table
 chain.append(
     title="Example2",
     data={
