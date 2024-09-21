@@ -70,27 +70,29 @@ def assert_and_log_is_type_or_list_of(
             logger,
             "error",
             variable is not None,
-            f"variable '{variable}' is 'None' while allow_none == False'",
+            f"variable '{var_name}' is 'None' while allow_none == False'",
         )
 
-    # Set some common variables
-    variable_type = type(variable)
-    list_and_allowed_types = [list] + allowed_list_types
+    # With that checked, only run the rest of the checks if the variable is not None
+    if variable is not None:
+        # Set some common variables
+        variable_type = type(variable)
+        list_and_allowed_types = [list] + allowed_list_types
 
-    # Check if the argument type
-    assert_and_log_error(
-        logger,
-        "error",
-        variable_type in [list] + list_and_allowed_types,
-        f"variable '{var_name}' is not in allowed types '{list_and_allowed_types}', instead got '{variable_type}'",
-    )
+        # Check if the argument type
+        assert_and_log_error(
+            logger,
+            "error",
+            variable_type in [list] + list_and_allowed_types,
+            f"variable '{var_name}' is not in allowed types '{list_and_allowed_types}', instead got '{variable_type}'",
+        )
 
-    # Check the values in the list if the argument is a list
-    if variable_type is list:
-        for value in variable:
-            assert_and_log_error(
-                logger,
-                "error",
-                isinstance(value, str),
-                f"Expected all items in list argument '{var_name}' to in types '{allowed_list_types}', instead got '{value}' of type '{type(value)}'",
-            )
+        # Check the values in the list if the argument is a list
+        if variable_type is list:
+            for value in variable:
+                assert_and_log_error(
+                    logger,
+                    "error",
+                    isinstance(value, str),
+                    f"Expected all items in list argument '{var_name}' to in types '{allowed_list_types}', instead got '{value}' of type '{type(value)}'",
+                )
