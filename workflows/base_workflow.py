@@ -49,8 +49,8 @@ def main():
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="Chain Test",
-        records=["HandlerOutput1"],
-        rejoin=True,
+        record_keys=["HandlerOutput1"],
+        rebase=True,
         split=False,
     )
 

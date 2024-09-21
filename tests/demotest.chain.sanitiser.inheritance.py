@@ -33,14 +33,14 @@ chain = Chain(
 ic(chain.record(1))
 ic(chain.latest_data)
 ic(chain.sanitiser.input_data)
-ic(chain.initial_sanitiser.input_data)
+ic(chain.base_sanitiser.input_data)
 ic("select_groups() - used in init")
 ic(chain.sanitiser.all_groups)
 ic(chain.sanitiser.active_groups)
 ic(chain.sanitiser.inactive_groups)
-ic(chain.initial_sanitiser.all_groups)
-ic(chain.initial_sanitiser.active_groups)
-ic(chain.initial_sanitiser.inactive_groups)
+ic(chain.base_sanitiser.all_groups)
+ic(chain.base_sanitiser.active_groups)
+ic(chain.base_sanitiser.inactive_groups)
 
 # (record key 2)
 # The table only needs to be added in the first step, but can be included again to add a new one
@@ -61,11 +61,11 @@ ic(chain.sanitiser.select_groups(["number"]))
 ic(chain.sanitiser.all_groups)
 ic(chain.sanitiser.active_groups)
 ic(chain.sanitiser.inactive_groups)
-ic(chain.initial_sanitiser.input_data)
-ic(chain.initial_sanitiser.select_groups(["number"]))
-ic(chain.initial_sanitiser.all_groups)
-ic(chain.initial_sanitiser.active_groups)
-ic(chain.initial_sanitiser.inactive_groups)
+ic(chain.base_sanitiser.input_data)
+ic(chain.base_sanitiser.select_groups(["number"]))
+ic(chain.base_sanitiser.all_groups)
+ic(chain.base_sanitiser.active_groups)
+ic(chain.base_sanitiser.inactive_groups)
 
 # (record key 3)
 # Since table is not assigned table will just be the last table
@@ -85,19 +85,19 @@ ic(chain.sanitiser.select_groups(["number", "date"]))
 ic(chain.sanitiser.all_groups)
 ic(chain.sanitiser.active_groups)
 ic(chain.sanitiser.inactive_groups)
-ic(chain.initial_sanitiser.input_data)
-ic(chain.initial_sanitiser.select_groups(["number", "date"]))
-ic(chain.initial_sanitiser.all_groups)
-ic(chain.initial_sanitiser.active_groups)
-ic(chain.initial_sanitiser.inactive_groups)
+ic(chain.base_sanitiser.input_data)
+ic(chain.base_sanitiser.select_groups(["number", "date"]))
+ic(chain.base_sanitiser.all_groups)
+ic(chain.base_sanitiser.active_groups)
+ic(chain.base_sanitiser.inactive_groups)
 
 # Print off all the generated values
 # Without a loop so ic will show the contents
 
 print("\nIs the sanitiser referencing the correct chain?")
 ic(chain)
-ic(chain.initial_sanitiser.outer_chain)
-ic(chain == chain.initial_sanitiser.outer_chain)
+ic(chain.base_sanitiser.outer_chain)
+ic(chain == chain.base_sanitiser.outer_chain)
 
 print(
     "\nAppending with the sanitiser representation of the chain shows changes in the normal chain (Record Key 4)"
@@ -114,7 +114,7 @@ chain.sanitiser.outer_chain.append(
 ic(chain.record(4))
 ic(chain.latest_data)
 ic(chain.sanitiser.input_data)
-ic(chain.initial_sanitiser.input_data)
+ic(chain.base_sanitiser.input_data)
 
 print("\nSanitiser input_data can be changed directly")
 ic(chain.sanitiser.input_data)

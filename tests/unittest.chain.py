@@ -119,7 +119,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(self.chain.latest_data, self.chain.records[3]["data"])
 
     def test_latest_table(self):
-        self.assertTrue(self.chain.latest_table.equals(self.chain.records[2]["table"]))
+        self.assertTrue(self.chain.latest_df.equals(self.chain.records[2]["table"]))
 
     def test_latest_table_id_column(self):
         self.assertEqual(
@@ -174,7 +174,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(selected_records[0]["title"], "Example1")
 
     def test_combiner(self):
-        combined_records = self.chain.combined_record(["Example1"])
+        combined_records = self.chain.combine_records(["Example1"])
         self.assertEqual(len(combined_records), 1)
         self.assertEqual(combined_records[0]["title"], "combined")
 
@@ -183,8 +183,8 @@ class TestChain(unittest.TestCase):
         self.chain.write_output(
             file_type="csv",
             file_name_prefix="Test",
-            records=["Example1"],
-            rejoin=True,
+            record_keys=["Example1"],
+            rebase=True,
             split=False,
         )
         # Add assertions to check if the file was created and contains the expected data

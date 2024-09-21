@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
+from typing import Self
 import copy
 import re
 import os
@@ -63,10 +64,7 @@ class Chain:
                 "dt": datetime.now(),
                 "delta": None,
                 "data": {},
-                "table": None,
-                "table_id_column": None,
                 "column_names": None,
-                "df": None,
             }
         }
 
@@ -74,16 +72,19 @@ class Chain:
         prep_results: dFrame_and_Data_Tuple = type_conditional_prepare(
             data_source, id_column, data_columns, encoding, sheet_name
         )
-        source_table: dFrame = prep_results[0]
+
+        # Unpack the returned tuple
+        prepared_df = prep_results[0]
         prepared_data: Data = prep_results[1]
 
+        # Before proceeding, set the 'protected' base variables (indicated by the leading underscore)
+        self._base_dataframe: dFrame = copy.deepcopy(prepared_df)
+        self._base_id_column = id_column
+
         # Finally, save this as the first record, while updating the expected length
-        # This is that becomes the initial record
         self.append(
             title="prepared",
             data=prepared_data,
-            table=source_table,
-            table_id_column=id_column,
             column_names=data_columns,
             update_expected_len=True,
         )
@@ -121,7 +122,7 @@ class Chain:
         # Initialise the sanitiser - in __init__ 'latest_data' is set to it's initialised value - which won't update
         # So a wrapper property will access and update this with new data
         # Call this using the self.sanitiser property so input_data is updated with the default latest data
-        self.initial_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
+        self.base_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
 
     # Inherit the LLMHandler class and add new run method which writes records and uses the latest_data by default
     # Abstractions required intricate juggling of args and kwargs to pass the context of the current chain instance...
@@ -364,14 +365,12 @@ class Chain:
         return self.record(key)["data"]
 
     @log_decorator(logger)
-    def table(self, key: IntStr) -> dFrame:
-        """Returns the table corresponding to the provided record_identifier number."""
-        return self.record(key)["table"]
-
-    @log_decorator(logger)
-    def table_id_column(self, key: IntStr) -> Optional_IntStr:
-        """Returns the table corresponding to the provided record_identifier number."""
-        return self.record(key)["table_id_column"]
+    def df(self, key: IntStr, recreate=False) -> dFrame:
+        """Returns the dataframe corresponding to the provided record_identifier number.
+        If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
+        # Create the record's dataframe if it didn't exist yet, and return it
+        self.create_dataframes(key, recreate=recreate)
+        return self.record(key)["df"]
 
     @log_decorator(logger)
     def record_delta(self, key: IntStr) -> timedelta:
@@ -390,17 +389,17 @@ class Chain:
 
         # Define the data to used based on settings
         new_data = (
-            self.initial_sanitiser.selected_data
-            if self.initial_sanitiser.use_selected
+            self.base_sanitiser.selected_data
+            if self.base_sanitiser.use_selected
             else self.latest_data
         )
-        self.initial_sanitiser.input_data = new_data
+        self.base_sanitiser.input_data = new_data
 
         # Since sanitise runs on the output_data attribute, make deepcopy
-        self.initial_sanitiser.output_data = copy.deepcopy(new_data)
+        self.base_sanitiser.output_data = copy.deepcopy(new_data)
 
         # Return the changed sanitiser
-        return self.initial_sanitiser
+        return self.base_sanitiser
 
     @log_decorator(logger)
     # WARNING!!! ON CHANGES - Manually syncronise these arguments, type hints and defaults with LLMHandler
@@ -482,15 +481,10 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_table(self) -> Optional_dFrame:
-        """Returns the latest 'table' from the latest 'record' in 'records'."""
-        return self.table(self.latest_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def latest_table_id_column(self) -> Optional_IntStr:
-        """Returns the latest 'table_id_column' from the latest 'record' in 'records'."""
-        return self.table_id_column(self.latest_key)
+    def latest_df(self, recreate=False) -> Optional_dFrame:
+        """Returns the latest 'df' from the latest 'record' in 'records'.
+        If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
+        return self.df(self.latest_key, recreate=recreate)
 
     @property
     @log_decorator(logger, is_property=True)
@@ -503,61 +497,6 @@ class Chain:
     def latest_column_names(self) -> StrList:
         """Returns the latest 'column_names' from 'records'."""
         return self.column_names(self.latest_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_key(self) -> int:
-        """Returns 1, but only if record_identifier 1 exists in the records."""
-        if 1 not in self.records:
-            log_and_raise_error(
-                logger,
-                "error",
-                KeyError,
-                "KeyError: Initial record does not exist yet! Use self.append to get started.",
-            )
-        return 1
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_record(self) -> Record:
-        """Returns the initial 'record' from 'records'."""
-        return self.record(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_title(self) -> str:
-        """Returns the initial 'title' from 'records'."""
-        return self.title(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_dt(self) -> datetime:
-        """Returns the initial 'dt' from 'records'."""
-        return self.dt(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_data(self) -> Data:
-        """Returns the initial 'data' from 'records'."""
-        return self.data(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_table(self) -> Optional_dFrame:
-        """Returns the initial 'table' from 'records'."""
-        return self.table(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_table_id_column(self) -> Optional_IntStr:
-        """Returns the initial 'table_id_column' from 'records'."""
-        return self.table_id_column(self.initial_key)
-
-    @property
-    @log_decorator(logger, is_property=True)
-    def initial_column_names(self) -> StrList:
-        """Returns the initial 'column_names' from 'records'."""
-        return self.column_names(self.initial_key)
 
     @property
     @log_decorator(logger, is_property=True)
@@ -579,8 +518,8 @@ class Chain:
             return [x for x, y in dict.items(self.data(key))]
 
         target_title: str = self.title(target_key)
-        initial_title: str = self.title(self.initial_key)
-        initial_key_list: list = key_list(self.initial_key)
+        initial_title: str = self.title(1)
+        initial_key_list: list = key_list(1)
         target_key_list = key_list(target_key)
         initial_not_target = [x for x in initial_key_list if x not in target_key_list]
         initial_not_target_len = len(initial_not_target)
@@ -592,7 +531,7 @@ class Chain:
             key_validator_message = ""
             if initial_not_target_len > 0:
                 key_validator_message = (
-                    f"{initial_not_target_len} keys were in the initial record {self.initial_key} "
+                    f"{initial_not_target_len} keys were in the initial record 1"
                     f"'{initial_title}"
                     f"', but not in the appended record {target_key} '{target_title}'. "
                     f"These were the following keys: {initial_not_target}"
@@ -601,7 +540,7 @@ class Chain:
                 key_validator_message = (
                     f"{target_not_initial_len} keys were in the appended record {target_key} "
                     f"'{target_title}"
-                    f"', but not in the initial record {self.initial_key} '{initial_title}'. "
+                    f"', but not in the initial record 1 '{initial_title}'. "
                     f"These were the following keys: {target_not_initial}"
                 )
             key_validator_message += (
@@ -667,8 +606,6 @@ class Chain:
         self,
         title: str,
         data: Data,
-        table: Optional_dFrame = None,
-        table_id_column: Optional_IntStr = None,
         column_names: Optional_StrList = None,
         update_expected_len: bool = False,
     ):
@@ -697,7 +634,7 @@ class Chain:
         # Check that the provided title doesn't exist yet
         self.title_validator(title)
 
-        # Build the record
+        # Build the record and validate the entry
         now: datetime = datetime.now()
         delta: timedelta = now - self.latest_dt
         new_key = self.latest_key + 1
@@ -707,10 +644,6 @@ class Chain:
             "delta": delta,
             "data": data,
             # References previous values if none
-            "table": self.latest_table if table is None else table,
-            "table_id_column": self.latest_table_id_column
-            if table_id_column is None
-            else table_id_column,
             "column_names": self.latest_column_names
             if column_names is None
             else column_names,
@@ -720,9 +653,12 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def create_dataframes(self, records: IntStrList, use_suffix: bool) -> IntList:
+    def create_dataframes(
+        self, records: IntStrList, use_suffix: bool = False, recreate=False
+    ) -> Self:
         """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
-        Returns the provided record keys afterwards."""
+        Returns the provided record keys afterwards.
+        While recreate is False, only creates the dataframes if they didn't already exist in the record."""
 
         # Type assertions
         assert_and_log_error(
@@ -749,36 +685,39 @@ class Chain:
                 f"records argument must be a str, int, or list, it was {arg_type}",
             )
 
-        # Looping over selected records and creating the dataframes
+        # Looping over selected records and creating the dataframes if necessary
         for record_key in records:
-            # Get the needed items from the record
-            data = self.data(record_key)
-            title = self.title(record_key)
-            column_names = self.column_names(record_key)
+            # Only if recreate is True or the df didn't exist yet
+            if recreate or record_key not in self.records:
+                # Get the needed items from the record
+                data = self.data(record_key)
+                title = self.title(record_key)
+                column_names = self.column_names(record_key)
 
-            # Creating a dataframe from the record data, treating the index as the row_id
-            df = pd.DataFrame.from_dict(data, orient="index")
+                # Creating a dataframe from the record data, treating the index as the row_id
+                df = pd.DataFrame.from_dict(data, orient="index")
 
-            # Renaming columns
-            # Includes suffixes if specified
-            # This helps with concat errors when multiple outputs are generated per column
-            df.columns = [
-                name + "_" + title if use_suffix else name for name in column_names
-            ]
+                # Renaming columns
+                # Includes suffixes if specified
+                # This helps with concat errors when multiple outputs are generated per column
+                df.columns = [
+                    name + "_" + title if use_suffix else name for name in column_names
+                ]
 
-            # Record the new "df" in the dictionary of the specified record
-            self.records[record_key]["df"] = df
+                # Record the new "df" in the dictionary of the specified record
+                self.records[record_key]["df"] = df
 
-        # Returning the keys of the selected records
-        return records
+        return self
 
     @log_decorator(logger)
-    def combined_record(self, new_record_title: str, target_records: list) -> int:
-        """Creates a combined dataframe from multiple records, appends it to the chain,
-        and returns the key of the new record."""
+    def combine_records(
+        self, new_record_title: str, target_records: list, recreate=False
+    ) -> Self:
+        """Creates a new record by combining multiple records, then appends it to the chain.
+        While recreate is False, only creates the dataframes it needs if they didn't already exist in the records."""
 
         # Create dataframes in the selected records
-        self.create_dataframes(target_records, use_suffix=True)
+        self.create_dataframes(target_records, use_suffix=True, recreate=recreate)
 
         # Create a list of dataframes from the record keys
         dataframes = []
@@ -792,17 +731,14 @@ class Chain:
 
         # Generate the required arguments to append the combined_df to the chain
 
-        # Use the core id column
-        id_column = self.initial_table_id_column
-
         # Use every column except the id as a data column
         combined_data_columns = [
-            col for col in combined_df.columns if col != self.initial_table_id_column
+            col for col in combined_df.columns if col != self._base_id_column
         ]
 
         # Use the prepare function on the combined_df, and get the data object from the returned tuple
         combined_data = type_conditional_prepare(
-            combined_df, id_column, combined_data_columns
+            combined_df, self._base_id_column, combined_data_columns
         )[1]
 
         # Append these to the chain
@@ -813,73 +749,30 @@ class Chain:
             update_expected_len=True,
         )
 
-        return self.latest_key
+        return self
 
     @log_decorator(logger)
-    def output(
-        self,
-        records: Optional_IntStrList = None,
-        rejoin: bool = True,
-        rejoin_on_record: Optional_IntStr = None,
-        combine: bool = True,
-    ):
-        """Writes prepared dataframe into the "output_df" key of the selected records."""
-
-        # Sub in references to the latest record if None was provided
-        if records is None:
-            records = self.latest_key
-        if rejoin_on_record is None:
-            rejoin_on_record = self.latest_key
-
-        # Set the "output_df" key for selected records
-
-        # (combine = True) Return a single, new record which is a combination of all the selected records, with a result df in the "output_df" key
-        if combine:
-            records_list: RecordList = self.combined_record(records)
-        # (combine = False) Create the "output_df" in each of the selected records
-        else:
-            records_list: RecordList = self.create_dataframes(records, use_suffix=False)
-        # Both return a list of the records for the next step
-        # TODO - change access to be key based, rather than copies of the records
-        # TODO - update type hints for each of combiner and selector methods
-        # TODO - rename to something reflecting that it generates the output_df key
-        # TODO - Update the generated combined record to be more complete, including a data key and active references
-        # TODO - Have the combined record automatically append to the chain (include title setting var)
-        # TODO - Have this function return a list of the records that were created or iterated over
-        # TODO - When all done, use this to seperate the df creation process from the output writing function
-
-        # Use the dataframes as is, or left join each back onto the target record dataframe
-        # Essentially gives us the original table with the llm output as new columns
-        if rejoin:
-            for record in records_list:
-                record["output_df"] = self.table(rejoin_on_record).merge(
-                    record["output_df"],
-                    how="left",
-                    left_on=self.table_id_column(rejoin_on_record),
-                    right_index=True,
-                )
-
-        # Final changes to the output_df
-        for record in records_list:
-            df = record["output_df"]
-            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
-            if record["table_id_column"] not in df.columns:
-                df.insert(0, record["table_id_column"], df.index)
-            # Sort by the id column ascending
-            df.sort_values(record["table_id_column"])
-            record["output_df"] = df
+    def get_rebase(self, key: IntStr) -> pd.DataFrame:
+        """Returns the specified record joined onto the base dataframe.
+        Does not append anything to the chain and is intended as an easy way to get your final output."""
+        return self._base_dataframe.merge(
+            self.record(key),
+            how="left",
+            left_on=self._base_id_column,
+            right_index=True,
+        )
 
     @log_decorator(logger)
     def write_output(
         self,
         file_type: str,
         file_name_prefix: str,
-        records: Optional_IntStrList = None,
-        rejoin: bool = True,
-        rejoin_on_record: Optional_IntStr = None,
+        record_keys: Optional_IntStrList = None,
+        rebase: bool = True,
         split: bool = False,
-    ):
+    ) -> Self:
         """Writes the output of the selected records to a file."""
+
         # Checking file_type is in allowed list
         allowed_file_types = ["csv", "xlsx"]
         assert_and_log_error(
@@ -888,35 +781,42 @@ class Chain:
             file_type in allowed_file_types,
             f"'{file_type}' is not in allowed list {allowed_file_types}.",
         )
+
         # Sub in reference to the latest record if None was provided
-        if records is None:
-            records = self.latest_key
-        if rejoin_on_record is None:
-            rejoin_on_record = self.latest_key
-        # Create records separately or combine
+        if record_keys is None:
+            record_keys = self.latest_key
+
+        # Create the dataframes for each record if they don't exist yet
+        self.create_dataframes(record_keys)
+
+        # Set the list of target records conditionally
         if split:
-            records_list: RecordList = self.create_dataframes(records, use_suffix=False)
+            records_list: RecordList = self.create_dataframes(
+                record_keys, use_suffix=False
+            )
+        # Multiple records must be combined if only one output is desired
         else:
-            records_list: RecordList = self.combined_record(records)
+            records_list: RecordList = self.combine_records(record_keys)
+
         # Use the dataframes as is, or left join each back onto the initial source
-        if rejoin:
+        if rebase:
             for record in records_list:
-                record["output_df"] = self.table(rejoin_on_record).merge(
-                    record["output_df"],
+                record["df"] = self._base_dataframe.merge(
+                    record["df"],
                     how="left",
-                    left_on=self.table_id_column(rejoin_on_record),
+                    left_on=self._base_id_column,
                     right_index=True,
                 )
 
-        # Final changes to the output_df
+        # Final changes to the df
         for record in records_list:
-            df = record["output_df"]
+            df = record["df"]
             # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rejoining)
-            if record["table_id_column"] not in df.columns:
-                df.insert(0, record["table_id_column"], df.index)
+            if self._base_id_column not in df.columns:
+                df.insert(0, self._base_id_column, df.index)
             # Sort by the id column ascending
-            df.sort_values(record["table_id_column"])
-            record["output_df"] = df
+            df.sort_values(self._base_id_column)
+            record["df"] = df
 
         def make_path(source_record: Record) -> str:
             """Function to generate file paths for records."""
@@ -944,7 +844,7 @@ class Chain:
         # Output the dataframes
         if file_type == "csv":
             for record in records_list:
-                df = record["output_df"]
+                df = record["df"]
                 path = make_path(record)
                 df.to_csv(path, index=False)
 
@@ -955,7 +855,9 @@ class Chain:
                 for record in (
                     records_list
                 ):  # Writing each record to its own sheet in the same xlsx file
-                    sheet_df = record["output_df"]
+                    sheet_df = record["df"]
                     invalid_chars = r'[\/:*?"<>|]'
                     sheet_title = re.sub(invalid_chars, "", record["title"])
                     sheet_df.to_excel(writer, sheet_name=sheet_title, index=False)
+
+        return self
