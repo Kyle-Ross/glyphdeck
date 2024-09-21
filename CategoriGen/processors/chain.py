@@ -345,7 +345,7 @@ class Chain:
         else:
             log_and_raise_error(
                 logger,
-                "info",
+                "error",
                 TypeError,
                 f"self.record() accepts either record keys (int) or record titles (str), not {type(record_identifier)}",
             )
