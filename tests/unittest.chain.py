@@ -185,7 +185,7 @@ class TestChain(unittest.TestCase):
             file_name_prefix="Test",
             record_keys=["Example1"],
             rebase=True,
-            split=False,
+            xlsx_use_sheets=False,
         )
         # Add assertions to check if the file was created and contains the expected data
 

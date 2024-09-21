@@ -51,7 +51,7 @@ def main():
         file_name_prefix="Chain Test",
         record_keys=["HandlerOutput1"],
         rebase=True,
-        split=False,
+        xlsx_use_sheets=False,
     )
 
 

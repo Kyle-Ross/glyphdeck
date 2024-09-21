@@ -764,7 +764,8 @@ class Chain:
         file_name_prefix: str,
         record_keys: Optional_IntStrList = None,
         rebase: bool = True,
-        split: bool = False,
+        combine: bool = True,
+        xlsx_use_sheets: bool = True,
         recreate: bool = False,
     ) -> Self:
         """Writes the output of the selected records to a file."""
@@ -795,35 +796,27 @@ class Chain:
 
         # Then conditionally append to it
 
-        # Append every record
-        if not rebase and split:
+        # Append every record individually
+        if not combine and not rebase:
             for key in record_keys:
                 key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
                 dataframes_lists.append(key_df_pair)
 
         # Combine all records, then append
-        if not rebase and not split:
-            title = (
-                self.title(record_keys[0])
-                if len(record_keys) == 1
-                else "combined"
-            )
+        if combine and not rebase:
+            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
             key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
             dataframes_lists.append(key_df_pair)
 
-        # Rebase, then append each record
-        if rebase and split:
+        # Rebase, then append each record individually
+        if not combine and rebase:
             for key in record_keys:
                 key_df_pair = [self.title(key), self.rebase(key, recreate=recreate)]
                 dataframes_lists.append(key_df_pair)
 
         # Combine all records, then rebase, then append
-        if rebase and not split:
-            title = (
-                self.title(record_keys[0])
-                if len(record_keys) == 1
-                else "combined"
-            )
+        if combine and rebase:
+            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
             key_df_pair = [
                 title,
                 self.get_rebase(record_keys, recreate=recreate),
@@ -855,21 +848,19 @@ class Chain:
             for title, df in dataframes_lists:
                 df.to_csv(make_path(title), index=False)
 
-        # xlsx will only have multiple files if split is True
-        if file_type == "xlsx" and split:
+        # xlsx will only have multiple files if xlsx_use_sheets is False
+        if file_type == "xlsx" and not xlsx_use_sheets:
             for title, df in dataframes_lists:
                 with pd.ExcelWriter(make_path(title)) as writer:
                     df.to_excel(writer, sheet_name=title, index=False)
 
-        # xlsx will put the multiple outputs in the sheets of a single file if split is False
-        if file_type == "xlsx" and not split:
+        # xlsx will put the multiple records in the sheets of a single file if xlsx_use_sheets split is True
+        if file_type == "xlsx" and xlsx_use_sheets:
             # Set the path of the file containing the multiple sheets
 
             # If len is 1, use the title of the record for the path, otherwise use 'split
             file_title = (
-                self.title(record_keys[0])
-                if len(record_keys) == 1
-                else "split"
+                self.title(record_keys[0]) if len(record_keys) == 1 else "split"
             )
             path = make_path(file_title)
 
