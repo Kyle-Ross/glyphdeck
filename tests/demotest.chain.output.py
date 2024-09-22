@@ -65,25 +65,27 @@ print("\nWhen we specify multiple records, eg [2, 3]")
 print("\nxlsx, multi record, rebase=False, combine=False, xlsx_use_sheets=False")
 ic(
     chain.write_output(
-        file_type="xlsx", 
-        file_name_prefix="chain-xlsx-rebase=False-combine=False-sheets=False", 
+        file_type="xlsx",
+        file_name_prefix="chain-xlsx-rebase=False-combine=False-sheets=False",
         record_keys=[2, 3],
         rebase=False,
         combine=False,
-        xlsx_use_sheets=False
+        xlsx_use_sheets=False,
     )
 )
-print("Result - Multiple xlsx files, one for each record, with no changes. Each with title of record in path.")
+print(
+    "Result - Multiple xlsx files, one for each record, with no changes. Each with title of record in path."
+)
 
 print("\nxlsx, multi record, rebase=True, combine=False, xlsx_use_sheets=False")
 ic(
     chain.write_output(
-        file_type="xlsx", 
-        file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=False", 
+        file_type="xlsx",
+        file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=False",
         record_keys=[2, 3],
         rebase=True,
         combine=False,
-        xlsx_use_sheets=False
+        xlsx_use_sheets=False,
     )
 )
 print("Result - Same as before, with the base dataframe added back on")
@@ -91,34 +93,38 @@ print("Result - Same as before, with the base dataframe added back on")
 print("\nxlsx, multi record, rebase=True, combine=True, xlsx_use_sheets=False")
 ic(
     chain.write_output(
-        file_type="xlsx", 
-        file_name_prefix="chain-xlsx-rebase=True-combine=True-sheets=False", 
+        file_type="xlsx",
+        file_name_prefix="chain-xlsx-rebase=True-combine=True-sheets=False",
         record_keys=[2, 3],
         rebase=True,
         combine=True,
-        xlsx_use_sheets=False
+        xlsx_use_sheets=False,
     )
 )
-print("Result - All records are output in the same table, combined with the base dataframe added back on")
+print(
+    "Result - All records are output in the same table, combined with the base dataframe added back on"
+)
 
 print("\nxlsx, multi record, rebase=True, combine=False, xlsx_use_sheets=True")
 ic(
     chain.write_output(
-        file_type="xlsx", 
-        file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=True" ,
+        file_type="xlsx",
+        file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=True",
         record_keys=[2, 3],
         rebase=True,
         combine=False,
-        xlsx_use_sheets=True
+        xlsx_use_sheets=True,
     )
 )
-print("Result - Each record is rebased individually and put in its own sheet of a single xlsx")
+print(
+    "Result - Each record is rebased individually and put in its own sheet of a single xlsx"
+)
 
 print("\ncsv, multi record, rebase=False, combine=False")
 ic(
     chain.write_output(
-        file_type="csv", 
-        file_name_prefix="chain-csv-rebase=False-combine=False", 
+        file_type="csv",
+        file_name_prefix="chain-csv-rebase=False-combine=False",
         record_keys=[2, 3],
         rebase=False,
         combine=False,
@@ -129,8 +135,8 @@ print("Result - Each record is put in its own csv")
 print("\ncsv, multi record, rebase=True, combine=False")
 ic(
     chain.write_output(
-        file_type="csv", 
-        file_name_prefix="chain-csv-rebase=True-combine=False", 
+        file_type="csv",
+        file_name_prefix="chain-csv-rebase=True-combine=False",
         record_keys=[2, 3],
         rebase=True,
         combine=False,
@@ -141,14 +147,16 @@ print("Result - Each record is rebased individually and put in its own csv")
 print("\ncsv, multi record, rebase=True, combine=True")
 ic(
     chain.write_output(
-        file_type="csv", 
-        file_name_prefix="chain-csv-rebase=True-combine=True", 
+        file_type="csv",
+        file_name_prefix="chain-csv-rebase=True-combine=True",
         record_keys=[2, 3],
         rebase=True,
         combine=True,
     )
 )
-print("Result - Records are combined in the same table and the base dataframe is added back on")
+print(
+    "Result - Records are combined in the same table and the base dataframe is added back on"
+)
 
 # Re-enable logging
 logging.disable(logging.NOTSET)
