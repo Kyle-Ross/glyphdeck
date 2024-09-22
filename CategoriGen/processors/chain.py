@@ -725,12 +725,16 @@ class Chain:
         # Create a list of dataframes from the record keys
         dataframes = []
         for record_key in target_records:
-            dataframes.append(self.records[record_key]["df"])
+            dataframes.append(self.record(record_key)["df"])
 
         # Using reduce to merge all Dataframes on their indices
-        combined_df = reduce(
-            lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dataframes
-        )
+        # Skip if there is one record
+        if len(dataframes) > 1:
+            combined_df = reduce(
+                lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dataframes
+            )
+        else:
+            combined_df = dataframes[0]
 
         return combined_df
 
