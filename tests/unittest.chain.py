@@ -75,34 +75,6 @@ class TestChain(unittest.TestCase):
         self.assertEqual(self.chain.latest_key, 4)
         self.assertEqual(self.chain.latest_title, "Example3")
 
-    def test_initial_key(self):
-        self.assertEqual(self.chain.initial_key, 1)
-
-    def test_initial_record(self):
-        self.assertEqual(self.chain.initial_record, self.chain.records[1])
-
-    def test_initial_title(self):
-        self.assertEqual(self.chain.initial_title, "prepared")
-
-    def test_initial_dt(self):
-        self.assertIsInstance(self.chain.initial_dt, datetime)
-
-    def test_initial_data(self):
-        self.assertEqual(self.chain.initial_data, self.chain.records[1]["data"])
-
-    def test_initial_table(self):
-        self.assertTrue(self.chain.initial_table.equals(self.chain.records[1]["table"]))
-
-    def test_initial_table_id_column(self):
-        self.assertEqual(
-            self.chain.initial_table_id_column, self.chain.records[1]["table_id_column"]
-        )
-
-    def test_initial_column_names(self):
-        self.assertEqual(
-            self.chain.initial_column_names, self.chain.records[1]["column_names"]
-        )
-
     def test_latest_key(self):
         self.assertEqual(self.chain.latest_key, 3)
 
@@ -118,13 +90,8 @@ class TestChain(unittest.TestCase):
     def test_latest_data(self):
         self.assertEqual(self.chain.latest_data, self.chain.records[3]["data"])
 
-    def test_latest_table(self):
-        self.assertTrue(self.chain.latest_df.equals(self.chain.records[2]["table"]))
-
-    def test_latest_table_id_column(self):
-        self.assertEqual(
-            self.chain.latest_table_id_column, self.chain.records[2]["table_id_column"]
-        )
+    def test_latest_df(self):
+        self.assertTrue(self.chain.latest_df.equals(self.chain.df(3)))
 
     def test_latest_column_names(self):
         self.assertEqual(
@@ -168,15 +135,36 @@ class TestChain(unittest.TestCase):
                 },
             )
 
-    def test_selector(self):
-        selected_records = self.chain.create_dataframes(["Example1"], use_suffix=False)
-        self.assertEqual(len(selected_records), 1)
-        self.assertEqual(selected_records[0]["title"], "Example1")
+    def test_create_dataframes(self):
+        examples_titles = ["Example1", "Example2"]
+        examples_keys = [self.chain.title_key(x) for x in examples_titles]
+        count_of_examples = len(examples_keys)
+        self.chain.create_dataframes(examples_keys, use_suffix=False, recreate=True)
+        counter = 0
+        for k, v in self.chain.records.items():
+            if k in examples_keys:
+                if "df" in v:
+                    counter += 1
+        self.assertEqual(count_of_examples, counter)
 
     def test_combiner(self):
-        combined_records = self.chain.get_combined(["Example1"])
-        self.assertEqual(len(combined_records), 1)
-        self.assertEqual(combined_records[0]["title"], "combined")
+        example1 = "Example1"
+        example2 = "Example2"
+        example1_df = self.chain.df(example1)
+        example2_df = self.chain.df(example2)
+        combined_df = self.chain.get_combined([example1, example2])
+        example1_col_count = example1_df.shape[1]
+        example2_col_count = example2_df.shape[1]
+        combined_col_count = combined_df.shape[1]
+        combined_cols_count_eg1_suffixes = len(
+            [col for col in combined_df.columns if example1 in col]
+        )
+        combined_cols_count_eg2_suffixes = len(
+            [col for col in combined_df.columns if example2 in col]
+        )
+        self.assertEqual(combined_col_count, example1_col_count + example2_col_count)
+        self.assertEqual(combined_cols_count_eg1_suffixes, example1_col_count)
+        self.assertEqual(combined_cols_count_eg2_suffixes, example2_col_count)
 
     def test_output(self):
         # This test assumes that the output function correctly writes files to the specified directory
