@@ -688,24 +688,28 @@ class Chain:
 
         # Looping over selected records and creating the dataframes if necessary
         for record_key in records:
-            # Only if recreate is True or the df didn't exist yet
+
+            # Only create if recreate is True or the df didn't exist yet
             if recreate or "df" not in self.records[record_key]:
-                # Get the needed items from the record
-                data = self.data(record_key)
-                title = self.title(record_key)
-                column_names = self.column_names(record_key)
+                    # Get the needed items from the record
+                    data = self.data(record_key)
 
-                # Creating a dataframe from the record data, treating the index as the row_id
-                df = pd.DataFrame.from_dict(data, orient="index")
+                    # Creating a dataframe from the record data, treating the index as the row_id
+                    df = pd.DataFrame.from_dict(data, orient="index")
 
-                # Renaming columns
-                # Includes suffixes if specified
-                # This helps with concat errors when multiple outputs are generated per column
-                df.columns = [
-                    name + "_" + title if use_suffix else name for name in column_names
-                ]
-                # Record the new "df" in the dictionary of the specified record
-                self.records[record_key]["df"] = df
+                    # Record the new "df" in the dictionary of the specified record
+                    self.records[record_key]["df"] = df
+
+            # Set the column names 
+            title = self.title(record_key)
+            column_names = self.column_names(record_key)
+
+            # Renaming columns
+            # Includes suffixes if specified
+            # This helps with concat errors when multiple outputs are generated per column
+            self.records[record_key]["df"].columns = [
+                name + "_" + title if use_suffix else name for name in column_names
+            ]
 
         return self
 
@@ -744,17 +748,20 @@ class Chain:
         suffix_on_duplicate = ""
 
         # Access a single df if the argument is str or int
-        if records is not list:
+        print(f"before if, records is {records}")
+        print(f"before if, records type is {type(records)}")
+        # Access a single record if the argument is a single item list
+        if isinstance(records, list) and len(records) == 1:
+            output_df = copy.deepcopy(self.df(records[0]))
+            suffix_on_duplicate = self.title(records[0])
+        # combine the records before rebasing
+        # Handles adding suffixes inside get_combined()
+        elif isinstance(records, list) :
+            output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
+        # Otherwise it is a str or int
+        else:
             output_df = copy.deepcopy(self.df(records))
             suffix_on_duplicate = self.title(records)
-        # Access a single record if the argument is a single item list
-        elif len(records) == 1:
-            output_df = copy.deepcopy(self.df(records[0]))
-            suffix_on_duplicate = self.title(records)
-        # Otherwise combine the records before rebasing
-        # Handles adding suffixes inside get_combined()
-        else:
-            output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
 
         # Join the output_df on the base _base_dataframe and return
         return self._base_dataframe.merge(
@@ -810,24 +817,25 @@ class Chain:
                 key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
                 dataframes_lists.append(key_df_pair)
 
+
+        # Rebase, then append each record individually
+        if not combine and rebase:
+            for key in record_keys:
+                key_df_pair = [self.title(key), self.get_rebase(key, recreate=recreate)]
+                dataframes_lists.append(key_df_pair)
+        
         # Combine all records, then append
         if combine and not rebase:
             title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
             key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
             dataframes_lists.append(key_df_pair)
 
-        # Rebase, then append each record individually
-        if not combine and rebase:
-            for key in record_keys:
-                key_df_pair = [self.title(key), self.rebase(key, recreate=recreate)]
-                dataframes_lists.append(key_df_pair)
-
         # Combine all records, then rebase, then append
         if combine and rebase:
             title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
             key_df_pair = [
                 title,
-                self.get_rebase(record_keys[0], recreate=recreate),
+                self.get_rebase(record_keys, recreate=recreate),
             ]
             dataframes_lists.append(key_df_pair)
 
@@ -842,7 +850,11 @@ class Chain:
         def make_path(title: str) -> str:
             """Function to generate file paths for records."""
             formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-            file_name = f"{file_name_prefix} - {title} - {formatted_time}.{file_type}"
+            path_parts = [file_name_prefix, formatted_time]
+            # Don't add the title if the string is blank
+            if title != "":
+                path_parts.insert(1, title)
+            file_name = f"{' - '.join(path_parts)}.{file_type}"
             file_path = os.path.join(OUTPUT_FILES_DIR, file_name)
             return file_path
 
@@ -865,9 +877,9 @@ class Chain:
         # xlsx will put the multiple records in the sheets of a single file if xlsx_use_sheets split is True
         if file_type == "xlsx" and xlsx_use_sheets:
             # Set the path of the file containing the multiple sheets
-            # If len is 1, use the title of the record for the path, otherwise use 'split
+            # If len is 1, use the title of the record for the path, otherwise use an empty string
             file_title = (
-                self.title(record_keys[0]) if len(record_keys) == 1 else "split"
+                self.title(record_keys[0]) if len(record_keys) == 1 else ""
             )
             path = make_path(file_title)
 
