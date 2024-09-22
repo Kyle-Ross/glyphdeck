@@ -748,8 +748,6 @@ class Chain:
         suffix_on_duplicate = ""
 
         # Access a single df if the argument is str or int
-        print(f"before if, records is {records}")
-        print(f"before if, records type is {type(records)}")
         # Access a single record if the argument is a single item list
         if isinstance(records, list) and len(records) == 1:
             output_df = copy.deepcopy(self.df(records[0]))
