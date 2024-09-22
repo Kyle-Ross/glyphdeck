@@ -26,6 +26,7 @@ from CategoriGen.validation.data_types import (
     Str_or_StrList,
     Str_or_dFrame,
     dFrame,
+    dFrameObjListDict,
     dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
@@ -660,7 +661,7 @@ class Chain:
         """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
         Returns the provided record keys afterwards.
         While recreate is False, only creates the dataframes if they didn't already exist in the record."""
-        
+
         # Type assertions
         assert_and_log_error(
             logger,
@@ -688,19 +689,18 @@ class Chain:
 
         # Looping over selected records and creating the dataframes if necessary
         for record_key in records:
-
             # Only create if recreate is True or the df didn't exist yet
             if recreate or "df" not in self.records[record_key]:
-                    # Get the needed items from the record
-                    data = self.data(record_key)
+                # Get the needed items from the record
+                data = self.data(record_key)
 
-                    # Creating a dataframe from the record data, treating the index as the row_id
-                    df = pd.DataFrame.from_dict(data, orient="index")
+                # Creating a dataframe from the record data, treating the index as the row_id
+                df = pd.DataFrame.from_dict(data, orient="index")
 
-                    # Record the new "df" in the dictionary of the specified record
-                    self.records[record_key]["df"] = df
+                # Record the new "df" in the dictionary of the specified record
+                self.records[record_key]["df"] = df
 
-            # Set the column names 
+            # Set the column names
             title = self.title(record_key)
             column_names = self.column_names(record_key)
 
@@ -754,7 +754,7 @@ class Chain:
             suffix_on_duplicate = self.title(records[0])
         # combine the records before rebasing
         # Handles adding suffixes inside get_combined()
-        elif isinstance(records, list) :
+        elif isinstance(records, list):
             output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
         # Otherwise it is a str or int
         else:
@@ -767,8 +767,116 @@ class Chain:
             how="left",
             left_on=self._base_id_column,
             right_index=True,
-            suffixes=('', f'_{suffix_on_duplicate}') 
+            suffixes=("", f"_{suffix_on_duplicate}"),
         )
+
+    @log_decorator(logger)
+    def get_output(
+        self,
+        record_keys: Optional_IntStrList = None,
+        output_type: str = "dataframe",
+        rebase: bool = True,
+        combine: bool = True,
+        recreate: bool = False,
+    ) -> dFrameObjListDict:
+        """
+        Get the output of the specified records and return in specified output_type.
+
+        Args:
+            record_keys (Optional_IntStrList, optional): List of record keys to be included in the output. If None, the latest record is used. Defaults to None.
+            output_type (str, optional): The type of output to be returned. Can be 'dataframe', 'list', 'nested list', or 'dict'. Defaults to "dataframe".
+            rebase (bool, optional): If True, the output dataframes are joined onto the base dataframe. Defaults to True.
+            combine (bool, optional): If True, the records are combined before joining onto the base dataframe or returning. Defaults to True.
+            recreate (bool, optional): If True, the dataframes are recreated from the data in the records instead of using existing dataframes. Defaults to False.
+
+        Returns:
+            output_type == 'dataframe' -> dataframe
+            output_type == 'list' -> [dataframe,]
+            output_type == 'nested list' -> [[title, dataframe],]
+            output_type == 'dict' -> {title:dataframe,}
+        """
+
+        # Check the provided keys
+        assert_and_log_is_type_or_list_of(
+            record_keys, "record_keys", [str, int], allow_none=True
+        )
+
+        # Check the provided output_type argument
+        allowed_output_types = ("dataframe", "list", "nested list", "dict")
+        assert_and_log_error(
+            logger,
+            "error",
+            output_type in allowed_output_types,
+            f"argument output_type '{output_type}' is not in allowed_output_types '{allowed_output_types}'",
+        )
+
+        # Sub in reference to the latest record if None was provided
+        if record_keys is None:
+            record_keys = [self.latest_key]
+        # If there was only 1 record_key provided as a str or int, put it in a list
+        else:
+            if not isinstance(record_keys, list):
+                record_keys = [record_keys]
+
+        # Always set to combine when output_type is "dataframe" and len is > 1
+        if output_type == "dataframe" and len(record_keys) > 1:
+            combine = True
+
+        # Prepare a list to contain processed titles and dataframes
+        title_dataframe_lists = []
+
+        # Then conditionally append to it
+
+        # Append every record individually
+        if not combine and not rebase:
+            for key in record_keys:
+                key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
+                title_dataframe_lists.append(key_df_pair)
+
+        # Rebase, then append each record individually
+        if not combine and rebase:
+            for key in record_keys:
+                key_df_pair = [self.title(key), self.get_rebase(key, recreate=recreate)]
+                title_dataframe_lists.append(key_df_pair)
+
+        # Combine all records, then append
+        if combine and not rebase:
+            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
+            key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
+            title_dataframe_lists.append(key_df_pair)
+
+        # Combine all records, then rebase, then append
+        if combine and rebase:
+            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
+            key_df_pair = [
+                title,
+                self.get_rebase(record_keys, recreate=recreate),
+            ]
+            title_dataframe_lists.append(key_df_pair)
+
+        # Actualising the index and sorting the dataframes
+        for title, df in title_dataframe_lists:
+            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rebasing)
+            if self._base_id_column not in df.columns:
+                df.insert(0, self._base_id_column, df.index)
+            # Sort by the id column ascending
+            df.sort_values(self._base_id_column)
+
+        # Conditionally return result
+
+        # When dataframe is selected the list will only ever contain one dataframe
+        if output_type == "dataframe":
+            # Access the dataframe of the inner list
+            return title_dataframe_lists[0][1]
+        # Return only the dataframes in a list
+        if output_type == "list":
+            return [x[1] for x in title_dataframe_lists]
+        # Return the list of lists unchanged
+        if output_type == "nested list":
+            return title_dataframe_lists
+        # Return it as a dictionary with the title as the key
+        if output_type == "dict":
+            return {item[0]: item[1] for item in title_dataframe_lists}
 
     @log_decorator(logger)
     def write_output(
@@ -781,20 +889,7 @@ class Chain:
         xlsx_use_sheets: bool = True,
         recreate: bool = False,
     ) -> Self:
-        """Writes the output of the selected records to a file."""
-        # Check the provided keys
-        assert_and_log_is_type_or_list_of(
-            record_keys, "record_keys", [str, int], allow_none=True
-        )
-
-        # Checking file_type is in allowed list
-        allowed_file_types = ["csv", "xlsx"]
-        assert_and_log_error(
-            logger,
-            "error",
-            file_type in allowed_file_types,
-            f"'{file_type}' is not in allowed list {allowed_file_types}.",
-        )
+        """Writes the output of the selected records to a file or files."""
 
         # Sub in reference to the latest record if None was provided
         if record_keys is None:
@@ -804,46 +899,14 @@ class Chain:
             if not isinstance(record_keys, list):
                 record_keys = [record_keys]
 
-        # Prepare a list to contain processed dataframes and their titles
-        dataframes_lists = []
-
-        # Then conditionally append to it
-
-        # Append every record individually
-        if not combine and not rebase:
-            for key in record_keys:
-                key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
-                dataframes_lists.append(key_df_pair)
-
-
-        # Rebase, then append each record individually
-        if not combine and rebase:
-            for key in record_keys:
-                key_df_pair = [self.title(key), self.get_rebase(key, recreate=recreate)]
-                dataframes_lists.append(key_df_pair)
-        
-        # Combine all records, then append
-        if combine and not rebase:
-            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
-            key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
-            dataframes_lists.append(key_df_pair)
-
-        # Combine all records, then rebase, then append
-        if combine and rebase:
-            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
-            key_df_pair = [
-                title,
-                self.get_rebase(record_keys, recreate=recreate),
-            ]
-            dataframes_lists.append(key_df_pair)
-
-        # Actualising the index and sorting the dataframes
-        for title, df in dataframes_lists:
-            # Insert the index as a col at 0, if it doesn't already exist (i.e. you are rebasing)
-            if self._base_id_column not in df.columns:
-                df.insert(0, self._base_id_column, df.index)
-            # Sort by the id column ascending
-            df.sort_values(self._base_id_column)
+        # Get the list of [[title, dataframe],] using self.get_output
+        title_dataframe_lists = self.get_output(
+            record_keys,
+            output_type = "nested list",
+            rebase=rebase,
+            combine=combine,
+            recreate=recreate,
+        )
 
         def make_path(title: str) -> str:
             """Function to generate file paths for records."""
@@ -863,12 +926,12 @@ class Chain:
 
         # csv will always have multiple files for multiple inputs
         if file_type == "csv":
-            for title, df in dataframes_lists:
+            for title, df in title_dataframe_lists:
                 df.to_csv(make_path(title), index=False)
 
         # xlsx will only have multiple files if xlsx_use_sheets is False
         if file_type == "xlsx" and not xlsx_use_sheets:
-            for title, df in dataframes_lists:
+            for title, df in title_dataframe_lists:
                 with pd.ExcelWriter(make_path(title)) as writer:
                     df.to_excel(writer, sheet_name=title, index=False)
 
@@ -876,14 +939,12 @@ class Chain:
         if file_type == "xlsx" and xlsx_use_sheets:
             # Set the path of the file containing the multiple sheets
             # If len is 1, use the title of the record for the path, otherwise use an empty string
-            file_title = (
-                self.title(record_keys[0]) if len(record_keys) == 1 else ""
-            )
+            file_title = self.title(record_keys[0]) if len(record_keys) == 1 else ""
             path = make_path(file_title)
 
             # Writing each record to its own sheet in the same xlsx file
             with pd.ExcelWriter(path) as writer:
-                for title, df in dataframes_lists:
+                for title, df in title_dataframe_lists:
                     invalid_chars = r'[\/:*?"<>|]'
                     sheet_title = re.sub(invalid_chars, "", title)
                     df.to_excel(writer, sheet_name=sheet_title, index=False)
