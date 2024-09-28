@@ -1,4 +1,4 @@
-from typing import Union, Tuple, List, Dict, Any
+from typing import Union, Tuple, List, Dict, Any, Self
 import copy
 import re
 
@@ -67,8 +67,8 @@ class Sanitiser:
     number_pattern: re.Pattern[str] = re.compile(number_regex)
 
     # Storing that all as a dict
-    patterns_data_type = Dict[str, Dict[str, Union[str, float, re.Pattern[str]]]]
-    patterns: patterns_data_type = {
+    PatternsDict = Dict[str, Dict[str, Union[str, float, re.Pattern[str]]]]
+    patterns: PatternsDict = {
         "date1": {
             "group": "date",
             "placeholder": "<DATE>",
@@ -128,7 +128,7 @@ class Sanitiser:
 
     @staticmethod
     @log_decorator(logger, is_static_method=True)
-    def placeholder_check(patterns_dict: patterns_data_type):
+    def placeholder_check(patterns_dict: PatternsDict):
         """Raises an error if any of the current placeholders contain non-alphabet characters excluding '<' and '>'."""
         for key, value in patterns_dict.items():
             if not all(char.isalpha() or char in "<>" for char in value["placeholder"]):
@@ -145,7 +145,7 @@ class Sanitiser:
 
     @staticmethod
     @log_decorator(logger, is_static_method=True)
-    def order_patterns(patterns_dict: patterns_data_type):
+    def order_patterns(patterns_dict: PatternsDict) -> PatternsDict:
         """Re-sorts the pattern dictionary by rank, for use if you have added a new pattern to the patterns attribute"""
         # Change the dict to a list with nested tuples and sort it by ascending rank
         sorted_items: List[Tuple[Any, Any]] = sorted(
@@ -160,7 +160,7 @@ class Sanitiser:
 
     @staticmethod
     @log_decorator(logger, is_static_method=True)
-    def remove_arrows(input_string: str):
+    def remove_arrows(input_string: str) -> str:
         """Removes '<' and '>' from a string"""
         input_string = input_string.replace("<", "").replace(">", "")
         return input_string
@@ -168,9 +168,9 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def groups_where(
-        patterns_dict: patterns_data_type, active_type: Union[list, set] = (True, False)
-    ):
-        """Returns a list of groups where the 'active' record_identifier, is True or False. Returns everything by default."""
+        patterns_dict: PatternsDict, active_type: Union[list, set] = (True, False)
+    ) -> List[str]:
+        """Returns a list of groups with the desired 'active' statuses, Returns everything by default."""
         groups: List = [
             value["group"]
             for key, value in patterns_dict.items()
@@ -195,19 +195,20 @@ class Sanitiser:
         self.total_matches: int = 0
 
     @log_decorator(logger)
-    def update_groups(self):
+    def update_groups(self) -> Self:
         """Uses update_group() to update all group references"""
         # Storing all the available pattern groups in a distinct lists for reference
-        self.all_groups: List = self.groups_where(self.patterns)  # All groups
-        self.active_groups: List = self.groups_where(
-            self.patterns, [True]
-        )  # Active groups
-        self.inactive_groups: List = self.groups_where(
-            self.patterns, [False]
-        )  # Inactive groups
+        # All groups
+        self.all_groups: List = self.groups_where(self.patterns)
+        # Active groups
+        self.active_groups: List = self.groups_where(self.patterns, [True])
+        # Inactive groups
+        self.inactive_groups: List = self.groups_where(self.patterns, [False])
+
+        return Self
 
     @log_decorator(logger, "off")  # Runs for every row, logs off by default
-    def update_match_counts(self):
+    def update_match_counts(self) -> Self:
         """Updates the per group match count dictionary and the overall count variable.
         Based on the per regex counts in the 'patterns' dictionary."""
         # Clear existing counts
@@ -221,9 +222,10 @@ class Sanitiser:
             if value["group"] in self.active_groups:
                 self.group_matches[value["group"]] += value["matches"]
                 self.total_matches += value["matches"]
+        return self
 
     @log_decorator(logger)
-    def set_placeholders(self, placeholder_dict: Dict[str, str]) -> "Sanitiser":
+    def set_placeholders(self, placeholder_dict: Dict[str, str]) -> Self:
         """Function to change the placeholders from their defaults
         Accepts a dict with {'group_name': 'placeholder',...}"""
         # Check supplied patterns all exist
@@ -248,7 +250,7 @@ class Sanitiser:
         return self
 
     @log_decorator(logger)
-    def select_groups(self, pattern_groups: List) -> "Sanitiser":
+    def select_groups(self, pattern_groups: List[str]) -> Self:
         """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
         # Check that each pattern exists
         for x in pattern_groups:
@@ -270,10 +272,11 @@ class Sanitiser:
         return self
 
     @log_decorator(logger)
-    def sort_patterns(self):
+    def sort_patterns(self) -> Self:
         """Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
         Making sure the patterns are run in order of rank regardless of other actions."""
         self.patterns = self.order_patterns(self.patterns)
+        return self
 
     @log_decorator(logger)
     def add_pattern(
@@ -301,7 +304,7 @@ class Sanitiser:
         self.update_groups()  # Update selected groups lists
 
     @log_decorator(logger, "info", suffix_message="Sanitise data")
-    def sanitise(self):
+    def sanitise(self) -> Self:
         """Run all selected patterns in order, updating the 'raw_output_data'.
 
         Run every selected regex pattern for every item, in every list, in every key, in the self.raw_output_data dict.
