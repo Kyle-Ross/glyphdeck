@@ -17,7 +17,6 @@ Optional_dFrame = Optional[pd.DataFrame]
 dfList = List[pd.DataFrame]
 RecordList = List[Record]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
-Optional_IntStrList = Optional[Union[List[Union[int, str]], Union[int, str]]]
 
 
 def assert_and_log_type_is_data(variable: Data, var_name: str):

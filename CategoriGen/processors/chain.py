@@ -13,7 +13,6 @@ from CategoriGen.validation.data_types import (
     Data,
     Optional_dFrame,
     Optional_Data,
-    Optional_IntStrList,
     Record,
     Records,
     dFrame_and_Data_Tuple,
@@ -775,7 +774,7 @@ class Chain:
     @log_decorator(logger)
     def get_output(
         self,
-        record_keys: Optional_IntStrList = None,
+        record_keys: Optional[Union[List[Union[int, str]], Union[int, str]]] = None,
         output_type: str = "dataframe",
         rebase: bool = True,
         combine: bool = True,
@@ -885,7 +884,7 @@ class Chain:
         self,
         file_type: str,
         file_name_prefix: str,
-        record_keys: Optional_IntStrList = None,
+        record_keys: Optional[Union[List[Union[int, str]], Union[int, str]]] = None,
         rebase: bool = True,
         combine: bool = True,
         xlsx_use_sheets: bool = True,
