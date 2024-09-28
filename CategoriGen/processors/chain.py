@@ -18,7 +18,6 @@ from CategoriGen.validation.data_types import (
     Optional_IntStrList,
     Record,
     Records,
-    Str_or_dFrame,
     dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
@@ -40,7 +39,7 @@ class Chain:
     @log_decorator(logger, "info", suffix_message="Initialise Chain object")
     def __init__(
         self,
-        data_source: Str_or_dFrame,
+        data_source: Union[str, pd.DataFrame],
         id_column: str,
         data_columns: Union[str, List[str]],
         encoding: str = "utf-8",

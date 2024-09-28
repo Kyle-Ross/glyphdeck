@@ -12,7 +12,6 @@ from CategoriGen.tools.file_importers import get_xlsx, get_csv, file_validation
 from CategoriGen.validation.data_types import (
     Data,
     Optional_Data,
-    Str_or_dFrame,
     Optional_dFrame,
     dFrame_and_Data_Tuple,
 )
@@ -107,7 +106,7 @@ def prepare_csv(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Data
 
 
 def type_conditional_prepare(
-    data_source: Str_or_dFrame, id_column, data_columns, encoding, sheet_name
+    data_source: Union[str, pd.DataFrame], id_column, data_columns, encoding, sheet_name
 ) -> dFrame_and_Data_Tuple:
     """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
     # Initialising variables
