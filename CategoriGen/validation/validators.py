@@ -1,3 +1,5 @@
+from typing import Union, List
+
 from pydantic import BaseModel, Field, field_validator
 
 from CategoriGen.tools.loggers import ValidatorsLogger, assert_and_log_error
@@ -21,7 +23,7 @@ class BaseValidatorModel(BaseModel):
     @field_validator(
         "sentiment_score", check_fields=False
     )  # Check fields uses since the item_model inherits from base
-    def check_decimal_places(cls, v):
+    def check_decimal_places(cls, v: Union[float, int]) -> Union[float, int]:
         if isinstance(v, float) or v in (
             -1,
             0,
@@ -36,7 +38,7 @@ class BaseValidatorModel(BaseModel):
         return v
 
     @field_validator("sentiment_score", check_fields=False)
-    def sentiment_float_in_range(cls, v):
+    def sentiment_float_in_range(cls, v: Union[float, int]) -> Union[float, int]:
         global sentiment_min, sentiment_max
         if isinstance(v, float) or v in (-1, 0, 1):
             minimum: float = sentiment_min
@@ -50,7 +52,9 @@ class BaseValidatorModel(BaseModel):
         return v
 
     @field_validator("per_sub_category_sentiment_scores", check_fields=False)
-    def list_of_sentiment_floats_in_range(cls, v):
+    def list_of_sentiment_floats_in_range(
+        cls, v: List[Union[float, int]]
+    ) -> List[Union[float, int]]:
         global sentiment_min, sentiment_max
         if isinstance(v, list):
             for x in v:
@@ -78,7 +82,7 @@ class BaseValidatorModel(BaseModel):
         return v
 
     @field_validator("top_categories", check_fields=False)
-    def list_1_to_5(cls, v):
+    def list_1_to_5(cls, v: List) -> List:
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 5
@@ -91,7 +95,7 @@ class BaseValidatorModel(BaseModel):
         return v
 
     @field_validator("sub_categories", check_fields=False)
-    def list_1_to_30(cls, v):
+    def list_1_to_30(cls, v: List) -> List:
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 30
