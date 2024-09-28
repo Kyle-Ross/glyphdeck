@@ -12,7 +12,7 @@ from CategoriGen.validation.data_types import (
     assert_and_log_is_type_or_list_of,
     DataDict,
     Optional_DataDict,
-    Record,
+    RecordDict,
     RecordsDict,
 )
 from CategoriGen.tools.loggers import (
@@ -326,7 +326,7 @@ class Chain:
                 )
 
     @log_decorator(logger)
-    def record(self, record_identifier: Union[int, str]) -> Record:
+    def record(self, record_identifier: Union[int, str]) -> RecordDict:
         """Returns the record corresponding to the provided record number or record title."""
         if isinstance(record_identifier, int):
             return self.records[record_identifier]
@@ -448,7 +448,7 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_record(self) -> Record:
+    def latest_record(self) -> RecordDict:
         """Returns the latest 'record' from 'records'."""
         return self.record(self.latest_key)
 

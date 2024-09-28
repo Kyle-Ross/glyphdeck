@@ -11,8 +11,10 @@ logger = DataTypesLogger().setup()
 # Types that will be used across the project
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
-Record = Dict[str, Union[str, None, List[str], datetime, timedelta, DataDict, pd.DataFrame]]
-RecordsDict = Dict[int, Record]
+RecordDict = Dict[
+    str, Union[str, None, List[str], datetime, timedelta, DataDict, pd.DataFrame]
+]
+RecordsDict = Dict[int, RecordDict]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):
