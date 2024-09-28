@@ -23,7 +23,6 @@ from CategoriGen.validation.data_types import (
     StrList,
     Str_or_StrList,
     Str_or_dFrame,
-    dFrame,
     dFrameObjListDict,
     dFrame_and_Data_Tuple,
 )
@@ -76,7 +75,7 @@ class Chain:
         prepared_data: Data = prep_results[1]
 
         # Before proceeding, set the 'protected' base variables (indicated by the leading underscore)
-        self._base_dataframe: dFrame = copy.deepcopy(prepared_df)
+        self._base_dataframe: pd.DataFrame = copy.deepcopy(prepared_df)
         self._base_id_column = id_column
 
         # Finally, save this as the first record, while updating the expected length
@@ -365,7 +364,7 @@ class Chain:
         return self.record(key)["data"]
 
     @log_decorator(logger)
-    def df(self, key: Union[int, str], recreate=False) -> dFrame:
+    def df(self, key: Union[int, str], recreate=False) -> pd.DataFrame:
         """Returns the dataframe corresponding to the provided record_identifier number.
         If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
         # Create the record's dataframe if it didn't exist yet, and return it
