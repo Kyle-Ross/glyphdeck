@@ -31,6 +31,15 @@ logger = ChainLogger().setup()
 
 
 class Chain:
+    """
+    Chain class is designed to handle and process a sequence of data records. 
+
+    Attributes:
+        records (Dict[int, RecordDict]): A dictionary to hold all records.
+        expected_len (int): The number of values expected in each list in the records data.
+        sanitiser (Sanitiser): An instance of the Sanitiser class to handle data sanitization.
+        llm_handler (LLMHandler): An instance to handle operations related to large language models.
+    """
     @log_decorator(logger, "info", suffix_message="Initialise Chain object")
     def __init__(
         self,
@@ -40,7 +49,19 @@ class Chain:
         encoding: str = "utf-8",
         sheet_name: Union[int, str] = 0,
     ):
-        """Common object for storing and passing the chained results of data processing."""
+        """
+        Initializes the Chain instance with the provided data source and configuration parameters.
+
+        Args:
+            data_source: The source of the data, which can be either a file path (str) or a DataFrame.
+            id_column: The name of the column to be used as the unique identifier.
+            data_columns: The column(s) from the data source to be processed. Can be a single column name (str) or a list of column names (List[str]).
+            encoding: The encoding format for reading data if `data_source` is a file. Defaults to "utf-8".
+            sheet_name: The sheet name or index for reading data if `data_source` is an Excel file. Defaults to 0.
+
+        Returns:
+            None
+        """
 
         # Initialise the records and expected_len variables
         self.expected_len = 0
