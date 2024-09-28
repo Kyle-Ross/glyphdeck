@@ -134,7 +134,7 @@ class Chain:
             # Actives all selections to be based on selected record key
             self.use_selected_of_record: bool = False
             # The key or title of the record to be accessed for use
-            self.selected_record_key: Optional[Union[int, str]] = None
+            self.selected_record_identifier: Optional[Union[int, str]] = None
             # Input data which is used by llm_handler.run_async()
             self.selected_input_data: Optional_DataDict = None
             # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
@@ -152,10 +152,10 @@ class Chain:
                 assert_and_log_error(
                     logger,
                     "error",
-                    self.selected_record_key is not None,
+                    self.selected_record_identifier is not None,
                     "self.selected_record_key has not been set",
                 )
-                key = self.selected_record_key
+                key = self.selected_record_identifier
             # Otherwise use the latest key
             else:
                 key = self.outer_chain.latest_key
@@ -243,16 +243,16 @@ class Chain:
             "info",
             suffix_message="Set chain.llm_handler to use a specified record",
         )
-        def use_record(self, record_key: Union[int, str]):
+        def use_record(self, record_identifier: Union[int, str]):
             """Sets chain.llm_handler to use a specified record"""
             # Assert the input type and assign the new record key
             assert_and_log_error(
                 logger,
                 "error",
-                isinstance(record_key, (int, str)),
-                "record_key key must be int or str",
+                isinstance(record_identifier, (int, str)),
+                "record_identifier key must be int or str",
             )
-            self.selected_record_key: Union[int, str] = record_key
+            self.selected_record_identifier: Union[int, str] = record_identifier
             # Set selection state
             self.use_selected: bool = False
             self.use_selected_of_record: bool = True
@@ -341,37 +341,37 @@ class Chain:
             )
 
     @log_decorator(logger)
-    def title(self, key: Union[int, str]) -> str:
+    def title(self, record_identifier: Union[int, str]) -> str:
         """Returns the title corresponding to the provided record_identifier number."""
-        return self.record(key)["title"]
+        return self.record(record_identifier)["title"]
 
     @log_decorator(logger)
-    def dt(self, key: Union[int, str]) -> datetime:
+    def dt(self, record_identifier: Union[int, str]) -> datetime:
         """Returns the datetime corresponding to the provided record_identifier number."""
-        return self.record(key)["dt"]
+        return self.record(record_identifier)["dt"]
 
     @log_decorator(logger)
-    def data(self, key: Union[int, str]) -> DataDict:
+    def data(self, record_identifier: Union[int, str]) -> DataDict:
         """Returns the data dictionary corresponding to the provided record_identifier number."""
-        return self.record(key)["data"]
+        return self.record(record_identifier)["data"]
 
     @log_decorator(logger)
-    def df(self, key: Union[int, str], recreate=False) -> pd.DataFrame:
+    def df(self, record_identifier: Union[int, str], recreate=False) -> pd.DataFrame:
         """Returns the dataframe corresponding to the provided record_identifier number.
         If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
         # Create the record's dataframe if it didn't exist yet, and return it
-        self.create_dataframes(key, recreate=recreate)
-        return self.record(key)["df"]
+        self.create_dataframes(record_identifier, recreate=recreate)
+        return self.record(record_identifier)["df"]
 
     @log_decorator(logger)
-    def record_delta(self, key: Union[int, str]) -> timedelta:
+    def record_delta(self, record_identifier: Union[int, str]) -> timedelta:
         """Returns the timedelta corresponding to the provided record_identifier number."""
-        return self.record(key)["delta"]
+        return self.record(record_identifier)["delta"]
 
     @log_decorator(logger)
-    def column_names(self, key: Union[int, str]) -> List[str]:
+    def column_names(self, record_identifier: Union[int, str]) -> List[str]:
         """Returns the list of column names corresponding to the provided record_identifier number."""
-        return self.record(key)["column_names"]
+        return self.record(record_identifier)["column_names"]
 
     @property
     @log_decorator(logger, is_property=True)
@@ -443,7 +443,7 @@ class Chain:
     @property
     @log_decorator(logger, is_property=True)
     def latest_key(self) -> int:
-        """Returns the max record_identifier from 'records'."""
+        """Returns the max key from 'records'."""
         return max(self.records.keys())
 
     @property
@@ -502,16 +502,16 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def key_validator(self, target_key: int):
+    def key_validator(self, record_identifier: int):
         """Validates that records have identical keys, and no new or missing keys."""
 
         def key_list(key) -> list:
             return [x for x, y in dict.items(self.data(key))]
 
-        target_title: str = self.title(target_key)
+        target_title: str = self.title(record_identifier)
         initial_title: str = self.title(1)
         initial_key_list: list = key_list(1)
-        target_key_list = key_list(target_key)
+        target_key_list = key_list(record_identifier)
         initial_not_target = [x for x in initial_key_list if x not in target_key_list]
         initial_not_target_len = len(initial_not_target)
         target_not_initial = [x for x in target_key_list if x not in initial_key_list]
@@ -524,12 +524,12 @@ class Chain:
                 key_validator_message = (
                     f"{initial_not_target_len} keys were in the initial record 1"
                     f"'{initial_title}"
-                    f"', but not in the appended record {target_key} '{target_title}'. "
+                    f"', but not in the appended record {record_identifier} '{target_title}'. "
                     f"These were the following keys: {initial_not_target}"
                 )
             if target_not_initial_len > 0:
                 key_validator_message = (
-                    f"{target_not_initial_len} keys were in the appended record {target_key} "
+                    f"{target_not_initial_len} keys were in the appended record {record_identifier} "
                     f"'{target_title}"
                     f"', but not in the initial record 1 '{initial_title}'. "
                     f"These were the following keys: {target_not_initial}"
@@ -541,10 +541,10 @@ class Chain:
             log_and_raise_error(logger, "error", KeyError, key_validator_message)
 
     @log_decorator(logger)
-    def data_validator(self, target_key: int):
+    def data_validator(self, record_identifier: int):
         """Checks that each list in the data of the target record has the expected length."""
-        target_data: DataDict = self.data(target_key)
-        target_title: str = self.title(target_key)
+        target_data: DataDict = self.data(record_identifier)
+        target_title: str = self.title(record_identifier)
         bad_keys: List[int] = []
         good_keys: List[int] = []
         for key, value in target_data.items():
@@ -646,7 +646,7 @@ class Chain:
     @log_decorator(logger)
     def create_dataframes(
         self,
-        records: Union[List[Union[int, str]], Union[int, str]],
+        record_identifiers: Union[List[Union[int, str]], Union[int, str]],
         use_suffix: bool = False,
         recreate=False,
     ) -> Self:
@@ -664,13 +664,13 @@ class Chain:
 
         # Conditionally handling input based on argument type
         # Converts all record identifers to keys
-        arg_type = type(records)
+        arg_type = type(record_identifiers)
         if arg_type is int:
-            records = [records]
+            record_identifiers = [record_identifiers]
         elif arg_type is str:
-            records = [self.title_key(records)]
+            record_identifiers = [self.title_key(record_identifiers)]
         elif arg_type is list:
-            records = [self.title_key(x) if isinstance(x, str) else x for x in records]
+            record_identifiers = [self.title_key(x) if isinstance(x, str) else x for x in record_identifiers]
         else:
             log_and_raise_error(
                 logger,
@@ -680,7 +680,7 @@ class Chain:
             )
 
         # Looping over selected records and creating the dataframes if necessary
-        for record_key in records:
+        for record_key in record_identifiers:
             # Only create if recreate is True or the df didn't exist yet
             if recreate or "df" not in self.records[record_key]:
                 # Get the needed items from the record
@@ -706,17 +706,17 @@ class Chain:
         return self
 
     @log_decorator(logger)
-    def get_combined(self, target_records: list, recreate=False) -> pd.DataFrame:
+    def get_combined(self, record_identifiers: list, recreate=False) -> pd.DataFrame:
         """Combines a list of records and returns them as a dataframe.
         Does not append anything to the chain."""
 
         # Create dataframes in the selected records
         # Use suffix ensures that all columns are suffixed with the record title, preventing duplicate columns
-        self.create_dataframes(target_records, use_suffix=True, recreate=recreate)
+        self.create_dataframes(record_identifiers, use_suffix=True, recreate=recreate)
 
         # Create a list of dataframes from the record keys
         dataframes = []
-        for record_key in target_records:
+        for record_key in record_identifiers:
             dataframes.append(self.record(record_key)["df"])
 
         # Using reduce to merge all Dataframes on their indices
@@ -733,14 +733,16 @@ class Chain:
 
     @log_decorator(logger)
     def get_rebase(
-        self, records: Union[List[Union[int, str]], Union[int, str]], recreate=False
+        self,
+        record_identifiers: Union[List[Union[int, str]], Union[int, str]],
+        recreate=False,
     ) -> pd.DataFrame:
         """Returns the specified records joined onto the base dataframe.
         If multiple records are provided they will be combined first.
         Does not append anything to the chain and is intended as an easy way to get your final output."""
 
         # Check the arguments
-        assert_and_log_is_type_or_list_of(records, "records", [str, int])
+        assert_and_log_is_type_or_list_of(record_identifiers, "records", [str, int])
 
         # Suffix added to column of non-base table fields if a duplicate exists in the merge
         # Blank by default, and is only set when individual records are specified
@@ -748,17 +750,19 @@ class Chain:
 
         # Access a single df if the argument is str or int
         # Access a single record if the argument is a single item list
-        if isinstance(records, list) and len(records) == 1:
-            output_df = copy.deepcopy(self.df(records[0]))
-            suffix_on_duplicate = self.title(records[0])
+        if isinstance(record_identifiers, list) and len(record_identifiers) == 1:
+            output_df = copy.deepcopy(self.df(record_identifiers[0]))
+            suffix_on_duplicate = self.title(record_identifiers[0])
         # combine the records before rebasing
         # Handles adding suffixes inside get_combined()
-        elif isinstance(records, list):
-            output_df = copy.deepcopy(self.get_combined(records, recreate=recreate))
+        elif isinstance(record_identifiers, list):
+            output_df = copy.deepcopy(
+                self.get_combined(record_identifiers, recreate=recreate)
+            )
         # Otherwise it is a str or int
         else:
-            output_df = copy.deepcopy(self.df(records))
-            suffix_on_duplicate = self.title(records)
+            output_df = copy.deepcopy(self.df(record_identifiers))
+            suffix_on_duplicate = self.title(record_identifiers)
 
         # Join the output_df on the base _base_dataframe and return
         return self._base_dataframe.merge(
@@ -772,7 +776,9 @@ class Chain:
     @log_decorator(logger)
     def get_output(
         self,
-        record_keys: Optional[Union[List[Union[int, str]], Union[int, str]]] = None,
+        record_identifiers: Optional[
+            Union[List[Union[int, str]], Union[int, str]]
+        ] = None,
         output_type: str = "dataframe",
         rebase: bool = True,
         combine: bool = True,
@@ -782,7 +788,7 @@ class Chain:
         Get the output of the specified records and return in specified output_type.
 
         Args:
-            record_keys (Optional_IntStrList, optional): List of record keys to be included in the output. If None, the latest record is used. Defaults to None.
+            record_identifiers (Optional_IntStrList, optional): List of records to be included in the output. If None, the latest record is used. Defaults to None.
             output_type (str, optional): The type of output to be returned. Can be 'dataframe', 'list', 'nested list', or 'dict'. Defaults to "dataframe".
             rebase (bool, optional): If True, the output dataframes are joined onto the base dataframe. Defaults to True.
             combine (bool, optional): If True, the records are combined before joining onto the base dataframe or returning. Defaults to True.
@@ -797,7 +803,7 @@ class Chain:
 
         # Check the provided keys
         assert_and_log_is_type_or_list_of(
-            record_keys, "record_keys", [str, int], allow_none=True
+            record_identifiers, "record_identifiers", [str, int], allow_none=True
         )
 
         # Check the provided output_type argument
@@ -810,15 +816,15 @@ class Chain:
         )
 
         # Sub in reference to the latest record if None was provided
-        if record_keys is None:
-            record_keys = [self.latest_key]
+        if record_identifiers is None:
+            record_identifiers = [self.latest_key]
         # If there was only 1 record_key provided as a str or int, put it in a list
         else:
-            if not isinstance(record_keys, list):
-                record_keys = [record_keys]
+            if not isinstance(record_identifiers, list):
+                record_identifiers = [record_identifiers]
 
         # Always set to combine when output_type is "dataframe" and len is > 1
-        if output_type == "dataframe" and len(record_keys) > 1:
+        if output_type == "dataframe" and len(record_identifiers) > 1:
             combine = True
 
         # Prepare a list to contain processed titles and dataframes
@@ -828,30 +834,41 @@ class Chain:
 
         # Append every record individually
         if not combine and not rebase:
-            for key in record_keys:
-                key_df_pair = [self.title(key), copy.deepcopy(self.df(key))]
-                title_dataframe_lists.append(key_df_pair)
+            for identifier in record_identifiers:
+                identifier_df_pair = [self.title(identifier), copy.deepcopy(self.df(identifier))]
+                title_dataframe_lists.append(identifier_df_pair)
 
         # Rebase, then append each record individually
         if not combine and rebase:
-            for key in record_keys:
-                key_df_pair = [self.title(key), self.get_rebase(key, recreate=recreate)]
-                title_dataframe_lists.append(key_df_pair)
+            for identifier in record_identifiers:
+                identifier_df_pair = [self.title(identifier), self.get_rebase(identifier, recreate=recreate)]
+                title_dataframe_lists.append(identifier_df_pair)
 
         # Combine all records, then append
         if combine and not rebase:
-            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
-            key_df_pair = [title, self.get_combined(record_keys, recreate=recreate)]
-            title_dataframe_lists.append(key_df_pair)
+            title = (
+                self.title(record_identifiers[0])
+                if len(record_identifiers) == 1
+                else "combined"
+            )
+            identifier_df_pair = [
+                title,
+                self.get_combined(record_identifiers, recreate=recreate),
+            ]
+            title_dataframe_lists.append(identifier_df_pair)
 
         # Combine all records, then rebase, then append
         if combine and rebase:
-            title = self.title(record_keys[0]) if len(record_keys) == 1 else "combined"
-            key_df_pair = [
+            title = (
+                self.title(record_identifiers[0])
+                if len(record_identifiers) == 1
+                else "combined"
+            )
+            identifier_df_pair = [
                 title,
-                self.get_rebase(record_keys, recreate=recreate),
+                self.get_rebase(record_identifiers, recreate=recreate),
             ]
-            title_dataframe_lists.append(key_df_pair)
+            title_dataframe_lists.append(identifier_df_pair)
 
         # Actualising the index and sorting the dataframes
         for title, df in title_dataframe_lists:
@@ -882,7 +899,9 @@ class Chain:
         self,
         file_type: str,
         file_name_prefix: str,
-        record_keys: Optional[Union[List[Union[int, str]], Union[int, str]]] = None,
+        record_identifiers: Optional[
+            Union[List[Union[int, str]], Union[int, str]]
+        ] = None,
         rebase: bool = True,
         combine: bool = True,
         xlsx_use_sheets: bool = True,
@@ -891,16 +910,16 @@ class Chain:
         """Writes the output of the selected records to a file or files."""
 
         # Sub in reference to the latest record if None was provided
-        if record_keys is None:
-            record_keys = [self.latest_key]
+        if record_identifiers is None:
+            record_identifiers = [self.latest_key]
         # If there was only 1 record_key provided as a str or int, put it in a list
         else:
-            if not isinstance(record_keys, list):
-                record_keys = [record_keys]
+            if not isinstance(record_identifiers, list):
+                record_identifiers = [record_identifiers]
 
         # Get the list of [[title, dataframe],] using self.get_output
         title_dataframe_lists = self.get_output(
-            record_keys,
+            record_identifiers,
             output_type="nested list",
             rebase=rebase,
             combine=combine,
@@ -938,7 +957,11 @@ class Chain:
         if file_type == "xlsx" and xlsx_use_sheets:
             # Set the path of the file containing the multiple sheets
             # If len is 1, use the title of the record for the path, otherwise use an empty string
-            file_title = self.title(record_keys[0]) if len(record_keys) == 1 else ""
+            file_title = (
+                self.title(record_identifiers[0])
+                if len(record_identifiers) == 1
+                else ""
+            )
             path = make_path(file_title)
 
             # Writing each record to its own sheet in the same xlsx file

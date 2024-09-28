@@ -67,7 +67,7 @@ ic(
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="chain-xlsx-rebase=False-combine=False-sheets=False",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=False,
         combine=False,
         xlsx_use_sheets=False,
@@ -82,7 +82,7 @@ ic(
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=False",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=True,
         combine=False,
         xlsx_use_sheets=False,
@@ -95,7 +95,7 @@ ic(
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="chain-xlsx-rebase=True-combine=True-sheets=False",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=True,
         combine=True,
         xlsx_use_sheets=False,
@@ -110,7 +110,7 @@ ic(
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="chain-xlsx-rebase=True-combine=False-sheets=True",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=True,
         combine=False,
         xlsx_use_sheets=True,
@@ -125,7 +125,7 @@ ic(
     chain.write_output(
         file_type="csv",
         file_name_prefix="chain-csv-rebase=False-combine=False",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=False,
         combine=False,
     )
@@ -137,7 +137,7 @@ ic(
     chain.write_output(
         file_type="csv",
         file_name_prefix="chain-csv-rebase=True-combine=False",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=True,
         combine=False,
     )
@@ -149,7 +149,7 @@ ic(
     chain.write_output(
         file_type="csv",
         file_name_prefix="chain-csv-rebase=True-combine=True",
-        record_keys=[2, 3],
+        record_identifiers=[2, 3],
         rebase=True,
         combine=True,
     )

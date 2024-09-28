@@ -49,7 +49,7 @@ def main():
     chain.write_output(
         file_type="xlsx",
         file_name_prefix="Chain Test",
-        record_keys=["sanitised", "HandlerOutput1"],
+        record_identifiers=["sanitised", "HandlerOutput1"],
         rebase=True,
         xlsx_use_sheets=False,
     )

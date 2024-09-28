@@ -171,7 +171,7 @@ class TestChain(unittest.TestCase):
         self.chain.write_output(
             file_type="csv",
             file_name_prefix="Test",
-            record_keys=["Example1"],
+            record_identifiers=["Example1"],
             rebase=True,
             xlsx_use_sheets=False,
         )
