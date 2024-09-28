@@ -11,7 +11,6 @@ Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 RecordsDict = Dict[int, Record]
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
-RecordList = List[Record]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):
