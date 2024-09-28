@@ -18,7 +18,6 @@ from CategoriGen.validation.data_types import (
     Optional_IntStrList,
     Record,
     Records,
-    Str_or_StrList,
     Str_or_dFrame,
     dFrame_and_Data_Tuple,
 )
@@ -43,7 +42,7 @@ class Chain:
         self,
         data_source: Str_or_dFrame,
         id_column: str,
-        data_columns: Str_or_StrList,
+        data_columns: Union[str, List[str]],
         encoding: str = "utf-8",
         sheet_name: Union[int, str] = 0,
     ):
