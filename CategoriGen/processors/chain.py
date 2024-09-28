@@ -12,7 +12,6 @@ from CategoriGen.validation.data_types import (
     assert_and_log_is_type_or_list_of,
     Data,
     IntStrList,
-    Optional_StrList,
     Optional_dFrame,
     Optional_Data,
     Optional_Str,
@@ -146,7 +145,7 @@ class Chain:
             # Input data which is used by llm_handler.run_async()
             self.selected_input_data: Optional_Data = None
             # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
-            self.selected_column_names: Optional_StrList = None
+            self.selected_column_names: Optional[List[str]] = None
             # Contains the name of the selected record title, which is appended to the cache identifier to keep it unique
             self.selected_record_title: Optional_Str = None
 
@@ -276,7 +275,7 @@ class Chain:
             suffix_message="Sets chain.llm_handler to use specified data and columns",
         )
         def use_selection(
-            self, data: Data, record_title: str, column_names: Optional_StrList = None
+            self, data: Data, record_title: str, column_names: Optional[List[str]] = None
         ):
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
             # Assert argument types, and check record title is unique
@@ -602,7 +601,7 @@ class Chain:
         self,
         title: str,
         data: Data,
-        column_names: Optional_StrList = None,
+        column_names: Optional[List[str]] = None,
         update_expected_len: bool = False,
     ):
         """Adds a new record to the 'records' dictionary."""
