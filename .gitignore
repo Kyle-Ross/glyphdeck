@@ -166,3 +166,4 @@ cython_debug/
 /output/
 .vscode/
 .idea/
+.prompts/
