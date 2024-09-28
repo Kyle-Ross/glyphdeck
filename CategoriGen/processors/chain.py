@@ -472,7 +472,7 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_df(self, recreate=False) -> Optional[pd.DataFrame]:
+    def latest_df(self, recreate=False) -> pd.DataFrame:
         """Returns the latest 'df' from the latest 'record' in 'records'.
         If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
         return self.df(self.latest_key, recreate=recreate)
