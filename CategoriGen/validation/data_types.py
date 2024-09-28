@@ -13,7 +13,6 @@ Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 RecordsDict = Dict[int, Record]
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
-dfList = List[pd.DataFrame]
 RecordList = List[Record]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, DataDict]
 
