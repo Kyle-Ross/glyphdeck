@@ -86,7 +86,9 @@ def prepare_df(
     "info",
     suffix_message="Running dataframe prepper via xslx",
 )
-def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> Tuple[pd.DataFrame, DataDict]:
+def prepare_xlsx(
+    file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
+) -> Tuple[pd.DataFrame, DataDict]:
     """Wrapper for prepare_df() that loads data from an xlsx file."""
     source_table = get_xlsx(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
@@ -97,14 +99,20 @@ def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> Tuple[pd.DataF
     "info",
     suffix_message="Running dataframe prepper via csv",
 )
-def prepare_csv(file_path, id_column, data_columns, **kwargs) -> Tuple[pd.DataFrame, DataDict]:
+def prepare_csv(
+    file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
+) -> Tuple[pd.DataFrame, DataDict]:
     """Wrapper for prepare_df() that loads data from a csv file."""
     source_table = get_csv(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
 
 
 def type_conditional_prepare(
-    data_source: Union[str, pd.DataFrame], id_column, data_columns, encoding, sheet_name
+    data_source: Union[str, pd.DataFrame],
+    id_column: str,
+    data_columns: Union[str, List[str]],
+    encoding: str,
+    sheet_name: str,
 ) -> Tuple[pd.DataFrame, DataDict]:
     """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
     # Initialising variables
