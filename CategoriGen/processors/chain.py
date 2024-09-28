@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Self
+from typing import Self, Union
 import copy
 import re
 import os
@@ -12,7 +12,6 @@ from CategoriGen.validation.data_types import (
     assert_and_log_is_type_or_list_of,
     Data,
     IntList,
-    IntStr,
     IntStrList,
     Optional_IntStr,
     Optional_StrList,
@@ -52,7 +51,7 @@ class Chain:
         id_column: str,
         data_columns: Str_or_StrList,
         encoding: str = "utf-8",
-        sheet_name: IntStr = 0,
+        sheet_name: Union[int, str] = 0,
     ):
         """Common object for storing and passing the chained results of data processing."""
 
@@ -158,7 +157,7 @@ class Chain:
 
         @property
         @log_decorator(logger, is_property=True)
-        def active_record_key(self) -> IntStr:
+        def active_record_key(self) -> int:
             """Returns the selected record key when self.use_selected_of_record is True.
             Otherwise returns the key of the latest record"""
             # Use the selected key to access the record
@@ -257,7 +256,7 @@ class Chain:
             "info",
             suffix_message="Set chain.llm_handler to use a specified record",
         )
-        def use_record(self, record_key: IntStr):
+        def use_record(self, record_key: Union[int, str]):
             """Sets chain.llm_handler to use a specified record"""
             # Assert the input type and assign the new record key
             assert_and_log_error(
@@ -266,7 +265,7 @@ class Chain:
                 isinstance(record_key, (int, str)),
                 "record_key key must be int or str",
             )
-            self.selected_record_key: IntStr = record_key
+            self.selected_record_key: Union[int, str] = record_key
             # Set selection state
             self.use_selected: bool = False
             self.use_selected_of_record: bool = True
@@ -337,7 +336,7 @@ class Chain:
                 )
 
     @log_decorator(logger)
-    def record(self, record_identifier: IntStr) -> Record:
+    def record(self, record_identifier: Union[int, str]) -> Record:
         """Returns the record corresponding to the provided record number or record title."""
         if isinstance(record_identifier, int):
             return self.records[record_identifier]
@@ -352,22 +351,22 @@ class Chain:
             )
 
     @log_decorator(logger)
-    def title(self, key: IntStr) -> str:
+    def title(self, key: Union[int, str]) -> str:
         """Returns the title corresponding to the provided record_identifier number."""
         return self.record(key)["title"]
 
     @log_decorator(logger)
-    def dt(self, key: IntStr) -> datetime:
+    def dt(self, key: Union[int, str]) -> datetime:
         """Returns the datetime corresponding to the provided record_identifier number."""
         return self.record(key)["dt"]
 
     @log_decorator(logger)
-    def data(self, key: IntStr) -> Data:
+    def data(self, key: Union[int, str]) -> Data:
         """Returns the data dictionary corresponding to the provided record_identifier number."""
         return self.record(key)["data"]
 
     @log_decorator(logger)
-    def df(self, key: IntStr, recreate=False) -> dFrame:
+    def df(self, key: Union[int, str], recreate=False) -> dFrame:
         """Returns the dataframe corresponding to the provided record_identifier number.
         If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
         # Create the record's dataframe if it didn't exist yet, and return it
@@ -375,12 +374,12 @@ class Chain:
         return self.record(key)["df"]
 
     @log_decorator(logger)
-    def record_delta(self, key: IntStr) -> timedelta:
+    def record_delta(self, key: Union[int, str]) -> timedelta:
         """Returns the timedelta corresponding to the provided record_identifier number."""
         return self.record(key)["delta"]
 
     @log_decorator(logger)
-    def column_names(self, key: IntStr) -> StrList:
+    def column_names(self, key: Union[int, str]) -> StrList:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
 
