@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import pandas as pd
 import openpyxl  # noqa: F401  -- Not referenced, but avoids errors with pd.read_excel()
@@ -9,8 +10,6 @@ from CategoriGen.tools.loggers import (
     assert_and_log_error,
     log_and_raise_error
 )
-
-from CategoriGen.validation.data_types import Optional_Str
 
 logger = FileImportersToolsLogger().setup()
 
@@ -45,7 +44,7 @@ def file_validation(file_path: str) -> str:
     assert_and_log_error(logger, "error", isinstance(file_path, str), f"file_path argument '{file_path}' is not a string")
 
     # Initialising holder variable
-    file_type: Optional_Str = None  # The source as a df
+    file_type: Optional[str] = None  # The source as a df
 
     # 1.0 - the string is a findable file path
     if os.path.isfile(file_path):

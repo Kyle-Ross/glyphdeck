@@ -14,7 +14,6 @@ from CategoriGen.validation.data_types import (
     IntStrList,
     Optional_dFrame,
     Optional_Data,
-    Optional_Str,
     Optional_IntStrList,
     Record,
     Records,
@@ -145,7 +144,7 @@ class Chain:
             # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
             self.selected_column_names: Optional[List[str]] = None
             # Contains the name of the selected record title, which is appended to the cache identifier to keep it unique
-            self.selected_record_title: Optional_Str = None
+            self.selected_record_title: Optional[str] = None
 
         @property
         @log_decorator(logger, is_property=True)
