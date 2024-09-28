@@ -8,7 +8,8 @@ from CategoriGen.tools.loggers import DataTypesLogger
 
 logger = DataTypesLogger().setup()
 
-# Types that will be used across the project
+# Common types that will be used across the project
+# Types for which it will be clearly to hint them in this abbreviated format in function signatures
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
 RecordDict = Dict[
