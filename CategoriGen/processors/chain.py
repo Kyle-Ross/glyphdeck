@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Self, Union, Optional, List, Dict
+from typing import Self, Union, Optional, List, Dict, Tuple
 import copy
 import re
 import os
@@ -14,7 +14,6 @@ from CategoriGen.validation.data_types import (
     Optional_DataDict,
     Record,
     RecordsDict,
-    dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
     ChainLogger,
@@ -56,7 +55,7 @@ class Chain:
         }
 
         # Prepare the data depending on the data_source type
-        prep_results: dFrame_and_Data_Tuple = type_conditional_prepare(
+        prep_results: Tuple[pd.DataFrame, DataDict] = type_conditional_prepare(
             data_source, id_column, data_columns, encoding, sheet_name
         )
 

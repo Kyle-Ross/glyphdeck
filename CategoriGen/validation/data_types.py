@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union, Dict, List, Optional, Tuple
-
-import pandas as pd
+from typing import Union, Dict, List, Optional
 
 from CategoriGen.tools.loggers import assert_and_log_error
 from CategoriGen.tools.loggers import DataTypesLogger
@@ -14,7 +12,6 @@ RecordsDict = Dict[int, Record]
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
 RecordList = List[Record]
-dFrame_and_Data_Tuple = Tuple[pd.DataFrame, DataDict]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):

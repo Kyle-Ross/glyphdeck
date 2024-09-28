@@ -1,4 +1,4 @@
-from typing import Union, List, Optional
+from typing import Union, List, Optional, Tuple
 
 import pandas as pd
 
@@ -12,7 +12,6 @@ from CategoriGen.tools.file_importers import get_xlsx, get_csv, file_validation
 from CategoriGen.validation.data_types import (
     DataDict,
     Optional_DataDict,
-    dFrame_and_Data_Tuple,
 )
 
 logger = PrepperLogger().setup()
@@ -25,7 +24,7 @@ logger = PrepperLogger().setup()
 )
 def prepare_df(
     source_table: pd.DataFrame, id_column: str, data_columns: Union[str, List[str]]
-) -> dFrame_and_Data_Tuple:
+) -> Tuple[pd.DataFrame, DataDict]:
     """Prepares a dataframe into the common data dict where keys are ids and values are lists of selected data column values.
     Validates the provided arguments for id_columns and data_columns."""
     # Adapts strings into a list if provided
@@ -87,7 +86,7 @@ def prepare_df(
     "info",
     suffix_message="Running dataframe prepper via xslx",
 )
-def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Data_Tuple:
+def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> Tuple[pd.DataFrame, DataDict]:
     """Wrapper for prepare_df() that loads data from an xlsx file."""
     source_table = get_xlsx(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
@@ -98,7 +97,7 @@ def prepare_xlsx(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Dat
     "info",
     suffix_message="Running dataframe prepper via csv",
 )
-def prepare_csv(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Data_Tuple:
+def prepare_csv(file_path, id_column, data_columns, **kwargs) -> Tuple[pd.DataFrame, DataDict]:
     """Wrapper for prepare_df() that loads data from a csv file."""
     source_table = get_csv(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
@@ -106,7 +105,7 @@ def prepare_csv(file_path, id_column, data_columns, **kwargs) -> dFrame_and_Data
 
 def type_conditional_prepare(
     data_source: Union[str, pd.DataFrame], id_column, data_columns, encoding, sheet_name
-) -> dFrame_and_Data_Tuple:
+) -> Tuple[pd.DataFrame, DataDict]:
     """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
     # Initialising variables
     source_table: Optional[pd.DataFrame] = None  # The source as a df
