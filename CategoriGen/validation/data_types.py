@@ -17,8 +17,7 @@ Optional_dFrame = Optional[pd.DataFrame]
 dfList = List[pd.DataFrame]
 RecordList = List[Record]
 dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
-IntStrList = Union[List[Union[int, str]], Union[int, str]]
-Optional_IntStrList = Optional[IntStrList]
+Optional_IntStrList = Optional[Union[List[Union[int, str]], Union[int, str]]]
 
 
 def assert_and_log_type_is_data(variable: Data, var_name: str):
@@ -47,7 +46,7 @@ def assert_and_log_type_is_data(variable: Data, var_name: str):
 
 
 def assert_and_log_is_type_or_list_of(
-    variable: IntStrList,
+    variable: Union[List[Union[int, str]], Union[int, str]],
     var_name: str,
     allowed_list_types: list,
     allow_none: bool = False,

@@ -11,7 +11,6 @@ from CategoriGen.validation.data_types import (
     assert_and_log_type_is_data,
     assert_and_log_is_type_or_list_of,
     Data,
-    IntStrList,
     Optional_dFrame,
     Optional_Data,
     Optional_IntStrList,
@@ -272,7 +271,10 @@ class Chain:
             suffix_message="Sets chain.llm_handler to use specified data and columns",
         )
         def use_selection(
-            self, data: Data, record_title: str, column_names: Optional[List[str]] = None
+            self,
+            data: Data,
+            record_title: str,
+            column_names: Optional[List[str]] = None,
         ):
             """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified."""
             # Assert argument types, and check record title is unique
@@ -646,7 +648,10 @@ class Chain:
 
     @log_decorator(logger)
     def create_dataframes(
-        self, records: IntStrList, use_suffix: bool = False, recreate=False
+        self,
+        records: Union[List[Union[int, str]], Union[int, str]],
+        use_suffix: bool = False,
+        recreate=False,
     ) -> Self:
         """Creates Dataframes in the selected records, and adds column names back on with optional suffixes.
         Returns the provided record keys afterwards.
@@ -721,7 +726,8 @@ class Chain:
         # Skip if there is one record
         if len(dataframes) > 1:
             combined_df = reduce(
-                lambda x, y: pd.merge(x, y, left_index=True, right_index=True), dataframes
+                lambda x, y: pd.merge(x, y, left_index=True, right_index=True),
+                dataframes,
             )
         else:
             combined_df = dataframes[0]
@@ -729,7 +735,9 @@ class Chain:
         return combined_df
 
     @log_decorator(logger)
-    def get_rebase(self, records: IntStrList, recreate=False) -> pd.DataFrame:
+    def get_rebase(
+        self, records: Union[List[Union[int, str]], Union[int, str]], recreate=False
+    ) -> pd.DataFrame:
         """Returns the specified records joined onto the base dataframe.
         If multiple records are provided they will be combined first.
         Does not append anything to the chain and is intended as an easy way to get your final output."""
@@ -896,7 +904,7 @@ class Chain:
         # Get the list of [[title, dataframe],] using self.get_output
         title_dataframe_lists = self.get_output(
             record_keys,
-            output_type = "nested list",
+            output_type="nested list",
             rebase=rebase,
             combine=combine,
             recreate=recreate,
