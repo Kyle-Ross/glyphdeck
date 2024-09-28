@@ -1,3 +1,4 @@
+from typing import Tuple, Callable
 import hashlib
 import os
 
@@ -10,7 +11,7 @@ logger = CacheLogger().setup()
 
 
 @log_decorator(logger, suffix_message="Check or create cache, return object and path")
-def cache_creator(cache_dir: str, max_mb_size: int):
+def cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
     """Checks if a cache exists, if not, creates it. Returns the cache object and file path afterwards."""
     # Creates the caches directory and returns the full cache file path within
     full_cache_dir = os.path.join(create_caches_directory(logger), cache_dir)
@@ -21,7 +22,7 @@ def cache_creator(cache_dir: str, max_mb_size: int):
 
 
 @log_decorator(logger, suffix_message="Grab OpenAI completions if in cache, otherwise API")
-def openai_cache(cache_dir, max_mb_size: int = 1000):
+def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
     """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
     cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
     records will be culled."""
