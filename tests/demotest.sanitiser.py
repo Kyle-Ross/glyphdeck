@@ -6,10 +6,10 @@ logging.disable(logging.CRITICAL)
 from icecream import ic  # noqa: E402
 
 from CategoriGen.processors.sanitiser import Sanitiser  # noqa: E402
-from CategoriGen.validation.data_types import Data  # noqa: E402
+from CategoriGen.validation.data_types import DataDict  # noqa: E402
 
 # Example data with targets for removal
-data_example: Data = {
+data_example: DataDict = {
     1: [
         r"I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",

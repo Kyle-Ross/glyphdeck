@@ -10,16 +10,15 @@ logger = DataTypesLogger().setup()
 
 # Types that will be used across the project
 Record = Union[str, Union[datetime, None, timedelta, dict, list]]
-Records = Dict[int, Record]
-Data = Dict[int, List]
-Optional_Data = Optional[Data]
-Optional_dFrame = Optional[pd.DataFrame]
+RecordsDict = Dict[int, Record]
+DataDict = Dict[int, List]
+Optional_DataDict = Optional[DataDict]
 dfList = List[pd.DataFrame]
 RecordList = List[Record]
-dFrame_and_Data_Tuple = Tuple[pd.DataFrame, Data]
+dFrame_and_Data_Tuple = Tuple[pd.DataFrame, DataDict]
 
 
-def assert_and_log_type_is_data(variable: Data, var_name: str):
+def assert_and_log_type_is_data(variable: DataDict, var_name: str):
     """Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type"""
     assert_and_log_error(
         logger,

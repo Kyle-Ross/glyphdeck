@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Optional
 
 import pandas as pd
 
@@ -10,9 +10,8 @@ from CategoriGen.tools.loggers import (
 )
 from CategoriGen.tools.file_importers import get_xlsx, get_csv, file_validation
 from CategoriGen.validation.data_types import (
-    Data,
-    Optional_Data,
-    Optional_dFrame,
+    DataDict,
+    Optional_DataDict,
     dFrame_and_Data_Tuple,
 )
 
@@ -77,7 +76,7 @@ def prepare_df(
         )
 
     # Convert the dataframe into the Chain compatible 'Data' type and return (df, output_data)
-    prepared_data: Data = {}
+    prepared_data: DataDict = {}
     for _, row in source_table.iterrows():
         prepared_data[row[id_column]] = [row[column] for column in data_columns]
     return (source_table, prepared_data)
@@ -110,8 +109,8 @@ def type_conditional_prepare(
 ) -> dFrame_and_Data_Tuple:
     """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
     # Initialising variables
-    source_table: Optional_dFrame = None  # The source as a df
-    prepared_data: Optional_Data = None  # The data in the 'Data' type
+    source_table: Optional[pd.DataFrame] = None  # The source as a df
+    prepared_data: Optional_DataDict = None  # The data in the 'Data' type
 
     # Assess the input argument and conditionally prepare the data
     data_source_type = type(data_source)

@@ -10,7 +10,7 @@ from CategoriGen.tools.loggers import (
     log_and_raise_error,
     log_decorator,
 )
-from CategoriGen.validation.data_types import Data
+from CategoriGen.validation.data_types import DataDict
 
 logger = SanitiserLogger().setup()
 
@@ -180,17 +180,17 @@ class Sanitiser:
         return groups
 
     @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
-    def __init__(self, input_data: Data, pattern_groups: List = None) -> None:
-        self.input_data: Data = input_data
+    def __init__(self, input_data: DataDict, pattern_groups: List = None) -> None:
+        self.input_data: DataDict = input_data
         # Will be changed by processes below
-        self.output_data: Data = copy.deepcopy(input_data)
+        self.output_data: DataDict = copy.deepcopy(input_data)
         self.overall_run_state = False
         self.all_groups: List = self.groups_where(self.patterns)
         # Sets the patterns dict only if selection was made
         if pattern_groups is not None:
             self.select_groups(pattern_groups)
         # Sets self.all_groups, self.active_groups & self.inactive_groups using patterns dict
-        self.update_groups()  
+        self.update_groups()
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
 

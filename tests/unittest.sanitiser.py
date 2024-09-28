@@ -6,12 +6,12 @@ logging.disable(logging.CRITICAL)
 import unittest  # noqa: E402
 from CategoriGen.tools.loggers import SanitiserLogger  # noqa: E402
 from CategoriGen.processors.sanitiser import Sanitiser  # noqa: E402
-from CategoriGen.validation.data_types import Data, assert_and_log_type_is_data  # noqa: E402
+from CategoriGen.validation.data_types import DataDict, assert_and_log_type_is_data  # noqa: E402
 
 logger = SanitiserLogger().setup
 
 # Example data with targets for removal
-test_data: Data = {
+test_data: DataDict = {
     1: [
         r"Record One! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",

@@ -6,11 +6,11 @@ logging.disable(logging.CRITICAL)
 import pandas as pd  # noqa: E402
 from icecream import ic  # noqa: E402
 
-from CategoriGen.validation.data_types import Data  # noqa: E402
+from CategoriGen.validation.data_types import DataDict  # noqa: E402
 from CategoriGen.processors.chain import Chain  # noqa: E402
 from CategoriGen.validation import validators  # noqa: E402
 
-meals_dict: Data = {
+meals_dict: DataDict = {
     1: ["Sushi", "Ramen", "Tempura"],
     2: ["Paella", "Tapas", "Churros"],
     3: ["Pizza", "Pasta", "Gelato"],
@@ -145,7 +145,9 @@ print("\nRun it again, with the data selected with the record id")
 ic(chain.llm_handler.run("HandlerOutput3"))
 ic(chain.latest_data)
 
-print("\nSwap it back to using the latest data, which is the recently created handler output")
+print(
+    "\nSwap it back to using the latest data, which is the recently created handler output"
+)
 ic(chain.llm_handler.use_latest())
 ic(chain.llm_handler.active_record_title)
 ic(chain.llm_handler.active_record_key)

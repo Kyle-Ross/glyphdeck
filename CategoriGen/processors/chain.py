@@ -10,11 +10,10 @@ import pandas as pd
 from CategoriGen.validation.data_types import (
     assert_and_log_type_is_data,
     assert_and_log_is_type_or_list_of,
-    Data,
-    Optional_dFrame,
-    Optional_Data,
+    DataDict,
+    Optional_DataDict,
     Record,
-    Records,
+    RecordsDict,
     dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
@@ -46,7 +45,7 @@ class Chain:
 
         # Initialise the records and expected_len variables
         self.expected_len = 0
-        self.records: Records = {
+        self.records: RecordsDict = {
             0: {
                 "title": "initialisation",
                 "dt": datetime.now(),
@@ -63,7 +62,7 @@ class Chain:
 
         # Unpack the returned tuple
         prepared_df = prep_results[0]
-        prepared_data: Data = prep_results[1]
+        prepared_data: DataDict = prep_results[1]
 
         # Before proceeding, set the 'protected' base variables (indicated by the leading underscore)
         self._base_dataframe: pd.DataFrame = copy.deepcopy(prepared_df)
@@ -87,7 +86,7 @@ class Chain:
                 self.use_selected: bool = False
 
                 # Data to use if use_selected = True, otherwise use latest
-                self.selected_data: Optional_Data = None
+                self.selected_data: Optional_DataDict = None
 
             @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
             def run(self, title: str = "sanitised"):
@@ -138,7 +137,7 @@ class Chain:
             # The key or title of the record to be accessed for use
             self.selected_record_key: Optional[Union[int, str]] = None
             # Input data which is used by llm_handler.run_async()
-            self.selected_input_data: Optional_Data = None
+            self.selected_input_data: Optional_DataDict = None
             # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs
             self.selected_column_names: Optional[List[str]] = None
             # Contains the name of the selected record title, which is appended to the cache identifier to keep it unique
@@ -188,7 +187,7 @@ class Chain:
 
         @property
         @log_decorator(logger, is_property=True)
-        def active_input_data(self) -> Data:
+        def active_input_data(self) -> DataDict:
             """Returns the selected data when self.use_selected is True.
             Otherwise returns data from the active record key"""
             # Use data stored in self.selected_column_names
@@ -271,7 +270,7 @@ class Chain:
         )
         def use_selection(
             self,
-            data: Data,
+            data: DataDict,
             record_title: str,
             column_names: Optional[List[str]] = None,
         ):
@@ -353,7 +352,7 @@ class Chain:
         return self.record(key)["dt"]
 
     @log_decorator(logger)
-    def data(self, key: Union[int, str]) -> Data:
+    def data(self, key: Union[int, str]) -> DataDict:
         """Returns the data dictionary corresponding to the provided record_identifier number."""
         return self.record(key)["data"]
 
@@ -468,13 +467,13 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_data(self) -> Data:
+    def latest_data(self) -> DataDict:
         """Returns the latest 'data' from the latest 'record' in 'records'."""
         return self.data(self.latest_key)
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_df(self, recreate=False) -> Optional_dFrame:
+    def latest_df(self, recreate=False) -> Optional[pd.DataFrame]:
         """Returns the latest 'df' from the latest 'record' in 'records'.
         If recreate is True, the dataframe will be re-created from whatever data is in the record instead."""
         return self.df(self.latest_key, recreate=recreate)
@@ -545,7 +544,7 @@ class Chain:
     @log_decorator(logger)
     def data_validator(self, target_key: int):
         """Checks that each list in the data of the target record has the expected length."""
-        target_data: Data = self.data(target_key)
+        target_data: DataDict = self.data(target_key)
         target_title: str = self.title(target_key)
         bad_keys: List[int] = []
         good_keys: List[int] = []
@@ -598,7 +597,7 @@ class Chain:
     def append(
         self,
         title: str,
-        data: Data,
+        data: DataDict,
         column_names: Optional[List[str]] = None,
         update_expected_len: bool = False,
     ):

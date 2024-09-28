@@ -9,10 +9,10 @@ import copy  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from CategoriGen.processors.chain import Chain  # noqa: E402
-from CategoriGen.validation.data_types import Data  # noqa: E402
+from CategoriGen.validation.data_types import DataDict  # noqa: E402
 
 # Example data with targets for removal
-data_record1: Data = {
+data_record1: DataDict = {
     1: [
         r"Record One! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
@@ -30,7 +30,7 @@ data_record1: Data = {
     ],
 }
 
-data_record2: Data = {
+data_record2: DataDict = {
     1: [
         r"Record Two! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
