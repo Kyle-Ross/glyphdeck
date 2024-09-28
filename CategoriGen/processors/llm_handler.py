@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple, Dict, Union, Coroutine
 import asyncio
 import copy
 import os
@@ -209,7 +209,7 @@ class LLMHandler:
         suffix_message="Checking if self.new_output_data is not none, indicating data has been flattened",
         show_nesting=False,
     )
-    def output_data(self):
+    def output_data(self) -> DataDict:
         """Accesses output data but only if the data has been flattened."""
         assert_and_log_error(
             logger,
@@ -227,7 +227,7 @@ class LLMHandler:
         suffix_message="Checking if self.new_column_names is not none, indicating data has been flattened",
         show_nesting=False,
     )
-    def column_names(self):
+    def column_names(self) -> List[str]:
         """Accesses column names but only if the new names have been generated during data flattening."""
         assert_and_log_error(
             logger,
@@ -272,7 +272,7 @@ class LLMHandler:
         item_validation_model=None,
         item_temperature: Optional[float] = None,
         item_max_validation_retries: Optional[int] = None,
-    ) -> tuple:
+    ) -> Tuple[Dict, int, Union[str, int]]:
         """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
@@ -349,7 +349,7 @@ class LLMHandler:
         suffix_message="Create coroutines",
         show_nesting=False,
     )
-    async def create_coroutines(self, func) -> list:
+    async def create_coroutines(self, func) -> List[Coroutine]:
         """Creates coroutines for the provided input data, using the specified LLM function."""
         # Create and store the tasks across the whole variable in a list
         coroutines = []
