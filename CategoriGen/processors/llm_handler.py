@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import asyncio
 import copy
 import os
@@ -15,7 +15,6 @@ from tenacity import (
 from CategoriGen.validation.data_types import (
     Data,
     assert_and_log_type_is_data,
-    StrList,
     Optional_Data,
     Optional_StrList,
 )
@@ -415,7 +414,7 @@ class LLMHandler:
         suffix_message="Convert output data for compatibility with chain class",
         show_nesting=False,
     )
-    def flatten_output_data(self, column_names: StrList):
+    def flatten_output_data(self, column_names: List[str]):
         """Flattens output data into a dictionary of lists for compatibility with the chain class.
         Also creates the new column names for the eventual output."""
         # Storage for key: list pairs representing rows

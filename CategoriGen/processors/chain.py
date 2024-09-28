@@ -19,7 +19,6 @@ from CategoriGen.validation.data_types import (
     Optional_IntStrList,
     Record,
     Records,
-    StrList,
     Str_or_StrList,
     Str_or_dFrame,
     dFrame_and_Data_Tuple,
@@ -172,7 +171,7 @@ class Chain:
 
         @property
         @log_decorator(logger, is_property=True)
-        def active_column_names(self) -> StrList:
+        def active_column_names(self) -> List[str]:
             """Returns the selected column names when self.use_selected is True.
             Otherwise returns columns names of the active record key"""
             # Use column names stored in self.selected_column_names
@@ -375,7 +374,7 @@ class Chain:
         return self.record(key)["delta"]
 
     @log_decorator(logger)
-    def column_names(self, key: Union[int, str]) -> StrList:
+    def column_names(self, key: Union[int, str]) -> List[str]:
         """Returns the list of column names corresponding to the provided record_identifier number."""
         return self.record(key)["column_names"]
 
@@ -491,7 +490,7 @@ class Chain:
 
     @property
     @log_decorator(logger, is_property=True)
-    def latest_column_names(self) -> StrList:
+    def latest_column_names(self) -> List[str]:
         """Returns the latest 'column_names' from 'records'."""
         return self.column_names(self.latest_key)
 
