@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Self, Union, Optional
+from typing import Self, Union, Optional, List, Dict
 import copy
 import re
 import os
@@ -23,7 +23,6 @@ from CategoriGen.validation.data_types import (
     StrList,
     Str_or_StrList,
     Str_or_dFrame,
-    dFrameObjListDict,
     dFrame_and_Data_Tuple,
 )
 from CategoriGen.tools.loggers import (
@@ -779,7 +778,7 @@ class Chain:
         rebase: bool = True,
         combine: bool = True,
         recreate: bool = False,
-    ) -> dFrameObjListDict:
+    ) -> Union[pd.DataFrame, List[pd.DataFrame], Dict[Union[int, str], pd.DataFrame]]:
         """
         Get the output of the specified records and return in specified output_type.
 
