@@ -1,6 +1,6 @@
-import os
-
 from typing import Tuple
+import logging
+import os
 
 from CategoriGen.path_constants import (
     OUTPUT_DIR,
@@ -12,7 +12,9 @@ from CategoriGen.path_constants import (
 # Not implementing function decorator logging here since it is nested within the functions themselves
 
 
-def create_directory(directory, directory_name, logger_arg) -> str:
+def create_directory(
+    directory: str, directory_name: str, logger_arg: logging.Logger
+) -> str:
     """Function to check a directory and create it if it doesn't exist, logging the outcome & returning the directory"""
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -26,22 +28,22 @@ def create_directory(directory, directory_name, logger_arg) -> str:
     return directory
 
 
-def create_output_directory(logger_arg) -> str:
+def create_output_directory(logger_arg: logging.Logger) -> str:
     """Checks and creates the output directory and returns the path"""
     return create_directory(OUTPUT_DIR, "Output", logger_arg)
 
 
-def create_logs_directory(logger_arg) -> str:
+def create_logs_directory(logger_arg: logging.Logger) -> str:
     """Checks and creates the logs directory and returns the path"""
     return create_directory(OUTPUT_LOGS_DIR, "Logs", logger_arg)
 
 
-def create_caches_directory(logger_arg) -> str:
+def create_caches_directory(logger_arg: logging.Logger) -> str:
     """Checks and creates the caches directory and returns the path"""
     return create_directory(OUTPUT_CACHES_DIR, "Caches", logger_arg)
 
 
-def create_files_directory(logger_arg) -> str:
+def create_files_directory(logger_arg: logging.Logger) -> str:
     """Checks and creates the files directory and returns the path"""
     return create_directory(OUTPUT_FILES_DIR, "Files", logger_arg)
 
