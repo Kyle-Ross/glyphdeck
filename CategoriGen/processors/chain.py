@@ -11,7 +11,6 @@ from CategoriGen.validation.data_types import (
     assert_and_log_type_is_data,
     assert_and_log_is_type_or_list_of,
     Data,
-    IntList,
     IntStrList,
     Optional_StrList,
     Optional_dFrame,
@@ -552,8 +551,8 @@ class Chain:
         """Checks that each list in the data of the target record has the expected length."""
         target_data: Data = self.data(target_key)
         target_title: str = self.title(target_key)
-        bad_keys: IntList = []
-        good_keys: IntList = []
+        bad_keys: List[int] = []
+        good_keys: List[int] = []
         for key, value in target_data.items():
             if len(value) != self.expected_len:
                 bad_keys.append(key)
