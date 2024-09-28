@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Self, Union
+from typing import Self, Union, Optional
 import copy
 import re
 import os
@@ -13,7 +13,6 @@ from CategoriGen.validation.data_types import (
     Data,
     IntList,
     IntStrList,
-    Optional_IntStr,
     Optional_StrList,
     Optional_dFrame,
     Optional_Data,
@@ -147,7 +146,7 @@ class Chain:
             # Actives all selections to be based on selected record key
             self.use_selected_of_record: bool = False
             # The key or title of the record to be accessed for use
-            self.selected_record_key: Optional_IntStr = None
+            self.selected_record_key: Optional[Union[int, str]] = None
             # Input data which is used by llm_handler.run_async()
             self.selected_input_data: Optional_Data = None
             # Contains selected column names to be used by flatten_output_data() when generating for any multiplicative per-column outputs

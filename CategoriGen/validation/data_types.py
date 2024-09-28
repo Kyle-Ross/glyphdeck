@@ -11,7 +11,6 @@ logger = DataTypesLogger().setup()
 # Types that will be used across the project
 Record = Union[str, Union[datetime, None, timedelta, dict, list]]
 Records = Dict[int, Record]
-Optional_IntStr = Optional[Union[int, str]]
 Data = Dict[Union[int, str], List]
 Optional_Data = Optional[Data]
 dFrame = pd.DataFrame
