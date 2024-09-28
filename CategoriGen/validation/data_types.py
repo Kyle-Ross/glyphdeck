@@ -1,16 +1,18 @@
 from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 
+import pandas as pd
+
 from CategoriGen.tools.loggers import assert_and_log_error
 from CategoriGen.tools.loggers import DataTypesLogger
 
 logger = DataTypesLogger().setup()
 
 # Types that will be used across the project
-Record = Union[str, Union[datetime, None, timedelta, dict, list]]
-RecordsDict = Dict[int, Record]
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
+Record = Dict[str, Union[str, None,  datetime, timedelta, DataDict, pd.DataFrame]]
+RecordsDict = Dict[int, Record]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):
