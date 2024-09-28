@@ -1,7 +1,7 @@
 import traceback
 import logging
 import os
-from typing import Type
+from typing import Type, Callable
 
 from CategoriGen.tools.directory_creators import check_logs_directory
 import CategoriGen.logger_constants as logger_constants
@@ -13,7 +13,7 @@ def log_and_raise_error(
     error_type: Type[BaseException],
     message: str,
     include_traceback: bool = False,
-) -> None:
+):
     """Logs and raises an error with the same message string. Wraps in custom error to indicate this is an error that
     was handled. Later this will prevent it being re-raised as an log level CRITICAL unhandled error"""
 
@@ -59,7 +59,7 @@ def assert_and_log_error(
     condition: bool,
     message: str,
     include_traceback: bool = False,
-) -> None:
+):
     """Asserts a condition and logs the specified error"""
     if not condition:
         log_and_raise_error(
@@ -67,8 +67,8 @@ def assert_and_log_error(
         )
 
 
-def check_logger_exists(logger_name: str):
-    """Checks if a logger_arg with the provided logger_name exists"""
+def check_logger_exists(logger_name: str) -> bool:
+    """Checks if a logger_arg with the provided logger_name exists, and returns the name"""
     existing_loggers = logging.Logger.manager.loggerDict.keys()
     # To be evaluated as True if it exists at all
     return logger_name in existing_loggers
@@ -78,15 +78,15 @@ nesting_level = 0
 
 
 def log_decorator(
-    logger_arg,
+    logger_arg: logging.Logger,
     level: str = "debug",
     start: str = "Start",
     finish: str = "Finish",
     suffix_message: str = None,
-    is_static_method=False,
-    is_property=False,
-    show_nesting=True,  # Include or exclude the nesting prefix
-):
+    is_static_method: bool = False,
+    is_property: bool = False,
+    show_nesting: bool = True,  # Include or exclude the nesting prefix
+) -> Callable:
     """Function decorator to log the start and end of a function with an optional suffixes & message"""
 
     # Set the prefix text
@@ -99,7 +99,7 @@ def log_decorator(
 
     levels = ["debug", "info", "warning", "error", "critical"]
 
-    def outer_wrapper(func):
+    def outer_wrapper(func: Callable) -> Callable:
         # Build the messages
         func_name = func.__name__ + "()"
 
@@ -119,7 +119,7 @@ def log_decorator(
         )
         finish_message = " | ".join(finish_message_list)
 
-        def inner_wrapper(*args, **kwargs):
+        def inner_wrapper(*args, **kwargs) -> Callable:
             def conditional_log(message):
                 """Make a different type of log depending on the provided arguments"""
                 if level == "off":
@@ -155,12 +155,12 @@ def log_decorator(
 
 
 def exception_logger(
-    logger_arg, include_traceback=True
-):  # At this level the function is a "decorator factory"
+    logger_arg: logging.Logger, include_traceback: bool = True
+) -> Callable:  # At this level the function is a "decorator factory"
     """Decorator function to automatically log any errors that are not explicitly handled elsewhere"""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args, **kwargs) -> Callable:
             try:
                 # Try the function that was passed in
                 return func(*args, **kwargs)
