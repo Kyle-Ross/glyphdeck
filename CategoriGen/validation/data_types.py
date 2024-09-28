@@ -11,7 +11,7 @@ logger = DataTypesLogger().setup()
 # Types that will be used across the project
 DataDict = Dict[int, List]
 Optional_DataDict = Optional[DataDict]
-Record = Dict[str, Union[str, None,  datetime, timedelta, DataDict, pd.DataFrame]]
+Record = Dict[str, Union[str, None, List[str], datetime, timedelta, DataDict, pd.DataFrame]]
 RecordsDict = Dict[int, Record]
 
 
