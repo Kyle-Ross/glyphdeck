@@ -3,7 +3,7 @@ name = "glyphdeck"
 version = "1.0.0"
 description = "Streamlined asynchronous natural language categorisation & sentiment analysis using generative AI."
 authors = ["Kyle Ross <107285758+Kyle-Ross@users.noreply.github.com>"]
-license = "CC BY-NC-SA 4.0"
+license = "Elastic License 2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
