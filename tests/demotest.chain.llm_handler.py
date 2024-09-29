@@ -59,7 +59,7 @@ print("\nInitialise the llm_handler, which uses cascade.latest_data by default")
 ic(
     cascade.set_llm_handler(
         provider="OpenAI",
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         system_message=(
             "You are an expert food country identication system. "
             "Analyse the foods and provide a primary category "

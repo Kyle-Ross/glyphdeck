@@ -21,7 +21,7 @@ print("\nCreate the handler object")
 handler = LLMHandler(
     test_data,
     provider="OpenAI",
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     system_message=(
         "You are an expert word categorisation system. "
         "Analyse the words and provide a primary category "

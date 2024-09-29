@@ -17,10 +17,10 @@ cascade.sanitiser.run()
 # Set the LLM Handler for this cascade instance
 cascade.set_llm_handler(
     provider="OpenAI",
-    model="gpt-3.5-turbo",
+    model="gpt-4o-mini",
     system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
     validation_model=gd.validators.SubCats,
-    cache_identifier="PizzaShipComment_Sub_Categories",
+    cache_identifier="PizzaShopComment_Sub_Categories",
     use_cache=True,
     temperature=0.2,
     max_validation_retries=3,
