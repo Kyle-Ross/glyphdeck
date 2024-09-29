@@ -16,7 +16,38 @@ logger = SanitiserLogger().setup()
 
 
 class Sanitiser:
-    """Takes a string and uses selected patterns to replace private information with placeholders."""
+    """Sanitises strings by replacing private information with placeholders.
+
+    Attributes:
+        email_regex: A regex pattern string for matching email addresses.
+        email_pattern: A compiled regex pattern for matching email addresses.
+        folder_path_regex: A regex pattern string for matching folder paths.
+        folder_path_pattern: A compiled regex pattern for matching folder paths.
+        file_path_regex: A regex pattern string for matching full file paths.
+        file_path_pattern: A compiled regex pattern for matching full file paths.
+        url_regex: A regex pattern string for matching URLs.
+        url_pattern: A compiled regex pattern for matching URLs.
+        date_regex1: A regex pattern string for matching dates in the form dd-mm-yyyy.
+        date_pattern1: A compiled regex pattern for matching dates in the form dd-mm-yyyy.
+        date_regex2: A regex pattern string for matching dates like 1 Jan 22 and variations.
+        date_pattern2: A compiled regex pattern for matching dates like 1 Jan 22 and variations.
+        date_regex3: A regex pattern string for matching dates like 1-mar-2022 and variations.
+        date_pattern3: A compiled regex pattern for matching dates like 1-mar-2022 and variations.
+        number_regex: A regex pattern string for matching words that contain one or more digits.
+        number_pattern: A compiled regex pattern for matching words that contain one or more digits.
+        PatternsDict: Typing alias for a dictionary of patterns.
+        patterns: A dictionary containing regex patterns and their associated metadata.
+        input_data: The data to be sanitized.
+        output_data: A deepcopy of input_data which will be modified.
+        overall_run_state: A boolean indicating if any sanitisation has been run.
+        all_groups: A list of all group names from the patterns dictionary.
+        active_groups: A list of active group names from the patterns dictionary.
+        inactive_groups: A list of inactive group names from the patterns dictionary.
+        group_matches: A dictionary recording the number of matches per group.
+        total_matches: The total number of matches for all patterns.
+    """
+
+    # Takes a string and uses selected patterns to replace private information with placeholders.
 
     # Email addresses
     email_regex: str = (
@@ -129,7 +160,14 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def placeholder_check(patterns_dict: PatternsDict):
-        """Raises an error if any of the current placeholders contain non-alphabet characters excluding '<' and '>'."""
+        """Checks that all placeholders in the patterns dictionary contain only allowed characters.
+
+        Args:
+            patterns_dict: A dictionary containing regex patterns and their associated metadata.
+
+        Raises:
+            TypeError: If any placeholder contains non-alphabet characters excluding '<' and '>'.
+        """
         for key, value in patterns_dict.items():
             if not all(char.isalpha() or char in "<>" for char in value["placeholder"]):
                 error_message = (
@@ -146,7 +184,14 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def order_patterns(patterns_dict: PatternsDict) -> PatternsDict:
-        """Re-sorts the pattern dictionary by rank, for use if you have added a new pattern to the patterns attribute"""
+        """Re-sorts the pattern dictionary by rank.
+
+        Args:
+            patterns_dict: A dictionary containing regex patterns and their associated metadata.
+
+        Returns:
+            Dict: The sorted dictionary of patterns.
+        """
         # Change the dict to a list with nested tuples and sort it by ascending rank
         sorted_items: List[Tuple[Any, Any]] = sorted(
             patterns_dict.items(), key=lambda item: item[1]["rank"]
@@ -161,7 +206,14 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def remove_arrows(input_string: str) -> str:
-        """Removes '<' and '>' from a string"""
+        """Removes angle brackets from a string.
+
+        Args:
+            input_string: The string from which to remove '<' and '>'.
+
+        Returns:
+            str: The string without angle brackets.
+        """
         input_string = input_string.replace("<", "").replace(">", "")
         return input_string
 
@@ -170,7 +222,15 @@ class Sanitiser:
     def groups_where(
         patterns_dict: PatternsDict, active_type: Union[list, set] = (True, False)
     ) -> List[str]:
-        """Returns a list of groups with the desired 'active' statuses, Returns everything by default."""
+        """Returns a list of pattern groups based on their 'active' status.
+
+        Args:
+            patterns_dict: A dictionary containing regex patterns and their associated metadata.
+            active_type: A list or set defining the 'active' statuses to filter by. Defaults to (True, False).
+
+        Returns:
+            List[str]: A list of group names with the desired 'active' statuses.
+        """
         groups: List = [
             value["group"]
             for key, value in patterns_dict.items()
@@ -181,6 +241,15 @@ class Sanitiser:
 
     @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
     def __init__(self, input_data: DataDict, pattern_groups: List = None) -> None:
+        """Initializes a Sanitiser object with input data and optionally selected pattern groups.
+
+        Args:
+            input_data: The data to be sanitized.
+            pattern_groups: A list of pattern groups to activate. Defaults to Non, which means all will be activated.
+
+        Returns:
+            None
+        """
         self.input_data: DataDict = input_data
         # Will be changed by processes below
         self.output_data: DataDict = copy.deepcopy(input_data)
@@ -196,7 +265,12 @@ class Sanitiser:
 
     @log_decorator(logger)
     def update_groups(self) -> Self:
-        """Uses update_group() to update all group references"""
+        """Updates the lists of all, active, and inactive pattern groups based on the current patterns dictionary.
+
+        Returns:
+            Self: The updated instance of the Sanitiser class.
+        """
+        # Uses update_group() to update all group references
         # Storing all the available pattern groups in a distinct lists for reference
         # All groups
         self.all_groups: List = self.groups_where(self.patterns)
@@ -209,8 +283,13 @@ class Sanitiser:
 
     @log_decorator(logger, "off")  # Runs for every row, logs off by default
     def update_match_counts(self) -> Self:
-        """Updates the per group match count dictionary and the overall count variable.
-        Based on the per regex counts in the 'patterns' dictionary."""
+        """Updates the match count dictionary and the overall match count.
+
+        Returns:
+            Self: The updated instance of the Sanitiser class.
+        """
+        # Updates the per group match count dictionary and the overall count variable.
+        # Based on the per regex counts in the 'patterns' dictionary.
         # Clear existing counts
         self.group_matches: Dict[str, int] = {}
         self.total_matches: int = 0
@@ -226,8 +305,18 @@ class Sanitiser:
 
     @log_decorator(logger)
     def set_placeholders(self, placeholder_dict: Dict[str, str]) -> Self:
-        """Function to change the placeholders from their defaults
-        Accepts a dict with {'group_name': 'placeholder',...}"""
+        """Sets custom placeholders for the patterns.
+
+        Args:
+            placeholder_dict: A dictionary with group names as keys and custom placeholders as values.
+
+        Returns:
+            Self: The updated instance of the Sanitiser class.
+
+        Raises:
+            KeyError: If a provided key does not exist in the available patterns.
+        """
+        # Function to change the placeholders from their defaults
         # Check supplied patterns all exist
         for x in placeholder_dict:
             if x not in self.all_groups:
@@ -251,7 +340,18 @@ class Sanitiser:
 
     @log_decorator(logger)
     def select_groups(self, pattern_groups: List[str]) -> Self:
-        """Function to select groups of patterns to run, updating the 'active' attribute in the instance."""
+        """Activates or deactivates pattern groups.
+
+        Args:
+            pattern_groups: A list of pattern groups to activate. All others are deactivated.
+
+        Returns:
+            Self: The updated instance of the Sanitiser class.
+
+        Raises:
+            KeyError: If a provided group does not exist in the available patterns.
+        """
+        # Function to select groups of patterns to run, updating the 'active' attribute in the instance.
         # Check that each pattern exists
         for x in pattern_groups:
             if x not in self.all_groups:
@@ -273,8 +373,13 @@ class Sanitiser:
 
     @log_decorator(logger)
     def sort_patterns(self) -> Self:
-        """Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
-        Making sure the patterns are run in order of rank regardless of other actions."""
+        """Ensures patterns are sorted by their rank in ascending order.
+
+        Returns:
+            Self: The updated instance of the Sanitiser class.
+        """
+        # Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
+        # Making sure the patterns are run in order of rank regardless of other actions.
         self.patterns = self.order_patterns(self.patterns)
         return self
 
@@ -282,8 +387,23 @@ class Sanitiser:
     def add_pattern(
         self, pattern_name: str, group: str, placeholder: str, rank: float, regex: str
     ):
-        """Adds a new pattern to the 'patterns' dictionary, that will be run during the sanitise method
-        in addition to the existing patterns."""
+        """Adds a new pattern to the sanitiser.
+
+        Args:
+            pattern_name: The unique name for the pattern.
+            group: The group to which the new pattern belongs.
+            placeholder: The placeholder to substitute matches with.
+            rank: The rank indicating the order in which to process this pattern.
+            regex: The regex string to compile and use for matching.
+
+        Returns:
+            None
+
+        Raises:
+            TypeError: If the placeholder contains invalid characters.
+        """
+        # Adds a new pattern to the 'patterns' dictionary, that will be run during the sanitise method
+        # in addition to the existing patterns.
         # Build the inner dictionary
         new_pattern: Dict[str, Union[str, float, re.Pattern[str], bool]] = {
             "group": group,
@@ -305,13 +425,15 @@ class Sanitiser:
 
     @log_decorator(logger, "info", suffix_message="Sanitise data")
     def sanitise(self) -> Self:
-        """Run all selected patterns in order, updating the 'raw_output_data'.
+        """Sanitises the input data using active patterns.
 
-        Run every selected regex pattern for every item, in every list, in every key, in the self.raw_output_data dict.
-
-        Successive regex patterns recursively act on the output of the previous regex,
-        in the order defined at the class level.
+        Returns:
+            Self: The updated instance of the Sanitiser class.
         """
+        # Run all selected patterns in order, updating the 'raw_output_data'.
+        # Run every selected regex pattern for every item, in every list, in every key, in the self.raw_output_data dict.
+        # Successive regex patterns recursively act on the output of the previous regex,
+        # in the order defined at the class level.
         self.placeholder_check(self.patterns)  # Check placeholders
         for pattern_key, pattern_dict in self.patterns.items():
             pattern_dict["matches"] = 0  # Resetting the per pattern count
