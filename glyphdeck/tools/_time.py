@@ -23,7 +23,7 @@ def delta_time_formatter(total_seconds: float) -> str:
     return result
 
 
-class RuntimeLogBlock:
+class LogBlock:
     """Context manager that logs the time elapsed over the total runtime of a block.
 
     Attributes:
