@@ -1,6 +1,7 @@
 import traceback
 import logging
 import os
+import sys
 from typing import Type, Callable, Optional
 
 from glyphdeck.tools._directory_creators import check_logs_directory
@@ -212,48 +213,6 @@ def log_decorator(
     return outer_wrapper
 
 
-def exception_logger(
-    logger_arg: logging.Logger, include_traceback: bool = True
-) -> Callable:
-    """Decorator to automatically log any unhandled exceptions as critical.
-
-    Args:
-        logger_arg (logging.Logger): Logger instance to log the exception.
-        include_traceback (bool, optional): Whether to include the traceback in the log. Defaults to True.
-
-    Returns:
-        Callable: The decorated function.
-    """
-
-    def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> Callable:
-            try:
-                # Try the function that was passed in
-                return func(*args, **kwargs)
-            except Exception as error:
-                # Handled exceptions should have the name 'HandledError' (see log_and_raise_error())
-                # So if the exception has this name, just re-raise it - it will already have logging
-                error_name = type(error).__name__
-                if error_name == "HandledError":
-                    raise
-                # Otherwise, log the unhandled error as critical and then re-raise
-                else:
-                    # Build the log / error message
-                    error_message = (
-                        f" | Function | exception_logger() | Exit | | {error_name}"
-                    )
-                    if (
-                        include_traceback
-                    ):  # Include detailed traceback information in the log if specified
-                        error_message = f"{error_message} | \\n{traceback.format_exc().replace('\n', '\\n')}"
-                logger_arg.critical(error_message)
-                raise
-
-        return wrapper
-
-    return decorator
-
-
 def logger_setup(
     logger_name: str,
     format_string: str,
@@ -304,6 +263,50 @@ def logger_setup(
 
     # Return the configured logger_arg object
     return logger
+
+
+# Define the global exception handler
+def global_exception_logger(exctype, value, tb):
+    """Global exception handler that logs uncaught exceptions.
+
+    This function is set to `sys.excepthook` to handle uncaught exceptions globally. This is set on any import of `_logging` or `loggers`.
+    It skips logging for exceptions of type `HandledError`.
+
+    Args:
+        exctype (type): The exception type.
+        value (BaseException): The exception instance raised.
+        tb (traceback): Traceback object representing the point at which
+            the exception was raised.
+    """
+    # Handled exceptions should have the name 'HandledError'
+    if exctype.__name__ == "HandledError":
+        return
+
+    # Check if logger is already set up, if not, set it up
+    try:
+        if not check_logger_exists("unhandled_errors_logger"):
+            logger = logger_setup(
+                "unhandled_errors_logger",
+                "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+                logging.ERROR,
+                logging.ERROR,
+                os.path.join(check_logs_directory()[2], "base.log"),
+            )
+
+        # Build the log/error message
+        formatted_exception = "".join(traceback.format_exception(exctype, value, tb))
+        error_message = f" | Function | global_exception_logger() | Exit | | {exctype.__name__} | \\n{formatted_exception.replace('\n', '\\n')}"
+        # Log the critical error
+        logger.critical(error_message)
+    except Exception as handler_error:
+        # In case of any issues with logging, print the exception details to stderr as a fallback
+        print(f"Error in global_exception_logger: {handler_error}", file=sys.stderr)
+        print("Original exception was:", file=sys.stderr)
+        traceback.print_exception(exctype, value, tb)
+
+
+# Set the global exception handler to sys.excepthook when ever this module is imported
+sys.excepthook = global_exception_logger
 
 
 class BaseLogger:
@@ -485,21 +488,6 @@ class BaseWorkflowLogger(BaseLogger):
             logger_name="base_workflow",
             file_log_level=logger_constants.base_workflow_file_log_level,
             console_log_level=logger_constants.base_workflow_console_log_level,
-        )
-
-
-class UnhandledErrorsLogger(BaseLogger):
-    """Logger for handling otherwise Unhandled Errors.
-
-    Inherits from BaseLogger.
-    """
-
-    def __init__(self):
-        """Initializes the UnhandledErrorsLogger instance."""
-        super().__init__(
-            logger_name="unhandled_errors",
-            file_log_level=logger_constants.unhandled_errors_file_log_level,
-            console_log_level=logger_constants.unhandled_errors_console_log_level,
         )
 
 

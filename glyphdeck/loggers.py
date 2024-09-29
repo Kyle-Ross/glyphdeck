@@ -1,27 +1,19 @@
+# Import the python logging module
 import logging
-from .tools._logging import (
-    CascadeLogger,
-    LLMHandlerLogger,
-    SanitiserLogger,
-    CacheLogger,
-    FileImportersToolsLogger,
-    PrepperLogger,
-    StringsToolsLogger,
-    TimeToolsLogger,
-    DataTypesLogger,
-    ValidatorsLogger,
-    BaseWorkflowLogger,
-    UnhandledErrorsLogger,
-)
+
+# Import the internal logging module
+# Contains the global syshook logger which is set on import
+from .tools import _logging
+
 
 class Loggers:
     """
-    A centralized logger setup for various components within the application, 
+    A centralized logger setup for various components within the application,
     essentially adds loggers to the public interface without changing their internal representation.
 
     This class sets up multiple loggers, each aimed at handling specific types of logging activities.
     Each logger is an instance of its respective logging class and is initialized via its `setup` method.
-    
+
     This is run on import of glyphdeck, creating an instance of the Logger class called `logger`.
     This means loggers can be accessed like this:
 
@@ -48,7 +40,7 @@ class Loggers:
 
     def __init__(self):
         """
-        Initializes a new instance of the Loggers class. All loggers are set 
+        Initializes a new instance of the Loggers class. All loggers are set
         to None initially and are created upon first access.
         """
         self._cascade = None
@@ -90,7 +82,9 @@ class Loggers:
             logging.Logger: The Cascade logger instance.
         """
         if self._cascade is None:
-            self._cascade = self._get_or_create_logger('cascade', CascadeLogger)
+            self._cascade = self._get_or_create_logger(
+                "cascade", _logging.CascadeLogger
+            )
         return self._cascade
 
     @property
@@ -102,7 +96,9 @@ class Loggers:
             logging.Logger: The LLM handler logger instance.
         """
         if self._llm_handler is None:
-            self._llm_handler = self._get_or_create_logger('llm_handler', LLMHandlerLogger)
+            self._llm_handler = self._get_or_create_logger(
+                "llm_handler", _logging.LLMHandlerLogger
+            )
         return self._llm_handler
 
     @property
@@ -114,7 +110,9 @@ class Loggers:
             logging.Logger: The Sanitiser logger instance.
         """
         if self._sanitiser is None:
-            self._sanitiser = self._get_or_create_logger('sanitiser', SanitiserLogger)
+            self._sanitiser = self._get_or_create_logger(
+                "sanitiser", _logging.SanitiserLogger
+            )
         return self._sanitiser
 
     @property
@@ -126,7 +124,7 @@ class Loggers:
             logging.Logger: The Cache logger instance.
         """
         if self._cache is None:
-            self._cache = self._get_or_create_logger('cache', CacheLogger)
+            self._cache = self._get_or_create_logger("cache", _logging.CacheLogger)
         return self._cache
 
     @property
@@ -138,7 +136,9 @@ class Loggers:
             logging.Logger: The File Importers logger instance.
         """
         if self._file_importers is None:
-            self._file_importers = self._get_or_create_logger('file_importers', FileImportersToolsLogger)
+            self._file_importers = self._get_or_create_logger(
+                "file_importers", _logging.FileImportersToolsLogger
+            )
         return self._file_importers
 
     @property
@@ -152,7 +152,9 @@ class Loggers:
         if self._prepper is None:
             self._prepper
         if self._prepper is None:
-            self._prepper = self._get_or_create_logger('prepper', PrepperLogger)
+            self._prepper = self._get_or_create_logger(
+                "prepper", _logging.PrepperLogger
+            )
         return self._prepper
 
     @property
@@ -164,7 +166,9 @@ class Loggers:
             logging.Logger: The String Tools logger instance.
         """
         if self._string_tools is None:
-            self._string_tools = self._get_or_create_logger('string_tools', StringsToolsLogger)
+            self._string_tools = self._get_or_create_logger(
+                "string_tools", _logging.StringsToolsLogger
+            )
         return self._string_tools
 
     @property
@@ -176,7 +180,9 @@ class Loggers:
             logging.Logger: The Time Tools logger instance.
         """
         if self._time_tools is None:
-            self._time_tools = self._get_or_create_logger('time_tools', TimeToolsLogger)
+            self._time_tools = self._get_or_create_logger(
+                "time_tools", _logging.TimeToolsLogger
+            )
         return self._time_tools
 
     @property
@@ -188,7 +194,9 @@ class Loggers:
             logging.Logger: The Data Types logger instance.
         """
         if self._data_types is None:
-            self._data_types = self._get_or_create_logger('data_types', DataTypesLogger)
+            self._data_types = self._get_or_create_logger(
+                "data_types", _logging.DataTypesLogger
+            )
         return self._data_types
 
     @property
@@ -200,7 +208,9 @@ class Loggers:
             logging.Logger: The Validators logger instance.
         """
         if self._validators is None:
-            self._validators = self._get_or_create_logger('validators', ValidatorsLogger)
+            self._validators = self._get_or_create_logger(
+                "validators", _logging.ValidatorsLogger
+            )
         return self._validators
 
     @property
@@ -212,19 +222,10 @@ class Loggers:
             logging.Logger: The Workflow logger instance.
         """
         if self._workflow is None:
-            self._workflow = self._get_or_create_logger('workflow', BaseWorkflowLogger)
+            self._workflow = self._get_or_create_logger(
+                "workflow", _logging.BaseWorkflowLogger
+            )
         return self._workflow
 
-    @property
-    def unhandled_errors(self):
-        """
-        Gets the Unhandled Errors logger, initializing it if it doesn't already exist.
-
-        Returns:
-            logging.Logger: The Unhandled Errors logger instance.
-        """
-        if self._unhandled_errors is None:
-            self._unhandled_errors = self._get_or_create_logger('unhandled_errors', UnhandledErrorsLogger)
-        return self._unhandled_errors
 
 loggers = Loggers()
