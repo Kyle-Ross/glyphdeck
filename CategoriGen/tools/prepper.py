@@ -25,8 +25,31 @@ logger = PrepperLogger().setup()
 def prepare_df(
     source_table: pd.DataFrame, id_column: str, data_columns: Union[str, List[str]]
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Prepares a dataframe into the common data dict where keys are ids and values are lists of selected data column values.
-    Validates the provided arguments for id_columns and data_columns."""
+    """Prepares a dataframe into a common data dictionary format.
+
+    This function transforms a dataframe into a dictionary where keys are unique IDs
+    from a specified column, and values are lists of selected data column values. It
+    also validates the presence and uniqueness of the specified ID column and
+    ensures the data columns are correctly specified.
+
+    Args:
+        source_table (pd.DataFrame): The source dataframe to be prepared.
+        id_column (str): The name of the column that contains unique IDs.
+        data_columns (Union[str, List[str]]): A single column name or a list of
+            column names that contain the data to be extracted.
+
+    Returns:
+        Tuple[pd.DataFrame, DataDict]: A tuple containing the original dataframe
+        and a dictionary with IDs as keys and lists of column values as values.
+
+    Raises:
+        AssertionError: If `id_column` is not a string, does not exist in the
+            dataframe, or if the column contains duplicate values.
+        AssertionError: If `data_columns` is neither a string nor a list of
+            strings, or if the list contains duplicate column names.
+    """
+    # Prepares a dataframe into the common data dict where keys are ids and values are lists of selected data column values.
+    # Validates the provided arguments for id_columns and data_columns.
     # Adapts strings into a list if provided
     data_columns = [data_columns] if isinstance(data_columns, str) else data_columns
 
@@ -89,7 +112,26 @@ def prepare_df(
 def prepare_xlsx(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Wrapper for prepare_df() that loads data from an xlsx file."""
+    """Loads data from an XLSX file and prepares it into a common data dictionary format.
+
+    Args:
+        file_path (str): The path to the XLSX file to be loaded.
+        id_column (str): The name of the column that contains unique IDs.
+        data_columns (Union[str, List[str]]): A single column name or a list of
+            column names that contain the data to be extracted.
+        **kwargs: Additional keyword arguments to pass to the file loader.
+
+    Returns:
+        Tuple[pd.DataFrame, DataDict]: A tuple containing the dataframe loaded from
+        the XLSX file and a dictionary with IDs as keys and lists of column values
+        as values.
+
+    Raises:
+        FileNotFoundError: If the specified XLSX file does not exist.
+        ValueError: If the file cannot be read as an XLSX.
+        AssertionError: If there are issues validating `id_column` or `data_columns`.
+    """
+    # Wrapper for prepare_df() that loads data from an xlsx file.
     source_table = get_xlsx(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
 
@@ -102,7 +144,26 @@ def prepare_xlsx(
 def prepare_csv(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Wrapper for prepare_df() that loads data from a csv file."""
+    """Loads data from a CSV file and prepares it into a common data dictionary format.
+
+    Args:
+        file_path (str): The path to the CSV file to be loaded.
+        id_column (str): The name of the column that contains unique IDs.
+        data_columns (Union[str, List[str]]): A single column name or a list of
+            column names that contain the data to be extracted.
+        **kwargs: Additional keyword arguments to pass to the file loader.
+
+    Returns:
+        Tuple[pd.DataFrame, DataDict]: A tuple containing the dataframe loaded from
+        the CSV file and a dictionary with IDs as keys and lists of column values
+        as values.
+
+    Raises:
+        FileNotFoundError: If the specified CSV file does not exist.
+        ValueError: If the file cannot be read as a CSV.
+        AssertionError: If there are issues validating `id_column` or `data_columns`.
+    """
+    # Wrapper for prepare_df() that loads data from a csv file.
     source_table = get_csv(file_path, **kwargs)
     return prepare_df(source_table, id_column, data_columns)
 
@@ -114,7 +175,33 @@ def type_conditional_prepare(
     encoding: str,
     sheet_name: str,
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx."""
+    """Conditionally prepares data from various formats into a common data dictionary format.
+
+    Depending on the input format (dataframe, CSV file, or XLSX file), this function
+    runs the appropriate preparation routine to convert the data into a common
+    dictionary format.
+
+    Args:
+        data_source (Union[str, pd.DataFrame]): The data source to be prepared. This
+            can be a dataframe, a CSV file path, or an XLSX file path.
+        id_column (str): The name of the column that contains unique IDs.
+        data_columns (Union[str, List[str]]): A single column name or a list of
+            column names that contain the data to be extracted.
+        encoding (str): The encoding to use when reading text files.
+        sheet_name (str): The name of the sheet to read from in an XLSX file.
+
+    Returns:
+        Tuple[pd.DataFrame, DataDict]: A tuple containing the prepared dataframe and
+        a dictionary with IDs as keys and lists of column values as values.
+
+    Raises:
+        AssertionError: If `data_source` is not a dataframe or a string path to a
+            CSV/XLSX file.
+        FileNotFoundError: If the specified CSV/XLSX file does not exist.
+        ValueError: If the file cannot be read as a CSV/XLSX.
+        AssertionError: If there are issues validating `id_column` or `data_columns`.
+    """
+    # Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx.
     # Initialising variables
     source_table: Optional[pd.DataFrame] = None  # The source as a df
     prepared_data: Optional_DataDict = None  # The data in the 'Data' type
