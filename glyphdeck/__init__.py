@@ -8,7 +8,7 @@ from .tools import prepper
 
 # Enables logger access in the public interface like gylphdeck.loggers.cascade
 # Accesses or creates loggers only if they do not exist globally yet
-from .loggers import loggers # noqa: F401
+from .loggers import loggers
 
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
@@ -17,4 +17,5 @@ __all__ = [
     "LLMHandler",
     "Sanitiser",
     "prepper",
+    "loggers"
 ]
