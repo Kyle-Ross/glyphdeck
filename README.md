@@ -1,2 +1,2 @@
 # CategoriGen
-Streamlined asynchronous natural language categorisation & sentiment analysis using generative AI.
+Streamlined asynchronous natural language categorisation & sentiment analysis using generative AI. !
