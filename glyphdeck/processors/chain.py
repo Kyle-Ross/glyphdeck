@@ -7,7 +7,7 @@ import os
 
 import pandas as pd
 
-from CategoriGen.validation.data_types import (
+from glyphdeck.validation.data_types import (
     assert_and_log_type_is_data,
     assert_and_log_is_type_or_list_of,
     DataDict,
@@ -15,17 +15,17 @@ from CategoriGen.validation.data_types import (
     RecordDict,
     RecordsDict,
 )
-from CategoriGen.tools.loggers import (
+from glyphdeck.tools.loggers import (
     ChainLogger,
     assert_and_log_error,
     log_and_raise_error,
     log_decorator,
 )
-from CategoriGen.processors.sanitiser import Sanitiser
-from CategoriGen.processors.llm_handler import LLMHandler
-from CategoriGen.tools.prepper import type_conditional_prepare
-from CategoriGen.tools.directory_creators import create_files_directory
-from CategoriGen.path_constants import OUTPUT_FILES_DIR
+from glyphdeck.processors.sanitiser import Sanitiser
+from glyphdeck.processors.llm_handler import LLMHandler
+from glyphdeck.tools.prepper import type_conditional_prepare
+from glyphdeck.tools.directory_creators import create_files_directory
+from glyphdeck.path_constants import OUTPUT_FILES_DIR
 
 logger = ChainLogger().setup()
 

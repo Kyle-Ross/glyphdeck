@@ -4,8 +4,8 @@ import os
 
 from diskcache import Cache
 
-from CategoriGen.tools.directory_creators import create_caches_directory
-from CategoriGen.tools.loggers import CacheLogger, log_decorator
+from glyphdeck.tools.directory_creators import create_caches_directory
+from glyphdeck.tools.loggers import CacheLogger, log_decorator
 
 logger = CacheLogger().setup()
 

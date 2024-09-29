@@ -6,7 +6,7 @@ logging.disable(logging.CRITICAL)
 from icecream import ic  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
+from glyphdeck.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
 
 print("\nCreate example dataframe")
 df = pd.DataFrame(

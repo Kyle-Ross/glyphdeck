@@ -6,7 +6,7 @@ logging.disable(logging.CRITICAL)
 import pandas as pd  # noqa: E402
 from icecream import ic  # noqa: E402
 
-from CategoriGen.processors.chain import Chain  # noqa: E402
+from glyphdeck.processors.chain import Chain  # noqa: E402
 
 # Establish test data
 test_data = {

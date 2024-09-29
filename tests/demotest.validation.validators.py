@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 import pprint
 
-from CategoriGen.validation.validators import (
+from glyphdeck.validation.validators import (
     Sentiment,
     PrimaryCat,
     Top5Cats,

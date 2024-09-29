@@ -3,7 +3,7 @@ from typing import Union, Dict, List, Optional
 
 import pandas as pd
 
-from CategoriGen.tools.loggers import assert_and_log_error, DataTypesLogger
+from glyphdeck.tools.loggers import assert_and_log_error, DataTypesLogger
 
 logger = DataTypesLogger().setup()
 

@@ -12,20 +12,20 @@ from tenacity import (
     retry_if_exception_type,
 )
 
-from CategoriGen.validation.data_types import (
+from glyphdeck.validation.data_types import (
     DataDict,
     assert_and_log_type_is_data,
     Optional_DataDict,
 )
-from CategoriGen.validation import validators
-from CategoriGen.tools.loggers import (
+from glyphdeck.validation import validators
+from glyphdeck.tools.loggers import (
     assert_and_log_error,
     LLMHandlerLogger,
     log_decorator,
 )
-from CategoriGen.logger_constants import log_output_data, log_input_data
-from CategoriGen.tools.strings import string_cleaner
-from CategoriGen.tools.caching import openai_cache
+from glyphdeck.logger_constants import log_output_data, log_input_data
+from glyphdeck.tools.strings import string_cleaner
+from glyphdeck.tools.caching import openai_cache
 
 logger = LLMHandlerLogger().setup()
 logger.debug(" | Step | llm_handler.py | Action | Initialised logger")

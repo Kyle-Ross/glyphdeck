@@ -8,7 +8,7 @@ from datetime import datetime, timedelta  # noqa: E402
 import unittest  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from CategoriGen.processors.chain import Chain  # noqa: E402
+from glyphdeck.processors.chain import Chain  # noqa: E402
 
 
 class TestChain(unittest.TestCase):

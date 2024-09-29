@@ -1,4 +1,4 @@
-from CategoriGen.tools.loggers import StringsToolsLogger, log_decorator
+from glyphdeck.tools.loggers import StringsToolsLogger, log_decorator
 
 logger = StringsToolsLogger().setup()
 

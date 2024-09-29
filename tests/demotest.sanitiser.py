@@ -5,8 +5,8 @@ logging.disable(logging.CRITICAL)
 
 from icecream import ic  # noqa: E402
 
-from CategoriGen.processors.sanitiser import Sanitiser  # noqa: E402
-from CategoriGen.validation.data_types import DataDict  # noqa: E402
+from glyphdeck.processors.sanitiser import Sanitiser  # noqa: E402
+from glyphdeck.validation.data_types import DataDict  # noqa: E402
 
 # Example data with targets for removal
 data_example: DataDict = {

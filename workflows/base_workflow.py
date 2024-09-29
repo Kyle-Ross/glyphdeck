@@ -1,11 +1,11 @@
-from CategoriGen.processors.chain import Chain
-from CategoriGen.tools.loggers import (
+from glyphdeck.processors.chain import Chain
+from glyphdeck.tools.loggers import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
     exception_logger,
 )
-from CategoriGen.tools.time import RuntimeLogBlock
-from CategoriGen.validation import validators
+from glyphdeck.tools.time import RuntimeLogBlock
+from glyphdeck.validation import validators
 
 logger = BaseWorkflowLogger().setup()
 unhandled_errors_logger = UnhandledErrorsLogger().setup()

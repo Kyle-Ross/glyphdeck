@@ -8,8 +8,8 @@ import copy  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from CategoriGen.processors.chain import Chain  # noqa: E402
-from CategoriGen.validation.data_types import DataDict  # noqa: E402
+from glyphdeck.processors.chain import Chain  # noqa: E402
+from glyphdeck.validation.data_types import DataDict  # noqa: E402
 
 # Example data with targets for removal
 data_record1: DataDict = {

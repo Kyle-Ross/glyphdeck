@@ -2,7 +2,7 @@ from typing import Union, List
 
 from pydantic import BaseModel, Field, field_validator
 
-from CategoriGen.tools.loggers import ValidatorsLogger, assert_and_log_error
+from glyphdeck.tools.loggers import ValidatorsLogger, assert_and_log_error
 
 logger = ValidatorsLogger().setup()
 

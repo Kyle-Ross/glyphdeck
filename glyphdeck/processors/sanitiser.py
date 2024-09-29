@@ -5,12 +5,12 @@ import re
 
 import pandas as pd
 
-from CategoriGen.tools.loggers import (
+from glyphdeck.tools.loggers import (
     SanitiserLogger,
     log_and_raise_error,
     log_decorator,
 )
-from CategoriGen.validation.data_types import DataDict
+from glyphdeck.validation.data_types import DataDict
 
 logger = SanitiserLogger().setup()
 

@@ -7,8 +7,8 @@ import unittest  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from CategoriGen.tools.prepper import prepare_df, prepare_xlsx, prepare_csv, type_conditional_prepare  # noqa: E402
-from CategoriGen.validation.data_types import assert_and_log_type_is_data  # noqa: E402
+from glyphdeck.tools.prepper import prepare_df, prepare_xlsx, prepare_csv, type_conditional_prepare  # noqa: E402
+from glyphdeck.validation.data_types import assert_and_log_type_is_data  # noqa: E402
 
 
 class TestPrepper(unittest.TestCase):

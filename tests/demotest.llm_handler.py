@@ -5,9 +5,9 @@ logging.disable(logging.CRITICAL)
 
 from icecream import ic  # noqa: E402
 
-from CategoriGen.validation.data_types import DataDict  # noqa: E402
-from CategoriGen.processors.llm_handler import LLMHandler  # noqa: E402
-from CategoriGen.validation import validators  # noqa: E402
+from glyphdeck.validation.data_types import DataDict  # noqa: E402
+from glyphdeck.processors.llm_handler import LLMHandler  # noqa: E402
+from glyphdeck.validation import validators  # noqa: E402
 
 print("\nCreate the test data")
 test_data: DataDict = {

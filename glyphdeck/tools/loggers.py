@@ -3,8 +3,8 @@ import logging
 import os
 from typing import Type, Callable, Optional
 
-from CategoriGen.tools.directory_creators import check_logs_directory
-import CategoriGen.logger_constants as logger_constants
+from glyphdeck.tools.directory_creators import check_logs_directory
+import glyphdeck.logger_constants as logger_constants
 
 
 def log_and_raise_error(

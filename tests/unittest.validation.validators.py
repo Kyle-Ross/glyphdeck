@@ -7,7 +7,7 @@ logging.disable(logging.CRITICAL)
 import unittest  # noqa: E402
 from pydantic import ValidationError  # noqa: E402
 
-from CategoriGen.validation.validators import (  # noqa: E402
+from glyphdeck.validation.validators import (  # noqa: E402
     Sentiment,
     PrimaryCat,
     Top5Cats,

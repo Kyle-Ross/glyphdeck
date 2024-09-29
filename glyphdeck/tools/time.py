@@ -1,7 +1,7 @@
 import logging
 import time
 
-from CategoriGen.tools.loggers import TimeToolsLogger, log_decorator
+from glyphdeck.tools.loggers import TimeToolsLogger, log_decorator
 
 logger = TimeToolsLogger().setup()
 
