@@ -19,7 +19,16 @@ RecordsDict = Dict[int, RecordDict]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):
-    """Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type"""
+    """Asserts and logs that a variable is of type 'DataDict'.
+
+    Args:
+        variable (DataDict): The variable to check.
+        var_name (str): The name of the variable being checked.
+
+    Raises:
+        AssertionError: If the variable is not a dictionary or the dictionary does not have the expected types.
+    """
+    # Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type
     assert_and_log_error(
         logger,
         "error",
@@ -49,7 +58,21 @@ def assert_and_log_is_type_or_list_of(
     allowed_list_types: list,
     allow_none: bool = False,
 ):
-    """Assert and log that a variable is one of the allowed types, or a list containing only those allowed types"""
+    """Asserts and logs that a variable is of an allowed type or a list containing only allowed types.
+
+    Args:
+        variable: The variable to check. It can be of a type in allowed_list_types or a list of such types.
+        var_name (str): The name of the variable being checked.
+        allowed_list_types (list): The list of allowed types for the variable or its contents.
+        allow_none (bool, optional): Whether None is considered an allowed type. Defaults to False.
+
+    Raises:
+        AssertionError:
+            - If the variable is None and allow_none is False.
+            - If the variable type is not in the allowed list types.
+            - If any item in a list-type variable is not in the allowed list types.
+    """
+    # Assert and log that a variable is one of the allowed types, or a list containing only those allowed types
 
     # Check if it is None,
     if not allow_none:
