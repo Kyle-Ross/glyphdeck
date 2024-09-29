@@ -32,7 +32,14 @@ logger.debug(" | Step | llm_handler.py | Action | Initialised logger")
 
 
 class LLMHandler:
-    """Write your docstring for the class here."""
+    """Handles interactions with Language Learning Models (LLMs).
+
+    This class is designed to interface with various LLM providers, validate their outputs using
+    specified models, and manage asynchronous requests with extensive error handling and caching.
+
+    Returns:
+        LLMHandler: An instance of the LLMHandler class.
+    """
 
     @log_decorator(
         logger,
@@ -41,7 +48,11 @@ class LLMHandler:
         show_nesting=False,
     )
     def check_validation_model(self):
-        """Checks that the provided class is an instance or inheritance of the Pydantic BaseValidatorModel class."""
+        """Check if the validation model is an instance of Pydantic BaseValidatorModel.
+
+        Raises:
+            AssertionError: If the validation model is not a subclass of the Pydantic BaseValidatorModel class.
+        """
         check: bool = issubclass(self.validation_model, validators.BaseValidatorModel)
         assert_and_log_error(
             logger,
@@ -74,6 +85,24 @@ class LLMHandler:
         # High values will run faster incrementally faster, but consume more memory
         max_awaiting_coroutines: int = 100,
     ):
+        """Initializes the LLMHandler with necessary configurations and validations.
+
+        Args:
+            input_data: Dictionary containing the input data.
+            provider: Name of the LLM provider.
+            model: Model identifier for the LLM.
+            system_message: The system message to provide to the LLM in prompts.
+            validation_model: Pydantic class used for validating output.
+            cache_identifier: Unique string used to identify discrete jobs and avoid cache mixing.
+            use_cache: Boolean indicating whether to use cache or not. Defaults to True.
+            temperature: Determines if the responses are deterministic (lower value) or random (higher value). Defaults to 0.2.
+            max_validation_retries: Maximum number of retries for failed validation attempts. Defaults to 2.
+            max_preprepared_coroutines: Maximum number of prepared coroutines before awaiting. Defaults to 10.
+            max_awaiting_coroutines: Maximum number of coroutines awaiting at once. Defaults to 100.
+
+        Raises:
+            AssertionError: If any of the provided arguments are of incorrect type or invalid values.
+        """
         logger.debug(
             " | Function | LLMHandler.__init__() | Start | Initialising LLMHandler object"
         )
@@ -210,7 +239,15 @@ class LLMHandler:
         show_nesting=False,
     )
     def output_data(self) -> DataDict:
-        """Accesses output data but only if the data has been flattened."""
+        """Accesses the output data after it has been flattened.
+
+        Returns:
+            DataDict: The flattened output data.
+
+        Raises:
+            AssertionError: If output_data is accessed before flatten_output_data() has been run.
+        """
+        # Accesses output data but only if the data has been flattened.
         assert_and_log_error(
             logger,
             "error",
@@ -228,7 +265,14 @@ class LLMHandler:
         show_nesting=False,
     )
     def column_names(self) -> List[str]:
-        """Accesses column names but only if the new names have been generated during data flattening."""
+        """Accesses the column names after they have been generated during data flattening.
+
+        Returns:
+            List[str]: The list of column names.
+
+        Raises:
+            AssertionError: If column_names is accessed before flatten_output_data() has been run.
+        """
         assert_and_log_error(
             logger,
             "error",
@@ -272,8 +316,25 @@ class LLMHandler:
         item_validation_model=None,
         item_temperature: Optional[float] = None,
         item_max_validation_retries: Optional[int] = None,
-    ) -> Tuple[Dict, int, Union[str, int]]:
-        """Asynchronous Per-item coroutine generation with OpenAI. Has exponential backoff on specified errors."""
+    ) -> Tuple[Dict, Union[str, int], int]:
+        """Asynchronous Per-item coroutine generation with OpenAI.
+
+        Args:
+            input_text: The input text to be processed by the LLM.
+            key: The key associated with the input text.
+            index: The index position of the input in the list.
+            item_model: Optional override for the LLM model.
+            item_system_message: Optional override for the system message.
+            item_validation_model: Optional override for the validation model.
+            item_temperature: Optional override for the response randomness.
+            item_max_validation_retries: Optional override for the maximum number of validation retries.
+
+        Returns:
+            Tuple: Containing the response dictionary, key, and index.
+
+        Raises:
+            AssertionError: If the temperature value is not between 0 and 1.
+        """
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
         if item_model is None:
@@ -350,7 +411,14 @@ class LLMHandler:
         show_nesting=False,
     )
     async def create_coroutines(self, func) -> List[Coroutine]:
-        """Creates coroutines for the provided input data, using the specified LLM function."""
+        """Creates coroutines for the provided input data using the specified LLM function.
+
+        Args:
+            func: The function to generate coroutines for.
+
+        Returns:
+            List[Coroutine]: A list of created coroutines.
+        """
         # Create and store the tasks across the whole variable in a list
         coroutines = []
         for key, list_value in self.input_data.items():
@@ -368,7 +436,11 @@ class LLMHandler:
         show_nesting=False,
     )
     async def await_coroutines(self, func):
-        """Await coroutines,  returning results in the order of completion, not the order they are run."""
+        """Await coroutines and return results in completion order.
+
+        Args:
+            func: The function used to generate coroutines.
+        """
         coroutines = await self.create_coroutines(func)
         # Loop over the futures
         logger.debug(
@@ -402,7 +474,11 @@ class LLMHandler:
         show_nesting=False,
     )
     def run_async(self):
-        """Asynchronously query the selected LLM across the whole variable and save results to the output"""
+        """Asynchronously query the selected LLM across the whole data and save results to the output.
+
+        Returns:
+            self: Instance of the LLMHandler class.
+        """
         if self.provider_clean == "openai":
             asyncio.run(self.await_coroutines(self.async_openai))
         return self
@@ -414,8 +490,14 @@ class LLMHandler:
         show_nesting=False,
     )
     def flatten_output_data(self, column_names: List[str]):
-        """Flattens output data into a dictionary of lists for compatibility with the chain class.
-        Also creates the new column names for the eventual output."""
+        """Flattens output data into a dictionary of lists for compatibility with the chain class. Also creates the new column names for the eventual output.
+
+        Args:
+            column_names: List of column names to be used.
+
+        Returns:
+            Dictionary of flattened output data.
+        """
         # Storage for key: list pairs representing rows
         new_output_data = {}
         # Storing a list of the column names corresponding to the ordered list
