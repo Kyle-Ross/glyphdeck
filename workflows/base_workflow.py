@@ -1,4 +1,4 @@
-from glyphdeck.processors.chain import Chain
+from glyphdeck.processors.cascade import Cascade
 from glyphdeck.tools.loggers import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
@@ -16,8 +16,8 @@ def main():
     # Set file vars
     source_file = r"tests\testdata.pizzashopreviews.xlsx"
 
-    # Intialising a chain object, __init__ appending its first record from the source file
-    chain = Chain(
+    # Intialising a cascade object, __init__ appending its first record from the source file
+    cascade = Cascade(
         data_source=source_file,
         id_column="Review Id",
         data_columns=["Review Text"],
@@ -25,10 +25,10 @@ def main():
     )
 
     # Sanitising the data of sensitive information, on default patterns and appends the result
-    chain.sanitiser.run()
+    cascade.sanitiser.run()
 
-    # Set the LLM Handler for this chain instance
-    chain.set_llm_handler(
+    # Set the LLM Handler for this cascade instance
+    cascade.set_llm_handler(
         provider="OpenAI",
         model="gpt-3.5-turbo",
         system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
@@ -42,13 +42,13 @@ def main():
     )
 
     # Run the llm_handler
-    chain.llm_handler.run("HandlerOutput1")
+    cascade.llm_handler.run("HandlerOutput1")
 
     # Output the result in the specified format
     # Latest record is used by default, but we specify it here
-    chain.write_output(
+    cascade.write_output(
         file_type="xlsx",
-        file_name_prefix="Chain Test",
+        file_name_prefix="Cascade Test",
         record_identifiers=["sanitised", "HandlerOutput1"],
         rebase=True,
         xlsx_use_sheets=False,

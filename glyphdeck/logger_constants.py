@@ -26,9 +26,9 @@ data_types_console_log_level: int = console_log_level_default
 prepper_file_log_level: int = file_log_level_default
 prepper_console_log_level: int = console_log_level_default
 
-# Chain.py
-chain_file_log_level: int = file_log_level_default
-chain_console_log_level: int = console_log_level_default
+# Cascade.py
+cascade_file_log_level: int = file_log_level_default
+cascade_console_log_level: int = console_log_level_default
 
 # Sanitiser.py
 sanitiser_file_log_level: int = file_log_level_default

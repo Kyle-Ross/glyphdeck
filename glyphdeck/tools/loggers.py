@@ -413,18 +413,18 @@ class PrepperLogger(BaseLogger):
         )
 
 
-class ChainLogger(BaseLogger):
-    """Logger for handling processor chain.
+class CascadeLogger(BaseLogger):
+    """Logger for handling processor cascade.
 
     Inherits from BaseLogger.
     """
 
     def __init__(self):
-        """Initializes the ChainLogger instance."""
+        """Initializes the CascadeLogger instance."""
         super().__init__(
-            logger_name="processors.chain",
-            file_log_level=logger_constants.chain_file_log_level,
-            console_log_level=logger_constants.chain_console_log_level,
+            logger_name="processors.cascade",
+            file_log_level=logger_constants.cascade_file_log_level,
+            console_log_level=logger_constants.cascade_console_log_level,
         )
 
 

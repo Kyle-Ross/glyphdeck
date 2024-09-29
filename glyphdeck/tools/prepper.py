@@ -97,7 +97,7 @@ def prepare_df(
             "'data_columns' argument '{data_columns}' must only have unique column names.",
         )
 
-    # Convert the dataframe into the Chain compatible 'Data' type and return (df, output_data)
+    # Convert the dataframe into the Cascade compatible 'Data' type and return (df, output_data)
     prepared_data: DataDict = {}
     for _, row in source_table.iterrows():
         prepared_data[row[id_column]] = [row[column] for column in data_columns]

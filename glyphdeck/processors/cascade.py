@@ -16,7 +16,7 @@ from glyphdeck.validation.data_types import (
     RecordsDict,
 )
 from glyphdeck.tools.loggers import (
-    ChainLogger,
+    CascadeLogger,
     assert_and_log_error,
     log_and_raise_error,
     log_decorator,
@@ -27,12 +27,12 @@ from glyphdeck.tools.prepper import type_conditional_prepare
 from glyphdeck.tools.directory_creators import create_files_directory
 from glyphdeck.path_constants import OUTPUT_FILES_DIR
 
-logger = ChainLogger().setup()
+logger = CascadeLogger().setup()
 
 
-class Chain:
+class Cascade:
     """
-    Chain class is designed to handle and process a sequence of data records.
+    Cascade class is designed to handle and process a sequence of data records.
 
     Attributes:
         records (Dict[int, RecordDict]): A dictionary to hold all records.
@@ -41,7 +41,7 @@ class Chain:
         llm_handler (LLMHandler): An instance to handle operations related to large language models.
     """
 
-    @log_decorator(logger, "info", suffix_message="Initialise Chain object")
+    @log_decorator(logger, "info", suffix_message="Initialise Cascade object")
     def __init__(
         self,
         data_source: Union[str, pd.DataFrame],
@@ -50,7 +50,7 @@ class Chain:
         encoding: str = "utf-8",
         sheet_name: Union[int, str] = 0,
     ):
-        """Initializes the Chain instance with the provided data source and configuration parameters.
+        """Initializes the Cascade instance with the provided data source and configuration parameters.
 
         Args:
             data_source: The source of the data, which can be either a file path (str) or a DataFrame.
@@ -98,21 +98,21 @@ class Chain:
 
         # Inherit the sanitiser class and add new run method which writes records and uses the latest_data by default
         class Sanitise(Sanitiser):
-            """Represents a sanitiser that is part of the Chain class. This class inherits
-            from Sanitiser and is used to sanitise and append data to the chain.
+            """Represents a sanitiser that is part of the Cascade class. This class inherits
+            from Sanitiser and is used to sanitise and append data to the cascade.
 
             Attributes:
-                outer_chain: The Chain instance that includes the Sanitise class.
+                outer_cascade: The Cascade instance that includes the Sanitise class.
                 use_selected: A boolean indicating whether to use selected data or not.
                 selected_data: Optional data dictionary to use when use_selected is True.
             """
 
-            @log_decorator(logger, "info", suffix_message="chain.sanitiser object")
-            def __init__(self, outer_chain: Chain, **kwargs):
-                """Initializes the Sanitise instance associated with the Chain instance.
+            @log_decorator(logger, "info", suffix_message="cascade.sanitiser object")
+            def __init__(self, outer_cascade: Cascade, **kwargs):
+                """Initializes the Sanitise instance associated with the Cascade instance.
 
                 Args:
-                    outer_chain: The Chain instance that this Sanitise instance is a part of.
+                    outer_cascade: The Cascade instance that this Sanitise instance is a part of.
                     **kwargs: Additional keyword arguments to be passed to the Sanitiser superclass.
 
                 Returns:
@@ -120,21 +120,21 @@ class Chain:
                 """
                 # Pass all arguments to superclass
                 super(Sanitise, self).__init__(**kwargs)
-                self.outer_chain: Chain = outer_chain
+                self.outer_cascade: Cascade = outer_cascade
                 self.use_selected: bool = False
 
                 # Data to use if use_selected = True, otherwise use latest
                 self.selected_data: Optional_DataDict = None
 
-            @log_decorator(logger, "info", suffix_message="Use chain.sanitiser.run()")
+            @log_decorator(logger, "info", suffix_message="Use cascade.sanitiser.run()")
             def run(self, title: str = "sanitised"):
-                """Runs the sanitiser and appends the result to the chain.
+                """Runs the sanitiser and appends the result to the cascade.
 
                 Args:
                     title: The title to be given to the sanitised record. Defaults to "sanitised".
 
                 Returns:
-                    The Sanitiser object, capable of being further used to chain additional operations
+                    The Sanitiser object, capable of being further used to cascade additional operations
                 """
                 # Check argument type
                 assert_and_log_error(
@@ -144,60 +144,60 @@ class Chain:
                     f"Provided title argument '{title}' is not a string",
                 )
                 # Check new title is unique
-                self.outer_chain.title_validator(title)
+                self.outer_cascade.title_validator(title)
                 # Sanitise the data
                 self.sanitise()
                 # Append and return self
-                self.outer_chain.append(title=title, data=self.output_data)
+                self.outer_cascade.append(title=title, data=self.output_data)
                 return self
 
         # Initialise the sanitiser - in __init__ 'latest_data' is set to it's initialised value - which won't update
         # So a wrapper property will access and update this with new data
         # Call this using the self.sanitiser property so input_data is updated with the default latest data
-        self.base_sanitiser = Sanitise(outer_chain=self, input_data=self.latest_data)
+        self.base_sanitiser = Sanitise(outer_cascade=self, input_data=self.latest_data)
 
     # Inherit the LLMHandler class and add new run method which writes records and uses the latest_data by default
-    # Abstractions required intricate juggling of args and kwargs to pass the context of the current chain instance...
+    # Abstractions required intricate juggling of args and kwargs to pass the context of the current cascade instance...
     # ... as well as implement a reference to that instance's self.latest_data property
     class Handler(LLMHandler):
         """Inherits from LLMHandler, handles the interaction with LLM providers and manages the processing of input data for asynchronous querying.
 
         Attributes:
-            outer_chain: Reference to the Chain instance that this Handler is associated with.
+            outer_cascade: Reference to the Cascade instance that this Handler is associated with.
             use_selected: Boolean flag to indicate whether to use manually 'selected' data or the latest data.
-            use_selected_of_record: Boolean flag to indicate whether to use a selected record in the chain.
+            use_selected_of_record: Boolean flag to indicate whether to use a selected record in the cascade.
             selected_record_identifier: The identifier (key or title) of the selected record to be accessed.
             selected_input_data: The data dictionary selected for use by the handler.
             selected_column_names: A list of column names to be used by the handler, if specified.
             selected_record_title: The title of the selected record, used to keep the cache identifier unique.
         """
 
-        @log_decorator(logger, "info", suffix_message="chain.llm_handler object")
+        @log_decorator(logger, "info", suffix_message="cascade.llm_handler object")
         def __init__(self, *args, **kwargs):
             """Initializes the Handler class with the provided arguments and Keyword arguments.
 
             This constructor method passes all input parameters to the superclass (LLMHandler) constructor,
-            while also storing a reference to the Chain instance it is associated with.
+            while also storing a reference to the Cascade instance it is associated with.
 
             Args:
                 *args: Variable length argument list passed to the LLMHandler.
-                **kwargs: Arbitrary keyword arguments passed to the LLMHandler. One of these keyword arguments should be 'outer_chain',
-                           which is a reference to the Chain instance.
+                **kwargs: Arbitrary keyword arguments passed to the LLMHandler. One of these keyword arguments should be 'outer_cascade',
+                           which is a reference to the Cascade instance.
             """
-            # Take the outer chain reference
-            outer_chain = kwargs["outer_chain"]
+            # Take the outer cascade reference
+            outer_cascade = kwargs["outer_cascade"]
             # And remove it before using it in the super().__init__
-            kwargs.pop("outer_chain")
+            kwargs.pop("outer_cascade")
 
             # Pass all arguments to superclass
             super().__init__(*args, **kwargs)
 
-            # Save the outer_chain reference to self
-            self.outer_chain: Chain = outer_chain
+            # Save the outer_cascade reference to self
+            self.outer_cascade: Cascade = outer_cascade
 
             # Values to be set post-initialisation, containing the result of methods setting custom targets
 
-            # Activates or disables the use of manually 'selected' chain parts
+            # Activates or disables the use of manually 'selected' cascade parts
             self.use_selected: bool = False
             # Actives all selections to be based on selected record key
             self.use_selected_of_record: bool = False
@@ -233,7 +233,7 @@ class Chain:
                 key = self.selected_record_identifier
             # Otherwise use the latest key
             else:
-                key = self.outer_chain.latest_key
+                key = self.outer_cascade.latest_key
             return key
 
         @property
@@ -242,7 +242,7 @@ class Chain:
             """Returns the column names of the active record.
 
             Depending on the state of `self.use_selected`, this method retrieves the column names from either the selected column names
-            or the active record in the chain.
+            or the active record in the cascade.
 
             Returns:
                 List[str]: The list of active column names.
@@ -261,7 +261,7 @@ class Chain:
                 column_names = self.selected_column_names
             # Otherwise use the active record key to access the column names
             else:
-                column_names = self.outer_chain.column_names(self.active_record_key)
+                column_names = self.outer_cascade.column_names(self.active_record_key)
             # Return the outcome
             return column_names
 
@@ -291,7 +291,7 @@ class Chain:
                 input_data = self.selected_input_data
             # Otherwise use the active record key to access the data
             else:
-                input_data = self.outer_chain.data(self.active_record_key)
+                input_data = self.outer_cascade.data(self.active_record_key)
             # Return the outcome
             return input_data
 
@@ -301,7 +301,7 @@ class Chain:
             """Returns the title of the active record.
 
             Depending on the state of `self.use_selected`, this method retrieves the title from
-            either the selected record or the active record in the chain.
+            either the selected record or the active record in the cascade.
 
             Returns:
                 str: The title of the active record.
@@ -317,21 +317,21 @@ class Chain:
                 title = self.selected_record_title
             # Otherwise use the title from the active record key
             else:
-                title = self.outer_chain.title(self.active_record_key)
+                title = self.outer_cascade.title(self.active_record_key)
             # Return the outcome
             return title
 
         @log_decorator(
             logger,
             "info",
-            suffix_message="Set chain.llm_handler to use the latest record",
+            suffix_message="Set cascade.llm_handler to use the latest record",
         )
         def use_latest(self):
             """
-            Sets the LLMHandler to use the latest record in the Chain.
+            Sets the LLMHandler to use the latest record in the Cascade.
 
             When invoked, this method ensures that the LLMHandler will operate
-            on the latest record in the Chain rather than any manually selected data.
+            on the latest record in the Cascade rather than any manually selected data.
 
             Args:
                 None
@@ -339,17 +339,17 @@ class Chain:
             Returns:
                 None
             """
-            # Reset selection state, leading control flow to use latest values for all chain.llm_handler access properties
+            # Reset selection state, leading control flow to use latest values for all cascade.llm_handler access properties
             self.use_selected: bool = False
             self.use_selected_of_record: bool = False
 
         @log_decorator(
             logger,
             "info",
-            suffix_message="Set chain.llm_handler to use a specified record",
+            suffix_message="Set cascade.llm_handler to use a specified record",
         )
         def use_record(self, record_identifier: Union[int, str]):
-            """Sets chain.llm_handler to use a specified record.
+            """Sets cascade.llm_handler to use a specified record.
 
             Args:
                 record_identifier: The identifier of the record to be used. Can be an integer representing the record key,
@@ -370,15 +370,15 @@ class Chain:
             self.use_selected: bool = False
             self.use_selected_of_record: bool = True
             # Assign values
-            self.selected_column_names = self.outer_chain.column_names(
+            self.selected_column_names = self.outer_cascade.column_names(
                 self.active_record_key
             )
-            self.selected_input_data = self.outer_chain.data(self.active_record_key)
+            self.selected_input_data = self.outer_cascade.data(self.active_record_key)
 
         @log_decorator(
             logger,
             "info",
-            suffix_message="Sets chain.llm_handler to use specified data and columns",
+            suffix_message="Sets cascade.llm_handler to use specified data and columns",
         )
         def use_selection(
             self,
@@ -404,7 +404,7 @@ class Chain:
             assert_and_log_is_type_or_list_of(
                 column_names, "column_names", [str], allow_none=True
             )
-            self.outer_chain.title_validator(record_title)
+            self.outer_cascade.title_validator(record_title)
             # Assign values
             self.selected_column_names = (
                 self.active_column_names if column_names is None else column_names
@@ -415,21 +415,21 @@ class Chain:
             self.selected_input_data = data
             self.selected_record_title = record_title
 
-        @log_decorator(logger, "info", suffix_message="Use chain.llm_handler.run()")
+        @log_decorator(logger, "info", suffix_message="Use cascade.llm_handler.run()")
         def run(self, title):
-            """Runs the LLMHandler and appends the results to the chain.
+            """Runs the LLMHandler and appends the results to the cascade.
 
             The function will process the LLMHandler with the current settings and append
-            the resulting output data to the chain as a new record with the specified title.
+            the resulting output data to the cascade as a new record with the specified title.
 
             Args:
-                title (str): The title to be assigned to the new record in the chain.
+                title (str): The title to be assigned to the new record in the cascade.
 
             Returns:
-                Handler: The Handler object, allowing further chained operations.
+                Handler: The Handler object, allowing further cascadeed operations.
             """
             # Check the new title is unique before proceeding
-            self.outer_chain.title_validator(title)
+            self.outer_cascade.title_validator(title)
             # Set self.input_data (used by run_async) to the active_input_data
             self.input_data = self.active_input_data
             # Run the llm_handler
@@ -437,7 +437,7 @@ class Chain:
             # Flatten and pivot the data into the Data format
             self.flatten_output_data(self.active_column_names)
             # Perform the append action and return self
-            self.outer_chain.append(
+            self.outer_cascade.append(
                 title=title,
                 data=self.output_data,
                 # Updating len since the llm validators can produce multiple columns per input
@@ -611,10 +611,10 @@ class Chain:
         max_preprepared_coroutines: int = 10,
         max_awaiting_coroutines: int = 100,
     ):
-        """Sets up the LLMHandler for the Chain instance.
+        """Sets up the LLMHandler for the Cascade instance.
 
         Rather than taking a input_data argument, it always uses self.latest_data. This can be changed.
-        Also Passes a reference to the current chain instance up through the kwargs.
+        Also Passes a reference to the current cascade instance up through the kwargs.
 
         Args:
             provider: The name of the LLM provider.
@@ -649,8 +649,8 @@ class Chain:
             "max_awaiting_coroutines": max_awaiting_coroutines,
         }
 
-        # Adding self (aka the current chain into the kwargs)
-        kwargs["outer_chain"] = self  # noqa: E402
+        # Adding self (aka the current cascade into the kwargs)
+        kwargs["outer_cascade"] = self  # noqa: E402
 
         # Set the llm_handler using the adapted arguments
         self.llm_handler = self.Handler(*args, **kwargs)
@@ -741,7 +741,7 @@ class Chain:
     @property
     @log_decorator(logger, is_property=True)
     def delta(self) -> timedelta:
-        """Returns the overall timedelta of the chain.
+        """Returns the overall timedelta of the cascade.
 
         Returns:
             timedelta: The overall timedelta from the initialisation to the latest record.
@@ -855,7 +855,7 @@ class Chain:
         Returns:
             None
         """
-        # This is necessary to maintain the uniqueness of the cache per-accessed record across the lifetime of a chain instance.
+        # This is necessary to maintain the uniqueness of the cache per-accessed record across the lifetime of a cascade instance.
 
         # Check argument type
         assert_and_log_error(
@@ -955,7 +955,7 @@ class Chain:
             recreate: Boolean flag to recreate dataframes from record data even if they already exist. Defaults to False.
 
         Returns:
-            Self: The Chain instance.
+            Self: The Cascade instance.
         """
 
         # Type assertions
@@ -1060,7 +1060,7 @@ class Chain:
         Returns:
             pd.DataFrame: The rebased dataframe.
         """
-        # Does not append anything to the chain and is intended as an easy way to get your final output.
+        # Does not append anything to the cascade and is intended as an easy way to get your final output.
 
         # Check the arguments
         assert_and_log_is_type_or_list_of(record_identifiers, "records", [str, int])
@@ -1243,7 +1243,7 @@ class Chain:
             recreate: If True, the dataframes are recreated from the data in the records instead of using existing dataframes. Defaults to False.
 
         Returns:
-            Self: The Chain object, allowing further chained operations.
+            Self: The Cascade object, allowing further cascadeed operations.
         """
 
         # Sub in reference to the latest record if None was provided

@@ -51,6 +51,7 @@ class LLMHandler:
         new_column_names: Generated column names to be used in the flattened output data.
         available_providers: List of LLM providers that are available.
     """
+
     @log_decorator(
         logger,
         "debug",
@@ -72,7 +73,7 @@ class LLMHandler:
             f"Pydantic BaseValidatorModel class",
         )
 
-    # WARNING!!! ON CHANGES - Manually syncronise these args, type hints & defaults with chain.set_llm_handler() function
+    # WARNING!!! ON CHANGES - Manually syncronise these args, type hints & defaults with cascade.set_llm_handler() function
     # Until such time you figure out how to have a function and a class share the same signature
     def __init__(
         self,
@@ -183,7 +184,7 @@ class LLMHandler:
             max_awaiting_coroutines
         )
 
-        # Storing the input variable, of the 'Data' type as typically delivered by a 'Chain' object
+        # Storing the input variable, of the 'Data' type as typically delivered by a 'Cascade' object
         self.input_data: DataDict = input_data
         # raw_output_data keeps keys, replaces with [None, None, ...] lists
         # Helps to insert output in the correct position later in 'await_tasks'
@@ -496,11 +497,11 @@ class LLMHandler:
     @log_decorator(
         logger,
         "info",
-        suffix_message="Convert output data for compatibility with chain class",
+        suffix_message="Convert output data for compatibility with cascade class",
         show_nesting=False,
     )
     def flatten_output_data(self, column_names: List[str]):
-        """Flattens output data into a dictionary of lists for compatibility with the chain class. Also creates the new column names for the eventual output.
+        """Flattens output data into a dictionary of lists for compatibility with the cascade class. Also creates the new column names for the eventual output.
 
         Args:
             column_names: List of column names to be used.

@@ -8,10 +8,10 @@ from datetime import datetime, timedelta  # noqa: E402
 import unittest  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from glyphdeck.processors.chain import Chain  # noqa: E402
+from glyphdeck.processors.cascade import Cascade  # noqa: E402
 
 
-class TestChain(unittest.TestCase):
+class TestCascade(unittest.TestCase):
     def setUp(self):
         # Set up test data
         self.test_data = {
@@ -27,7 +27,7 @@ class TestChain(unittest.TestCase):
 
         # Initialise,
         # Creates a blank initialisation (record key 0), then appends the initial record (record key 1)
-        self.chain = Chain(
+        self.cascade = Cascade(
             test_df,  # csv and xlsx inputs are tested elsewhere
             "Word ID",
             ["Word1", "Word2", "Word3"],
@@ -37,7 +37,7 @@ class TestChain(unittest.TestCase):
         # (record key 2)
         # The table, id and data_columns only needs to be added in the first step, but can be included again to update them
         # Otherwise each record will refer to the last time each was defined, which is the original record until set otherwise
-        self.chain.append(
+        self.cascade.append(
             title="Example1",
             data={
                 1: ["potato", "steak", "party"],
@@ -47,7 +47,7 @@ class TestChain(unittest.TestCase):
         )
         # (record key 2)
         # Becomes the 'latest'
-        self.chain.append(
+        self.cascade.append(
             title="Example2",
             data={
                 1: ["potatoes", "carrot", "gary"],
@@ -57,14 +57,14 @@ class TestChain(unittest.TestCase):
         )
 
     def test_delta(self):
-        self.assertIsInstance(self.chain.delta, timedelta)
+        self.assertIsInstance(self.cascade.delta, timedelta)
 
     def test_set_expected(self):
-        self.chain.set_expected_len(5)
-        self.assertEqual(self.chain.expected_len, 5)
+        self.cascade.set_expected_len(5)
+        self.assertEqual(self.cascade.expected_len, 5)
 
     def test_good_append(self):
-        self.chain.append(
+        self.cascade.append(
             title="Example3",
             data={
                 1: ["wiggle", "carrot", "gary"],
@@ -72,38 +72,38 @@ class TestChain(unittest.TestCase):
                 3: ["bananas", "beast", "jeffery"],
             },
         )
-        self.assertEqual(self.chain.latest_key, 4)
-        self.assertEqual(self.chain.latest_title, "Example3")
+        self.assertEqual(self.cascade.latest_key, 4)
+        self.assertEqual(self.cascade.latest_title, "Example3")
 
     def test_latest_key(self):
-        self.assertEqual(self.chain.latest_key, 3)
+        self.assertEqual(self.cascade.latest_key, 3)
 
     def test_latest_record(self):
-        self.assertEqual(self.chain.latest_record, self.chain.records[3])
+        self.assertEqual(self.cascade.latest_record, self.cascade.records[3])
 
     def test_latest_title(self):
-        self.assertEqual(self.chain.latest_title, "Example2")
+        self.assertEqual(self.cascade.latest_title, "Example2")
 
     def test_latest_dt(self):
-        self.assertIsInstance(self.chain.latest_dt, datetime)
+        self.assertIsInstance(self.cascade.latest_dt, datetime)
 
     def test_latest_data(self):
-        self.assertEqual(self.chain.latest_data, self.chain.records[3]["data"])
+        self.assertEqual(self.cascade.latest_data, self.cascade.records[3]["data"])
 
     def test_latest_df(self):
-        self.assertTrue(self.chain.latest_df.equals(self.chain.df(3)))
+        self.assertTrue(self.cascade.latest_df.equals(self.cascade.df(3)))
 
     def test_latest_column_names(self):
         self.assertEqual(
-            self.chain.latest_column_names, self.chain.records[2]["column_names"]
+            self.cascade.latest_column_names, self.cascade.records[2]["column_names"]
         )
 
     def test_sanitiser_data(self):
-        self.assertEqual(self.chain.latest_data, self.chain.sanitiser.input_data)
+        self.assertEqual(self.cascade.latest_data, self.cascade.sanitiser.input_data)
 
     def test_missing_value_append(self):
         with self.assertRaises(ValueError):
-            self.chain.append(
+            self.cascade.append(
                 title="Missing Value",
                 data={
                     1: ["potato", "steak", "party"],
@@ -114,7 +114,7 @@ class TestChain(unittest.TestCase):
 
     def test_new_key_append(self):
         with self.assertRaises(KeyError):
-            self.chain.append(
+            self.cascade.append(
                 title="New Key",
                 data={
                     1: ["potato", "steak", "party"],
@@ -126,7 +126,7 @@ class TestChain(unittest.TestCase):
 
     def test_missing_key_append(self):
         with self.assertRaises(KeyError):
-            self.chain.append(
+            self.cascade.append(
                 title="New Key",
                 data={
                     1: ["potato", "steak", "party"],
@@ -137,11 +137,11 @@ class TestChain(unittest.TestCase):
 
     def test_create_dataframes(self):
         examples_titles = ["Example1", "Example2"]
-        examples_keys = [self.chain.title_key(x) for x in examples_titles]
+        examples_keys = [self.cascade.title_key(x) for x in examples_titles]
         count_of_examples = len(examples_keys)
-        self.chain.create_dataframes(examples_keys, use_suffix=False, recreate=True)
+        self.cascade.create_dataframes(examples_keys, use_suffix=False, recreate=True)
         counter = 0
-        for k, v in self.chain.records.items():
+        for k, v in self.cascade.records.items():
             if k in examples_keys:
                 if "df" in v:
                     counter += 1
@@ -150,9 +150,9 @@ class TestChain(unittest.TestCase):
     def test_combiner(self):
         example1 = "Example1"
         example2 = "Example2"
-        example1_df = self.chain.df(example1)
-        example2_df = self.chain.df(example2)
-        combined_df = self.chain.get_combined([example1, example2])
+        example1_df = self.cascade.df(example1)
+        example2_df = self.cascade.df(example2)
+        combined_df = self.cascade.get_combined([example1, example2])
         example1_col_count = example1_df.shape[1]
         example2_col_count = example2_df.shape[1]
         combined_col_count = combined_df.shape[1]
@@ -168,7 +168,7 @@ class TestChain(unittest.TestCase):
 
     def test_output(self):
         # This test assumes that the output function correctly writes files to the specified directory
-        self.chain.write_output(
+        self.cascade.write_output(
             file_type="csv",
             file_name_prefix="Test",
             record_identifiers=["Example1"],

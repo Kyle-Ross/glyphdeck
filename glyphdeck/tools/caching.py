@@ -69,10 +69,10 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used
             self_cache_identifier = self.cache_identifier
-            # self.active_record_title only exists when this wrapper is used in the chain.llm_handler inheritance of LLMHandler
+            # self.active_record_title only exists when this wrapper is used in the cascade.llm_handler inheritance of LLMHandler
             # So if we don't find it, we replace with a default value
             self_record_identifier = getattr(
-                self, "active_record_title", "no_active_chain_record"
+                self, "active_record_title", "no_active_cascade_record"
             )
             self_cache_and_record_identifier = (
                 f"{self_cache_identifier} | {self_record_identifier}"

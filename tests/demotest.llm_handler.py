@@ -28,7 +28,7 @@ handler = LLMHandler(
         "representing the animal most likely to eat them."
     ),
     validation_model=validators.PrimaryCat,
-    cache_identifier="chain_llm_print_test_primary_category",
+    cache_identifier="cascade_llm_print_test_primary_category",
     use_cache=False,
     temperature=0.2,
     max_validation_retries=3,
@@ -40,7 +40,7 @@ print("\nRun the handler on the data")
 ic(handler.run_async())
 
 print(
-    "\nFlatten the output into the chain format (same as the test data). Can generate more than one response column for each input column."
+    "\nFlatten the output into the cascade format (same as the test data). Can generate more than one response column for each input column."
 )
 ic(handler.flatten_output_data(["Col1", "Col2", "Col3"]))
 ic(handler.output_data)

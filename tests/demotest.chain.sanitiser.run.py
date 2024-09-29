@@ -8,7 +8,7 @@ import copy  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from glyphdeck.processors.chain import Chain  # noqa: E402
+from glyphdeck.processors.cascade import Cascade  # noqa: E402
 from glyphdeck.validation.data_types import DataDict  # noqa: E402
 
 # Example data with targets for removal
@@ -55,7 +55,7 @@ test_df.columns = ["Person Id", "Comment1", "Comment2", "Comment3"]  # Rename co
 
 # (Record Key 1)
 # Initialise, preparing the first record
-chain = Chain(
+cascade = Cascade(
     test_df,
     "Person Id",
     ["Comment1", "Comment2", "Comment3"],
@@ -66,39 +66,39 @@ chain = Chain(
 # (record key 2)
 # The table only needs to be added in the first step, but can be included again to add a new one
 # Otherwise the table will be the last time 'table' was assigned, or the original source data as a dataframe
-chain.append(title="data_record2", data=data_record2)
+cascade.append(title="data_record2", data=data_record2)
 
-# Making a copy of the chain for testing a custom set up below, rather than the default values
-chain_custom = copy.deepcopy(chain)
+# Making a copy of the cascade for testing a custom set up below, rather than the default values
+cascade_custom = copy.deepcopy(cascade)
 
 # With the default settings
 print("\nRunning Sanitiser WIHTOUT customisations, using all pattern groups as default")
 print("Before sanitisation")
-ic(chain.latest_data)
+ic(cascade.latest_data)
 print("After sanitisation")
-ic(chain.sanitiser.run())
-ic(chain.latest_data)
+ic(cascade.sanitiser.run())
+ic(cascade.latest_data)
 
 # With the custom settings
 print(
     "\nRunning Sanitiser WITH customisations, using specified pattern groups as default"
 )
 print("Before updating pattern groups")
-ic(chain_custom.sanitiser.active_groups)
+ic(cascade_custom.sanitiser.active_groups)
 ic(
-    chain_custom.sanitiser.select_groups(
+    cascade_custom.sanitiser.select_groups(
         [
             "date",
         ]
     )
 )
 print("After updating pattern groups")
-ic(chain_custom.sanitiser.active_groups)
+ic(cascade_custom.sanitiser.active_groups)
 print("Before sanitisation")
-ic(chain_custom.latest_data)
+ic(cascade_custom.latest_data)
 print("After sanitisation")
-ic(chain_custom.sanitiser.run())
-ic(chain_custom.latest_data)
+ic(cascade_custom.sanitiser.run())
+ic(cascade_custom.latest_data)
 
 # Re-enable logging
 logging.disable(logging.NOTSET)
