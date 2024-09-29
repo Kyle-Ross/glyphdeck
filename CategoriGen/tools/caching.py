@@ -12,7 +12,15 @@ logger = CacheLogger().setup()
 
 @log_decorator(logger, suffix_message="Check or create cache, return object and path")
 def cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
-    """Checks if a cache exists, if not, creates it. Returns the cache object and file path afterwards."""
+    """Creates a cache if it doesn't already exist and returns the cache object and its path.
+
+    Args:
+        cache_dir: Directory where the cache will be stored.
+        max_mb_size: Maximum size of the cache in megabytes.
+
+    Returns:
+        Tuple containing the Cache object and the full path to the cache directory.
+    """
     # Creates the caches directory and returns the full cache file path within
     full_cache_dir = os.path.join(create_caches_directory(logger), cache_dir)
     # Create a DiskCache instance with the specified max_size
@@ -21,27 +29,54 @@ def cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
     return cache, full_cache_dir
 
 
-@log_decorator(logger, suffix_message="Grab OpenAI completions if in cache, otherwise API")
+@log_decorator(
+    logger, suffix_message="Grab OpenAI completions if in cache, otherwise API"
+)
 def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
-    """Facilitates caching for openai in the handler when used as a decorator. Function result will be taken from the
+    """Decorator to cache the results of OpenAI completions. Function result will be taken from the
     cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
-    records will be culled."""
+    records will be culled.
+
+    Args:
+        cache_dir: Directory where the cache will be stored.
+        max_mb_size (optional): Maximum size of the cache in megabytes. Defaults to 1000.
+
+    Returns:
+        A decorator that caches the result of the decorated function.
+    """
     # Finds or creates the cache folder and object, as well as returning the directory of the cache
     cache, full_cache_dir = cache_creator(cache_dir, max_mb_size)
 
     # Define the actual decorator function
     def decorator(func):
+        """Wraps the function for result caching.
+
+        Args:
+            func: The function being decorated.
+
+        Returns:
+            The wrapper function that manages the caching logic.
+        """
         # counter for the amount of completions
-        completions = 0  
+        completions = 0
 
         async def wrapper(self, *args, **kwargs):
+            """Handles the caching mechanism before calling the original function.
+
+            Returns:
+                The result from the cache or the decorated function.
+            """
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used
             self_cache_identifier = self.cache_identifier
             # self.active_record_title only exists when this wrapper is used in the chain.llm_handler inheritance of LLMHandler
             # So if we don't find it, we replace with a default value
-            self_record_identifier = getattr(self, 'active_record_title', 'no_active_chain_record')
-            self_cache_and_record_identifier = f"{self_cache_identifier} | {self_record_identifier}"
+            self_record_identifier = getattr(
+                self, "active_record_title", "no_active_chain_record"
+            )
+            self_cache_and_record_identifier = (
+                f"{self_cache_identifier} | {self_record_identifier}"
+            )
             self_use_cache = self.use_cache
             self_provider = self.provider
             self_model = self.model
