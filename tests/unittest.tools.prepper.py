@@ -31,8 +31,8 @@ class TestPrepper(unittest.TestCase):
 
     def test_prepare_xlsx(self):
         df, data = prepare_xlsx(
-            r"tests\testdata.clothingreviews.xlsx",
-            "Row ID",
+            r"tests\testdata.pizzashopreviews.xlsx",
+            "Review Id",
             ["Review Text"],
             sheet_name="Sheet1",
         )
@@ -41,8 +41,8 @@ class TestPrepper(unittest.TestCase):
 
     def test_prepare_csv(self):
         df, data = prepare_csv(
-            r"tests\testdata.clothingreviews.csv",
-            "Row ID",
+            r"tests\testdata.pizzashopreviews.csv",
+            "Review Id",
             "Review Text",
             encoding="ISO-8859-1",
         )
@@ -55,12 +55,12 @@ class TestPrepper(unittest.TestCase):
         assert_and_log_type_is_data(data, "data")
 
     def test_type_conditional_prepare_csv(self):
-        df, data = type_conditional_prepare(r"tests\testdata.clothingreviews.csv", "Row ID", "Review Text", "ISO-8859-1", None)
+        df, data = type_conditional_prepare(r"tests\testdata.pizzashopreviews.csv", "Review Id", "Review Text", "ISO-8859-1", None)
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 
     def test_type_conditional_prepare_xlsx(self):
-        df, data = type_conditional_prepare(r"tests\testdata.clothingreviews.xlsx", "Row ID", "Review Text", None, "Sheet1")
+        df, data = type_conditional_prepare(r"tests\testdata.pizzashopreviews.xlsx", "Review Id", "Review Text", None, "Sheet1")
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 

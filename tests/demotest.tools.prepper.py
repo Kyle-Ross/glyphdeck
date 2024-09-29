@@ -27,8 +27,8 @@ ic(prepare_df(df, "id", ["data1", "data2"]))
 print("\nPrepare via xlsx file")
 ic(
     prepare_xlsx(
-        r"tests\testdata.clothingreviews.xlsx",
-        "Row ID",
+        r"tests\testdata.pizzashopreviews.xlsx",
+        "Review Id",
         [
             "Review Text",
         ],
@@ -39,8 +39,8 @@ ic(
 print("\nPrepare via csv file")
 ic(
     prepare_csv(
-        r"tests\testdata.clothingreviews.csv",
-        "Row ID",
+        r"tests\testdata.pizzashopreviews.csv",
+        "Review Id",
         "Review Text",
         encoding="ISO-8859-1",
     )
