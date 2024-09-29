@@ -206,7 +206,7 @@ field_schema: dict = {
 
 # ---Sentiment Classes---
 class Sentiment(BaseValidatorModel):
-    """Model for representing sentiment scores.
+    """Validation model for representing sentiment scores.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -219,7 +219,7 @@ class Sentiment(BaseValidatorModel):
 
 # ---Categorising Classes---
 class PrimaryCat(BaseValidatorModel):
-    """Model for representing the primary category.
+    """Validation model for representing the primary category.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -231,7 +231,7 @@ class PrimaryCat(BaseValidatorModel):
 
 
 class Top5Cats(BaseValidatorModel):
-    """Model for representing the top 1 to 5 categories identified.
+    """Validation model for representing the top 1 to 5 categories identified.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -243,7 +243,7 @@ class Top5Cats(BaseValidatorModel):
 
 
 class SubCats(BaseValidatorModel):
-    """Model for representing sub-categories.
+    """Validation model for representing sub-categories.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -255,7 +255,7 @@ class SubCats(BaseValidatorModel):
 
 
 class PrimaryCatSentiment(BaseValidatorModel):
-    """Model for representing a primary category with its associated sentiment score.
+    """Validation model for representing a primary category with its associated sentiment score.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -269,7 +269,7 @@ class PrimaryCatSentiment(BaseValidatorModel):
 
 
 class PrimarySubCat(BaseValidatorModel):
-    """Model for representing a primary category with its associated sub-categories.
+    """Validation model for representing a primary category with its associated sub-categories.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -283,7 +283,7 @@ class PrimarySubCat(BaseValidatorModel):
 
 
 class SubCatsSentiment(BaseValidatorModel):
-    """Model for representing sub-categories with an associated overall sentiment score.
+    """Validation model for representing sub-categories with an associated overall sentiment score.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -297,7 +297,7 @@ class SubCatsSentiment(BaseValidatorModel):
 
 
 class SubCatsPerItemSentiment(BaseValidatorModel):
-    """Model for representing sub-categories with individual sentiment scores.
+    """Validation model for representing sub-categories with individual sentiment scores.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -311,7 +311,7 @@ class SubCatsPerItemSentiment(BaseValidatorModel):
 
 
 class SubCatsPerItemOverallSentiment(BaseValidatorModel):
-    """Model for representing sub-categories with individual sentiment scores and an overall sentiment score.
+    """Validation model for representing sub-categories with individual sentiment scores and an overall sentiment score.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -327,7 +327,7 @@ class SubCatsPerItemOverallSentiment(BaseValidatorModel):
 
 
 class TopCatsSentiment(BaseValidatorModel):
-    """Model for representing the top sub-categories with an associated overall sentiment score.
+    """Validation model for representing the top sub-categories with an associated overall sentiment score.
 
     Attributes:
         _field_count: The number of fields in the model.
@@ -341,7 +341,7 @@ class TopCatsSentiment(BaseValidatorModel):
 
 
 class CatHierarchySentiment(BaseValidatorModel):
-    """Model for representing a category hierarchy with an associated overall sentiment score.
+    """Validation model for representing a category hierarchy with an associated overall sentiment score.
 
     Attributes:
         _field_count: The number of fields in the model.
