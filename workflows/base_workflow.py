@@ -14,12 +14,12 @@ unhandled_errors_logger = UnhandledErrorsLogger().setup()
 @exception_logger(unhandled_errors_logger)
 def main():
     # Set file vars
-    source_file = r"F:\Github\CategoriGen\scratch\Womens clothing reviews\Womens Clothing E-Commerce Reviews - 100.csv"
+    source_file = r"tests\testdata.pizzashopreviews.xlsx"
 
     # Intialising a chain object, __init__ appending its first record from the source file
     chain = Chain(
         data_source=source_file,
-        id_column="Row ID",
+        id_column="Review Id",
         data_columns=["Review Text"],
         encoding="ISO-8859-1",
     )
@@ -33,7 +33,7 @@ def main():
         model="gpt-3.5-turbo",
         system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
         validation_model=validators.SubCats,
-        cache_identifier="WomensClothesReview_Comment_Sub_Categories",
+        cache_identifier="PizzaShipComment_Sub_Categories",
         use_cache=True,
         temperature=0.2,
         max_validation_retries=3,
