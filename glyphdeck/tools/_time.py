@@ -25,6 +25,13 @@ def delta_time_formatter(total_seconds: float) -> str:
 
 class LogBlock:
     """Context manager that logs the time elapsed over the total runtime of a block.
+    Useful for timing glyphdeck workflows.
+
+    Usage:
+    ```
+    with LogBlock("Workflow Runtime"):
+        # Your code here
+    ```
 
     Attributes:
         logger: The logger instance used for logging messages.
@@ -34,31 +41,34 @@ class LogBlock:
         elapsed_time_seconds: Elapsed time formatted as a string in seconds.
     """
 
-    message = "in RuntimeLogBlock class"
+    decorator_message = "in LogBlock"
 
     # Prepare the logger on initialisation
-    @log_decorator(logger, show_nesting=False, suffix_message=message)
-    def __init__(self, logger_arg: logging.Logger):
-        """Initializes RuntimeLogBlock with a logger instance.
+    @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
+    def __init__(self, message, logger_arg: logging.Logger = logger):
+        """
+        Initializes LogBlock with a logger instance and a custom message.
 
         Args:
-            logger_arg: A logging.Logger instance used for logging messages.
+            message (str): A custom message to include in the log.
+            logger_arg (logging.Logger): A logging.Logger instance used for logging messages. Defaults to module logger.
         """
+        self.message = message
         self.logger = logger_arg
 
     # On entry, record the time at the start of the block
-    @log_decorator(logger, show_nesting=False, suffix_message=message)
+    @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __enter__(self):
         """Records the start time at the entry of the block.
 
         Returns:
-            self: Returns the instance of RuntimeLogBlock.
+            self: Returns the instance of LogBlock.
         """
         self.start_time: float = time.time()
         return self
 
     # On exit, compare the end time with the start and log the result
-    @log_decorator(logger, show_nesting=False, suffix_message=message)
+    @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __exit__(self, exc_type, exc_value, exc_tb):
         """Logs the total runtime at the exit of the block.
 
@@ -72,5 +82,5 @@ class LogBlock:
         self.elapsed_time_seconds: str = format(self.elapsed_time, ",.4f")
         delta_time = delta_time_formatter(self.elapsed_time)
         delta_seconds = f"{self.elapsed_time_seconds} sec"
-        message = f" | Class | RuntimeLogBlock | Finish | Total runtime | | | {delta_time} | {delta_seconds}"
+        message = f" | Class | LogBlock | Finish | Total runtime - {self.message} | | | {delta_time} | {delta_seconds}"
         self.logger.info(message)

@@ -14,6 +14,9 @@ from .loggers import loggers
 # Making common data_types available in the interface
 from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
 
+# Making the LogBlock context manager available
+from .tools._time import LogBlock 
+
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
 __all__ = [
@@ -26,5 +29,6 @@ __all__ = [
     "DataDict",
     "Optional_DataDict",
     "RecordDict",
-    "RecordsDict"
+    "RecordsDict",
+    "LogBlock"
 ]
