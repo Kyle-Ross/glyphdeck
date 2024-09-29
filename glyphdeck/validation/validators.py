@@ -354,3 +354,48 @@ class CatHierarchySentiment(BaseValidatorModel):
     primary_category: str = primary_category
     sub_categories: list = categories_1_to_30
     sentiment_score: float = sentiment_score
+
+
+def list_models():
+    """Prints outs the built-in validation models, including their names and descriptions."""
+    # Models to print out
+    validation_models = [
+        Sentiment,
+        PrimaryCat,
+        Top5Cats,
+        SubCats,
+        PrimaryCatSentiment,
+        PrimarySubCat,
+        SubCatsSentiment,
+        SubCatsPerItemSentiment,
+        SubCatsPerItemOverallSentiment,
+        TopCatsSentiment,
+        CatHierarchySentiment,
+    ]
+
+    def print_line(char: str, length: int, newlines_after: int):
+        """
+        Prints a line consisting of a repeated character followed by a specified number of newlines.
+
+        Args:
+            char (str): The character to repeat in the line.
+            length (int): The number of times to repeat the character.
+            newlines_after (int): The number of newlines to print after the line.
+
+        Returns:
+            None
+        """
+        line = char * length
+        newlines = "\n" * newlines_after
+        print(line + newlines)
+
+    print("\n")
+    print_line("-", 40, 0)
+    print("List of built-in validation models:")
+    print_line("-", 40, 2)
+
+    for cls in validation_models:
+        print_line("*", 25, 0)
+        print(cls.__name__)
+        print_line("*", 25, 1)
+        print(f"{cls.__doc__}")
