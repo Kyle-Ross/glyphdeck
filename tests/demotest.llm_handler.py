@@ -27,7 +27,7 @@ handler = LLMHandler(
         "Analyse the words and provide a primary category "
         "representing the animal most likely to eat them."
     ),
-    validation_model=validators.PrimaryCategory,
+    validation_model=validators.PrimaryCat,
     cache_identifier="chain_llm_print_test_primary_category",
     use_cache=False,
     temperature=0.2,

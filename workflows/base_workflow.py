@@ -32,7 +32,7 @@ def main():
         provider="OpenAI",
         model="gpt-3.5-turbo",
         system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
-        validation_model=validators.SubCategories,
+        validation_model=validators.SubCats,
         cache_identifier="WomensClothesReview_Comment_Sub_Categories",
         use_cache=True,
         temperature=0.2,

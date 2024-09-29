@@ -65,7 +65,7 @@ ic(
             "Analyse the foods and provide a primary category "
             "representing their country of origin."
         ),
-        validation_model=validators.PrimaryCategory,
+        validation_model=validators.PrimaryCat,
         cache_identifier="chain_llm_print_test_primary_category_food_country",
         use_cache=True,
         temperature=0.2,
