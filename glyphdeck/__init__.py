@@ -10,6 +10,9 @@ from .tools import prepper
 # Accesses or creates loggers only if they do not exist globally yet
 from .loggers import loggers
 
+# Making common data_types available in the interface
+from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
+
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
 __all__ = [
@@ -17,5 +20,9 @@ __all__ = [
     "LLMHandler",
     "Sanitiser",
     "prepper",
-    "loggers"
+    "loggers",
+    "DataDict",
+    "Optional_DataDict",
+    "RecordDict",
+    "RecordsDict"
 ]
