@@ -1,11 +1,11 @@
 import glyphdeck as gd
 
-from glyphdeck.tools.logging import (
+from glyphdeck.tools._logging import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
     exception_logger,
 )
-from glyphdeck.tools.time import RuntimeLogBlock
+from glyphdeck.tools._time import RuntimeLogBlock
 from glyphdeck.validation import validators
 
 logger = BaseWorkflowLogger().setup()

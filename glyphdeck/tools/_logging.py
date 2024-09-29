@@ -3,7 +3,7 @@ import logging
 import os
 from typing import Type, Callable, Optional
 
-from glyphdeck.tools.directory_creators import check_logs_directory
+from glyphdeck.tools._directory_creators import check_logs_directory
 import glyphdeck.logger_constants as logger_constants
 
 
