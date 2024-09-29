@@ -1,18 +1,11 @@
 import glyphdeck as gd
 
 from glyphdeck.tools._logging import (
-    BaseWorkflowLogger,
-    UnhandledErrorsLogger,
     exception_logger,
 )
 from glyphdeck.tools._time import RuntimeLogBlock
-from glyphdeck.validation import validators
 
-logger = BaseWorkflowLogger().setup()
-unhandled_errors_logger = UnhandledErrorsLogger().setup()
-
-
-@exception_logger(unhandled_errors_logger)
+@exception_logger(gd.loggers.unhandled_errors)
 def main():
     # Set file vars
     source_file = r"tests\testdata.pizzashopreviews.xlsx"
@@ -33,7 +26,7 @@ def main():
         provider="OpenAI",
         model="gpt-3.5-turbo",
         system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
-        validation_model=validators.SubCats,
+        validation_model=gd.validators.SubCats,
         cache_identifier="PizzaShipComment_Sub_Categories",
         use_cache=True,
         temperature=0.2,
@@ -59,5 +52,5 @@ def main():
 if (
     __name__ == "__main__"
 ):  # Run the main code, with decorators and context managers in effect
-    with RuntimeLogBlock(logger):  # These run nested, in order (outer to inner)
+    with RuntimeLogBlock(gd.loggers.workflow):  # These run nested, in order (outer to inner)
         main()
