@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "glyphdeck"
-version = "0.1.1"
+version = "1.0.0"
 description = "Streamlined asynchronous natural language categorisation & sentiment analysis using generative AI."
 authors = ["Kyle Ross <107285758+Kyle-Ross@users.noreply.github.com>"]
 license = "GNU GENERAL PUBLIC LICENSE"
