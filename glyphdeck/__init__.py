@@ -8,7 +8,7 @@ from .tools import prepper
 
 # Set up all the loggers and add the loggers instance to the gylphdeck namespace
 # Enables logger access like gylphdeck.loggers.cascade
-from ._loggers import loggers # noqa: F401
+from .loggers import loggers # noqa: F401
 
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
