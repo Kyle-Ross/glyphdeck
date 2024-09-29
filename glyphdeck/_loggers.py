@@ -14,7 +14,7 @@ from .tools.logging import (
 )
 
 # Set up all the loggers
-class Logger:
+class Loggers:
     """
     A centralized logger setup for various components within the application.
 
@@ -57,4 +57,4 @@ class Logger:
     workflow = BaseWorkflowLogger().setup()
     unhandled_errors = UnhandledErrorsLogger().setup()
 
-logger = Logger()
+loggers = Loggers()
