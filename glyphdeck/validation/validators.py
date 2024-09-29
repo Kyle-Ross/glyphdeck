@@ -159,30 +159,30 @@ class BaseValidatorModel(BaseModel):
 # Used here to add a description to each field
 # Defined separately to avoid repetition in similar classes below
 sentiment_score: float = Field(
-    description="A 2 decimal value that represents the overall sentiment of a comment. Ranges from -1.00 "
+    description="A 2 decimal value that represents the overall sentiment of the input. Ranges from -1.00 "
     "(max negative sentiment) to 1.00 (max positive sentiment), with 0.00 indicating neutral "
     "sentiment. It must be between -1.00 and 1.00"
 )
 
 per_sub_category_sentiment_scores: list = Field(
     description="A list of sentiment scores corresponding to the list of identified sub-categories. Each score is "
-    "a 2 decimal value that represents sentiment of the corresponding sub-categories as it was used in "
-    "the comment. Each score ranges from -1.00 (max negative sentiment) to 1.00 (max positive "
+    "a 2 decimal value that represents sentiment of the corresponding sub-categories as it was used inside "
+    "the input. Each score ranges from -1.00 (max negative sentiment) to 1.00 (max positive "
     "sentiment), with 0.00 indicating neutral sentiment. It must be between -1.00 and 1.00. The list "
     "should be of equal length to the list of corresponding sub-categories, and in the same order."
 )
 
 primary_category: str = Field(
-    description="The primary category identified in the comment. Each category name should be concise."
+    description="The primary category identified inside the input. Each category name should be concise."
 )
 
 top_5_categories: list = Field(
-    description="The top 1 to 5 sub-categories identified in the comment in order of relevance. "
+    description="The top 1 to 5 sub-categories identified inside the input in order of relevance. "
     "Each category name should be concise."
 )
 
 categories_1_to_30: list = Field(
-    description="All sub-categories identified in the comment in order of relevance, making sure to capture all the "
+    description="All sub-categories identified inside the input in order of relevance, making sure to capture all the "
     "topics, with least 1 and no more than 30 categories. Each category name should be concise."
 )
 
@@ -235,7 +235,7 @@ class Top5Cats(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        top_categories: The top 1 to 5 sub-categories identified in the comment in order of relevance.
+        top_categories: The top 1 to 5 sub-categories identified inside the input in order of relevance.
     """
 
     _field_count: int = 1
@@ -247,7 +247,7 @@ class SubCats(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
     """
 
     _field_count: int = 1
@@ -274,7 +274,7 @@ class PrimarySubCat(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         primary_category: The primary category identified.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
     """
 
     _field_count: int = 2
@@ -287,7 +287,7 @@ class SubCatsSentiment(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
     """
 
@@ -301,7 +301,7 @@ class SubCatsPerItemSentiment(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
         per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
     """
 
@@ -315,7 +315,7 @@ class SubCatsPerItemOverallSentiment(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
         per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
         sentiment_score: The overall sentiment score.
     """
@@ -331,7 +331,7 @@ class TopCatsSentiment(BaseValidatorModel):
 
     Attributes:
         _field_count: The number of fields in the model.
-        top_categories: The top 1 to 5 sub-categories identified in the comment in order of relevance.
+        top_categories: The top 1 to 5 sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
     """
 
@@ -346,7 +346,7 @@ class CatHierarchySentiment(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         primary_category: The primary category identified.
-        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sub_categories: All sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
     """
 
