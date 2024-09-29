@@ -1,4 +1,5 @@
-from glyphdeck.processors.cascade import Cascade
+import glyphdeck as gd
+
 from glyphdeck.tools.loggers import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
@@ -17,7 +18,7 @@ def main():
     source_file = r"tests\testdata.pizzashopreviews.xlsx"
 
     # Intialising a cascade object, __init__ appending its first record from the source file
-    cascade = Cascade(
+    cascade = gd.Cascade(
         data_source=source_file,
         id_column="Review Id",
         data_columns=["Review Text"],
