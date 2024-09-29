@@ -1,4 +1,4 @@
-from typing import Union, Tuple, List, Dict, Any, Self
+from typing import Union, Tuple, List, Dict, Any, Self, Set
 import copy
 import re
 
@@ -220,7 +220,7 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def groups_where(
-        patterns_dict: PatternsDict, active_type: Union[list, set] = (True, False)
+        patterns_dict: PatternsDict, active_type: Union[List, Tuple] = (True, False)
     ) -> List[str]:
         """Returns a list of pattern groups based on their 'active' status.
 

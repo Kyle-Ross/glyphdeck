@@ -878,7 +878,7 @@ class Chain:
         self,
         title: str,
         data: DataDict,
-        column_names: Optional[List[str]] = None,
+        column_names: Optional[Union[str, List[str]]] = None,
         update_expected_len: bool = False,
     ):
         """Adds a new record to the 'records' dictionary.
@@ -902,6 +902,11 @@ class Chain:
             # Uses the latest if none were set
             if column_names is None:
                 column_names_len = len(self.latest_column_names)
+            # If its a string, put it in a list
+            # Set len to 1
+            elif isinstance(column_names, str):
+                column_names = [column_names]
+                column_names_len = 1
             else:
                 # Otherwise, get the length from the provided list
                 column_names_len = len(column_names)

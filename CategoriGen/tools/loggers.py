@@ -1,7 +1,7 @@
 import traceback
 import logging
 import os
-from typing import Type, Callable
+from typing import Type, Callable, Optional
 
 from CategoriGen.tools.directory_creators import check_logs_directory
 import CategoriGen.logger_constants as logger_constants
@@ -115,7 +115,7 @@ def log_decorator(
     level: str = "debug",
     start: str = "Start",
     finish: str = "Finish",
-    suffix_message: str = None,
+    suffix_message: Optional[str] = None,
     is_static_method: bool = False,
     is_property: bool = False,
     show_nesting: bool = True,  # Include or exclude the nesting prefix

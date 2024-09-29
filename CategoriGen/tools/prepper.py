@@ -173,7 +173,7 @@ def type_conditional_prepare(
     id_column: str,
     data_columns: Union[str, List[str]],
     encoding: str,
-    sheet_name: str,
+    sheet: Union[str, int],
 ) -> Tuple[pd.DataFrame, DataDict]:
     """Conditionally prepares data from various formats into a common data dictionary format.
 
@@ -188,7 +188,7 @@ def type_conditional_prepare(
         data_columns (Union[str, List[str]]): A single column name or a list of
             column names that contain the data to be extracted.
         encoding (str): The encoding to use when reading text files.
-        sheet_name (str): The name of the sheet to read from in an XLSX file.
+        sheet_name (Union[str, int]): The name or number of the sheet to read from in an XLSX file.
 
     Returns:
         Tuple[pd.DataFrame, DataDict]: A tuple containing the prepared dataframe and
@@ -226,7 +226,7 @@ def type_conditional_prepare(
         # 2.2 - if the file is an .xlsx
         if file_type == "xlsx":
             source_table, prepared_data = prepare_xlsx(
-                data_source, id_column, data_columns, sheet_name=sheet_name
+                data_source, id_column, data_columns, sheet_name=sheet
             )
 
     # 3 - If it is neither a dataframe or a string
