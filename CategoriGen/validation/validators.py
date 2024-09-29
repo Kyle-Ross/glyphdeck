@@ -17,13 +17,29 @@ sentiment_max = 1.00
 # ---BASE MODELS---
 # Add field names to the field_validator arguments if you want them to be validated by a method
 class BaseValidatorModel(BaseModel):
-    """Adds field validation to the resulting BaseValidatorModel class, which are used if columns match the arguments.
-    Multiple validation can apply to a single field if the column name is in multiple validation."""
+    """Base class for validator models. Provides common field validations, which are used in columns match the arguments. 
+    Multiple validations can apply to a single field if the column name is in multiple validation rules.
 
+    Args:
+        BaseModel: The base class for Pydantic models.
+
+    Returns:
+        BaseValidatorModel: An instance of the base validator model.
+    """
+
+    # Decorator needed to check field uses since the item_model inherits from base
     @field_validator(
         "sentiment_score", check_fields=False
-    )  # Check fields uses since the item_model inherits from base
+    )
     def check_decimal_places(cls, v: Union[float, int]) -> Union[float, int]:
+        """Checks that the value has no more than two decimal places.
+
+        Args:
+            v: The value to be validated, either float or int.
+
+        Returns:
+            The validated value if it passes the check.
+        """
         if isinstance(v, float) or v in (
             -1,
             0,
@@ -39,6 +55,14 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("sentiment_score", check_fields=False)
     def sentiment_float_in_range(cls, v: Union[float, int]) -> Union[float, int]:
+        """Ensures the sentiment score is within the allowed range.
+
+        Args:
+            v: The value to be validated, either float or int.
+
+        Returns:
+            The validated value if it is within the specified range.
+        """
         global sentiment_min, sentiment_max
         if isinstance(v, float) or v in (-1, 0, 1):
             minimum: float = sentiment_min
@@ -55,6 +79,14 @@ class BaseValidatorModel(BaseModel):
     def list_of_sentiment_floats_in_range(
         cls, v: List[Union[float, int]]
     ) -> List[Union[float, int]]:
+        """Validates a list of sentiment scores ensuring values are floats within the allowed range.
+
+        Args:
+            v: The list of values to be validated.
+
+        Returns:
+            The validated list of values.
+        """
         global sentiment_min, sentiment_max
         if isinstance(v, list):
             for x in v:
@@ -83,6 +115,14 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("top_categories", check_fields=False)
     def list_1_to_5(cls, v: List) -> List:
+        """Validates that the list contains between 1 to 5 entries.
+
+        Args:
+            v: The list to be validated.
+
+        Returns:
+            The validated list if it passes the check.
+        """
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 5
@@ -96,6 +136,14 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("sub_categories", check_fields=False)
     def list_1_to_30(cls, v: List) -> List:
+        """Validates that the list contains between 1 to 30 entries.
+
+        Args:
+            v: The list to be validated.
+
+        Returns:
+            The validated list if it passes the check.
+        """
         if isinstance(v, list):
             minimum: int = 1
             maximum: int = 30
@@ -160,51 +208,111 @@ field_schema: dict = {
 
 # ---Sentiment Classes---
 class SentimentScore(BaseValidatorModel):
+    """Model for representing sentiment scores.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 1
     sentiment_score: float = sentiment_score
 
 
 # ---Categorising Classes---
 class PrimaryCategory(BaseValidatorModel):
+    """Model for representing the primary category.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        primary_category: The primary category identified.
+    """
     _field_count: int = 1
     primary_category: str = primary_category
 
 
 class Top5Categories(BaseValidatorModel):
+    """Model for representing the top 1 to 5 categories identified.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        top_categories: The top 1 to 5 sub-categories identified in the comment in order of relevance.
+    """
     _field_count: int = 1
     top_categories: list = top_5_categories
 
 
 class SubCategories(BaseValidatorModel):
+    """Model for representing sub-categories.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+    """
     _field_count: int = 1
     sub_categories: list = categories_1_to_30
 
 
 class PrimaryCategoryAndSentiment(BaseValidatorModel):
+    """Model for representing a primary category with its associated sentiment score.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        primary_category: The primary category identified.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 2
     primary_category: str = primary_category
     sentiment_score: float = sentiment_score
 
 
 class PrimaryCategoryAndSubCategory(BaseValidatorModel):
+    """Model for representing a primary category with its associated sub-categories.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        primary_category: The primary category identified.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+    """
     _field_count: int = 2
     primary_category: str = primary_category
     sub_categories: list = categories_1_to_30
 
 
 class SubCategoriesAndSentiment(BaseValidatorModel):
+    """Model for representing sub-categories with an associated overall sentiment score.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 2
     sub_categories: list = categories_1_to_30
     sentiment_score: float = sentiment_score
 
 
 class SubCategoriesWithPerItemSentiment(BaseValidatorModel):
+    """Model for representing sub-categories with individual sentiment scores.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+        per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
+    """
     _field_count: int = 2
     sub_categories: list = categories_1_to_30
     per_sub_category_sentiment_scores: list = per_sub_category_sentiment_scores
 
 
 class SubCategoriesWithPerItemSentimentAndOverallSentiment(BaseValidatorModel):
+    """Model for representing sub-categories with individual sentiment scores and an overall sentiment score.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+        per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 3
     sub_categories: list = categories_1_to_30
     per_sub_category_sentiment_scores: list = per_sub_category_sentiment_scores
@@ -212,12 +320,27 @@ class SubCategoriesWithPerItemSentimentAndOverallSentiment(BaseValidatorModel):
 
 
 class TopCategoriesAndSentiment(BaseValidatorModel):
+    """Model for representing the top sub-categories with an associated overall sentiment score.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        top_categories: The top 1 to 5 sub-categories identified in the comment in order of relevance.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 2
     top_categories: list = top_5_categories
     sentiment_score: float = sentiment_score
 
 
 class CategoryHierarchyAndSentiment(BaseValidatorModel):
+    """Model for representing a category hierarchy with an associated overall sentiment score.
+
+    Attributes:
+        _field_count: The number of fields in the model.
+        primary_category: The primary category identified.
+        sub_categories: All sub-categories identified in the comment in order of relevance.
+        sentiment_score: The overall sentiment score.
+    """
     _field_count: int = 3
     primary_category: str = primary_category
     sub_categories: list = categories_1_to_30
