@@ -15,7 +15,15 @@ logger = FileImportersToolsLogger().setup()
 
 
 def assert_and_log_error_path(path: str, function_name: str):
-    """Wrapper for asserting and logging correct path in file_importers"""
+    """Asserts that a provided path is a string and logs an error if not.
+
+    Args:
+        path (str): The path to be validated.
+        function_name (str): The name of the function that calls this assertion.
+
+    Raises:
+        AssertionError: If the path is not a string.
+    """
     assert_and_log_error(
         logger,
         "error",
@@ -26,21 +34,54 @@ def assert_and_log_error_path(path: str, function_name: str):
 
 @log_decorator(logger)
 def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
-    """Wrapper for pd.read_excel with additional logic"""
+    """Reads an Excel file and returns its content as a DataFrame.
+
+    Args:
+        file_path (str): The path to the Excel file.
+
+    Returns:
+        pd.DataFrame: The content of the Excel file as a DataFrame.
+    
+    Raises:
+        AssertionError: If the file_path is not a string or the file does not exist.
+    """
+    # Wrapper for pd.read_excel with additional logic
     assert_and_log_error_path(file_path, "get_xlsx()")
     return pd.read_excel(file_path, engine="openpyxl", **kwargs)
 
 
 @log_decorator(logger)
 def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
-    """Wrapper for pd.read_csv with additional logic"""
+    """Reads a CSV file and returns its content as a DataFrame.
+
+    Args:
+        file_path (str): The path to the CSV file.
+
+    Returns:
+        pd.DataFrame: The content of the CSV file as a DataFrame.
+    
+    Raises:
+        AssertionError: If the file_path is not a string or the file does not exist.
+    """
+    # Wrapper for pd.read_csv with additional logic
     assert_and_log_error_path(file_path, "get_csv()")
     return pd.read_csv(file_path, **kwargs)
 
 
 @log_decorator(logger)
 def file_validation(file_path: str) -> str:
-    """Takes a file path, checks that the file exists and is in one of the compatible types, then returns the file type."""
+    """Validates the provided file path and determines its type.
+
+    Args:
+        file_path (str): The path to the file to be validated.
+
+    Returns:
+        str: The type of the file, either 'csv' or 'xlsx'.
+    
+    Raises:
+        AssertionError: If the file_path is not a string, the file does not exist, or the file type is unsupported.
+    """
+    # Takes a file path, checks that the file exists and is in one of the compatible types, then returns the file type.
     # Validating input
     assert_and_log_error(
         logger,
