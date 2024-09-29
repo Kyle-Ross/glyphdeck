@@ -304,6 +304,9 @@ def global_exception_logger(exctype, value, tb):
         print("Original exception was:", file=sys.stderr)
         traceback.print_exception(exctype, value, tb)
 
+    # Re-raise the error afterwards
+    raise value
+
 
 # Set the global exception handler to sys.excepthook when ever this module is imported
 sys.excepthook = global_exception_logger
