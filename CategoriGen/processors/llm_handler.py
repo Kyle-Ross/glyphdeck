@@ -32,15 +32,25 @@ logger.debug(" | Step | llm_handler.py | Action | Initialised logger")
 
 
 class LLMHandler:
-    """Handles interactions with Language Learning Models (LLMs).
+    """Handler for interacting with Large Language Models (LLMs) and managing their settings, inputs, and outputs.
 
-    This class is designed to interface with various LLM providers, validate their outputs using
-    specified models, and manage asynchronous requests with extensive error handling and caching.
-
-    Returns:
-        LLMHandler: An instance of the LLMHandler class.
+    Attributes:
+        input_data: Dictionary containing the input data.
+        provider: Name of the LLM provider.
+        model: Model identifier for the LLM.
+        system_message: The system message to provide in the LLM prompts.
+        validation_model: Pydantic class used for validating LLM outputs.
+        cache_identifier: Unique string used to identify discrete jobs and avoid cache mixing.
+        use_cache: Boolean indicating whether to use cache or not.
+        temperature: Determines if the responses are deterministic (lower value) or random (higher value).
+        max_validation_retries: Maximum number of retries for validation attempts.
+        max_preprepared_coroutines_semaphore: Semaphore to limit the number of pre-prepared coroutines.
+        max_awaiting_coroutines_semaphore: Semaphore to limit the number of awaiting coroutines.
+        raw_output_data: Dictionary to store the intermediate LLM outputs.
+        new_output_data: Flattened output data to be generated.
+        new_column_names: Generated column names to be used in the flattened output data.
+        available_providers: List of LLM providers that are available.
     """
-
     @log_decorator(
         logger,
         "debug",
