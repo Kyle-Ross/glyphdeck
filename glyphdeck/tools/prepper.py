@@ -2,7 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import pandas as pd
 
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     PrepperLogger,
     log_decorator,
     assert_and_log_error,

@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import openpyxl  # noqa: F401  -- Not referenced, but avoids errors with pd.read_excel()
 
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     FileImportersToolsLogger,
     log_decorator,
     assert_and_log_error,

@@ -1,7 +1,7 @@
 import logging
 import time
 
-from glyphdeck.tools.loggers import TimeToolsLogger, log_decorator
+from glyphdeck.tools.logging import TimeToolsLogger, log_decorator
 
 logger = TimeToolsLogger().setup()
 

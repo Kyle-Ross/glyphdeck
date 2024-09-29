@@ -1,6 +1,6 @@
 import glyphdeck as gd
 
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     BaseWorkflowLogger,
     UnhandledErrorsLogger,
     exception_logger,

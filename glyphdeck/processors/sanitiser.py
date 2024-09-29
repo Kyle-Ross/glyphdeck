@@ -5,7 +5,7 @@ import re
 
 import pandas as pd
 
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     SanitiserLogger,
     log_and_raise_error,
     log_decorator,

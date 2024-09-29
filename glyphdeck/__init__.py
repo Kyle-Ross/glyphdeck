@@ -7,7 +7,7 @@ from .processors.sanitiser import Sanitiser
 from .tools import prepper
 
 # Import all the loggers
-from .tools.loggers import (
+from .tools.logging import (
     CascadeLogger,
     LLMHandlerLogger,
     SanitiserLogger,

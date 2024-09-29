@@ -18,7 +18,7 @@ from glyphdeck.validation.data_types import (
     Optional_DataDict,
 )
 from glyphdeck.validation import validators
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     assert_and_log_error,
     LLMHandlerLogger,
     log_decorator,

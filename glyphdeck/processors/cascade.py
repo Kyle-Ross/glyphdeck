@@ -15,7 +15,7 @@ from glyphdeck.validation.data_types import (
     RecordDict,
     RecordsDict,
 )
-from glyphdeck.tools.loggers import (
+from glyphdeck.tools.logging import (
     CascadeLogger,
     assert_and_log_error,
     log_and_raise_error,
