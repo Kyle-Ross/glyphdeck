@@ -6,8 +6,8 @@ from .processors.llm_handler import LLMHandler
 from .processors.sanitiser import Sanitiser
 from .tools import prepper
 
-# Set up all the loggers and add the loggers instance to the gylphdeck namespace
-# Enables logger access like gylphdeck.loggers.cascade
+# Enables logger access in the public interface like gylphdeck.loggers.cascade
+# Accesses or creates loggers only if they do not exist globally yet
 from .loggers import loggers # noqa: F401
 
 # Explicitly defining __all__ for metadata and clarity
