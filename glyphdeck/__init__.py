@@ -6,35 +6,9 @@ from .processors.llm_handler import LLMHandler
 from .processors.sanitiser import Sanitiser
 from .tools import prepper
 
-# Import all the loggers
-from .tools.logging import (
-    CascadeLogger,
-    LLMHandlerLogger,
-    SanitiserLogger,
-    CacheLogger,
-    FileImportersToolsLogger,
-    PrepperLogger,
-    StringsToolsLogger,
-    TimeToolsLogger,
-    DataTypesLogger,
-    ValidatorsLogger,
-    BaseWorkflowLogger,
-    UnhandledErrorsLogger,
-)
-
-# Set up all the loggers
-cascade_logger = CascadeLogger().setup()
-llm_handler_logger = LLMHandlerLogger().setup()
-sanitiser_logger = SanitiserLogger().setup()
-cache_logger = CacheLogger().setup()
-file_importers_logger = FileImportersToolsLogger().setup()
-prepper_logger = PrepperLogger().setup()
-string_tools_logger = StringsToolsLogger().setup()
-time_tools_logger = TimeToolsLogger().setup()
-data_types_logger = DataTypesLogger().setup()
-validators_logger = ValidatorsLogger().setup()
-workflow_logger = BaseWorkflowLogger().setup()
-unhandled_errors_logger = UnhandledErrorsLogger().setup()
+# Set up all the loggers and add the loggers instance to the gylphdeck namespace
+# Enables logger access like gylphdeck.loggers.cascade
+from ._loggers import loggers # noqa: F401
 
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
