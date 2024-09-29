@@ -167,3 +167,4 @@ cython_debug/
 .vscode/
 .idea/
 .prompts/
+glyphdeck.code-workspace
