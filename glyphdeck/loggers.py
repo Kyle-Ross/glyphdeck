@@ -3,7 +3,7 @@ import logging
 
 # Import the internal logging module
 # Contains the global syshook logger which is set on import
-from . import _logging
+from .tools import _logging
 
 
 class Loggers:
@@ -223,7 +223,7 @@ class Loggers:
         """
         if self._workflow is None:
             self._workflow = self._get_or_create_logger(
-                "workflow", _logging.WorkflowLogger
+                "workflow", _logging.BaseWorkflowLogger
             )
         return self._workflow
 
