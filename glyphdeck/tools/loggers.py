@@ -14,19 +14,16 @@ class Loggers:
     This class sets up multiple loggers, each aimed at handling specific types of logging activities.
     Each logger is an instance of its respective logging class and is initialized via its `setup` method.
 
-    It also controls contains the attributes that handle the inclusion of input and output data in the logs.
-
     This is run on import of glyphdeck, creating an instance of the Logger class called `logger`.
     This means loggers can be accessed like this:
 
     ```
     import glyphdeck as gd
+
     logger = gd.logger.cascade
     ```
 
     Attributes:
-        log_input_data (bool): Indicates if input data should be logged.
-        log_output_data (bool): Indicates if output data should be logged.
         cascade (logging.Logger): Handles Cascade related logging.
         llm_handler (logging.Logger): Handles logging for language model handler operations.
         sanitiser (logging.Logger): Logs activities related to the Sanitiser class.
@@ -43,18 +40,9 @@ class Loggers:
 
     def __init__(self):
         """
-        Initializes a new instance of the Loggers class.
-
-        This class sets up a centralized logger configuration, where each
-        logger instance is initialized upon first access. It also controls
-        the inclusion of input and output data in the logs.
+        Initializes a new instance of the Loggers class. All loggers are set
+        to None initially and are created upon first access.
         """
-
-        # Privacy controls on inclusion of data in the logs
-        self.log_input_data: bool = False
-        self.log_output_data: bool = False
-
-        # Create-on-access log references which will be used via properties below
         self._cascade = None
         self._llm_handler = None
         self._sanitiser = None

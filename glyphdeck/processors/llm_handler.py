@@ -23,7 +23,7 @@ from glyphdeck.tools._logging import (
     LLMHandlerLogger,
     log_decorator,
 )
-from glyphdeck.tools.loggers import log_output_data, log_input_data
+from glyphdeck.logger_constants import log_output_data, log_input_data
 from glyphdeck.tools._strings import string_cleaner
 from glyphdeck.tools._caching import openai_cache
 
