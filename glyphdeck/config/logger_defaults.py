@@ -5,8 +5,8 @@
 # -----------------
 # Default levels
 # -----------------
-file_log_level_default: int = 10
-console_log_level_default: int = 10
+file_log_level_default: int = 99
+console_log_level_default: int = 20
 
 # -----------------
 # Private Information Control
