@@ -41,4 +41,3 @@ file_importers:
 unhandled_errors:
   file: 10
   console: 10
-source: set_all

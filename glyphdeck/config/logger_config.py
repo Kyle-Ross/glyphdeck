@@ -153,12 +153,12 @@ def set_logging_config(
         if setting_type is not None:
             assert isinstance(
                 setting_type, str
-            ), f"level_source is type '{type(setting_type)}', expected str"
+            ), f"setting_type is type '{type(setting_type)}', expected str"
             allowed_sources = ("default", "set_all", "granular")
             assert (
                 setting_type in allowed_sources
-            ), f"level_source '{setting_type}' is not in allowed sources '{allowed_sources}'"
-            config.data["source"] = setting_type
+            ), f"setting_type '{setting_type}' is not in allowed sources '{allowed_sources}'"
+            config.data["setting_type"] = setting_type
 
         if set_all_levels is not None:
             _set_levels(config.data, "set_all", set_all_levels)
@@ -209,7 +209,8 @@ def restore_logger_config():
     """
 
     config = {
-        "private_data": {"log_input": False, "log_output": False, "source": "default"},
+        "private_data": {"log_input": False, "log_output": False},
+        "setting_type": "default",
         "set_all": {"file": 10, "console": 10},
         "data_types": {"file": 10, "console": 10},
         "prepper": {"file": 10, "console": 10},
