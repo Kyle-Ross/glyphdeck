@@ -3,7 +3,7 @@ import logging
 
 # Import the internal logging module
 # Contains the global syshook logger which is set on import
-from .tools import _logging
+from . import _logging
 
 
 class Loggers:

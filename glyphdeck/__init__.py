@@ -16,7 +16,7 @@ from .config.logger_config import (
 
 # Enables logger access in the public interface like gylphdeck.loggers.cascade
 # Accesses or creates loggers only if they do not exist globally yet
-from .loggers import loggers
+from .tools.loggers import loggers
 
 # Making common data_types available in the interface
 from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
