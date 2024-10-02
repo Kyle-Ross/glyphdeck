@@ -7,6 +7,9 @@ from .processors.sanitiser import Sanitiser
 from glyphdeck.validation import validators
 from .tools import prepper
 
+# Provide access to the set_logging_config
+from .config.logger_config import logging_config, restore_logger_config
+
 # Enables logger access in the public interface like gylphdeck.loggers.cascade
 # Accesses or creates loggers only if they do not exist globally yet
 from .loggers import loggers
@@ -15,7 +18,7 @@ from .loggers import loggers
 from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
 
 # Making the LogBlock context manager available
-from .tools._time import LogBlock 
+from .tools._time import LogBlock
 
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
@@ -25,10 +28,12 @@ __all__ = [
     "Sanitiser",
     "validators",
     "prepper",
+    "logging_config",
+    "restore_logger_config",
     "loggers",
     "DataDict",
     "Optional_DataDict",
     "RecordDict",
     "RecordsDict",
-    "LogBlock"
+    "LogBlock",
 ]

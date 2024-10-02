@@ -1,7 +1,7 @@
 private_data:
   log_input: false
   log_output: false
-source: default
+  source: default
 set_all:
   file: 10
   console: 10
@@ -29,9 +29,6 @@ cache:
 workflows:
   file: 10
   console: 10
-unhandled:
-  file: 10
-  console: 10
 strings:
   file: 10
   console: 10
@@ -39,5 +36,8 @@ time:
   file: 10
   console: 10
 file_importers:
+  file: 10
+  console: 10
+unhandled_errors:
   file: 10
   console: 10
