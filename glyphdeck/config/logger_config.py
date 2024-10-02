@@ -39,10 +39,10 @@ def logging_config(
     log_input_data: Optional[bool] = None,
     log_output_data: Optional[bool] = None,
     # Parent level setting directing logger level references
-    level_source: Optional[str] = None,
-    # Used if level_source == "set_all"
+    setting_type: Optional[str] = None,
+    # Used if setting_type == "set_all"
     set_all_levels: Optional[Tuple[int]] = None,
-    # Used if level_source == "granular"
+    # Used if setting_type == "granular"
     data_types_levels: Optional[Tuple[int]] = None,
     prepper_levels: Optional[Tuple[int]] = None,
     cascade_levels: Optional[Tuple[int]] = None,
@@ -62,6 +62,45 @@ def logging_config(
     the source of logging levels, and the logging levels for different components of the module.
 
     Changes here affect the module globally for current and future use.
+
+    Privacy:
+    --------
+    - log_input_data: Optional[bool]
+    - log_output_data: Optional[bool]
+
+    Setting_type:
+    ----------------
+    Can be "default", "set_all" or "granular"
+    - setting_type: Optional[str]
+
+    If "default":
+    -----------------------------
+    Uses the default values:
+    - file = 90 (no logs)
+    - console = 20 (info)
+    \n
+    For all loggers.
+
+    If "set_all":
+    -----------------------------
+    (file_level, console_level)
+    - set_all_levels: Optional[Tuple[int]]
+
+    If "Granular":
+    ------------------------------
+    (file_level, console_level)
+    - data_types_levels: Optional[Tuple[int]]
+    - prepper_levels: Optional[Tuple[int]]
+    - cascade_levels: Optional[Tuple[int]]
+    - sanitiser_levels: Optional[Tuple[int]]
+    - validators_levels: Optional[Tuple[int]]
+    - llm_handler_levels: Optional[Tuple[int]]
+    - cache_levels: Optional[Tuple[int]]
+    - workflows_levels: Optional[Tuple[int]]
+    - strings_levels: Optional[Tuple[int]]
+    - time_levels: Optional[Tuple[int]]
+    - file_importers_levels: Optional[Tuple[int]]
+    - unhandled_errors_levels: Optional[Tuple[int]]
     """
 
     def _set_levels(d: dict, key: str, levels: Tuple[int]):
@@ -104,15 +143,15 @@ def logging_config(
             ), f"log_input_data is type '{type(log_output_data)}', expected bool"
             config.data["private_data"]["log_output"] = log_output_data
 
-        if level_source is not None:
+        if setting_type is not None:
             assert isinstance(
-                level_source, str
-            ), f"level_source is type '{type(level_source)}', expected str"
+                setting_type, str
+            ), f"level_source is type '{type(setting_type)}', expected str"
             allowed_sources = ("default", "set_all", "granular")
             assert (
-                level_source in allowed_sources
-            ), f"level_source '{level_source}' is not in allowed sources '{allowed_sources}'"
-            config.data["source"] = level_source
+                setting_type in allowed_sources
+            ), f"level_source '{setting_type}' is not in allowed sources '{allowed_sources}'"
+            config.data["source"] = setting_type
 
         if set_all_levels is not None:
             _set_levels(config.data, "set_all", set_all_levels)
@@ -160,9 +199,8 @@ def restore_logger_config():
     f"""This function restores the logger configuration yaml file '{_config_path}' in its original state.
     Useful if your changes have broken the file, but beware as this will overwrite any modifications
     in the config.
-
-
     """
+
     config = {
         "private_data": {"log_input": False, "log_output": False, "source": "default"},
         "set_all": {"file": 10, "console": 10},
@@ -187,5 +225,5 @@ def restore_logger_config():
 # Only run in here, for testing
 if __name__ == "__main__":
     logging_config(
-        log_input_data=False, level_source="default", strings_levels=(10, 10)
+        log_input_data=False, setting_type="default", strings_levels=(10, 10)
     )
