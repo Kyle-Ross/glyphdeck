@@ -242,9 +242,10 @@ def logger_setup(
     # Initialising the logger_arg and naming it
     logger = logging.getLogger(logger_name)
 
-    # Set logger_arg level to the lowest level between file and console
+    # Set logger_arg level to the lowest possible level, to allow the handlers to decide the output without interference
     # This is because handlers can only access levels at or above the level of the logger_arg
-    logger.setLevel(min(file_log_level, console_log_level))
+    # We set it to 1 not 0, since setting it to 0 was resolving to NOTSET, and seemingly setting it to the level of the root logger (30)
+    logger.setLevel(1)
 
     # Get the formatter for this logger_arg
     formatter = logging.Formatter(format_string)
