@@ -8,7 +8,7 @@ from glyphdeck.validation import validators
 from .tools import prepper
 
 # Provide access to the set_logging_config
-from .config.logger_config import logging_config, restore_logger_config
+from .config.logger_config import set_logging_config, restore_logger_config
 
 # Enables logger access in the public interface like gylphdeck.loggers.cascade
 # Accesses or creates loggers only if they do not exist globally yet
@@ -28,7 +28,7 @@ __all__ = [
     "Sanitiser",
     "validators",
     "prepper",
-    "logging_config",
+    "set_logging_config",
     "restore_logger_config",
     "loggers",
     "DataDict",

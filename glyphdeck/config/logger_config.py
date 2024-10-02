@@ -6,6 +6,13 @@ import copy
 _config_path = r"glyphdeck\config\logger_config.yaml"
 
 
+def access_logging_config() -> dict:
+    """Reads the logger configuration YAML file and returns its content as a Python dictionary."""
+    with open(_config_path, "r") as file:
+        config = yaml.safe_load(file)
+    return config
+
+
 class LoggerConfig:
     """Context manager for modifying a YAML configuration file.
     Opens the config, makes your changes, and then saves it.
@@ -34,7 +41,7 @@ class LoggerConfig:
                 yaml.dump(self.data, f)
 
 
-def logging_config(
+def set_logging_config(
     # Bool toggles for private data logging
     log_input_data: Optional[bool] = None,
     log_output_data: Optional[bool] = None,
@@ -220,10 +227,3 @@ def restore_logger_config():
 
     with open(_config_path, "w") as file:
         yaml.dump(config, file)
-
-
-# Only run in here, for testing
-if __name__ == "__main__":
-    logging_config(
-        log_input_data=False, setting_type="default", strings_levels=(10, 10)
-    )
