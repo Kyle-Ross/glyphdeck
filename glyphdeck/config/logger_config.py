@@ -1,14 +1,10 @@
-import yaml
-from icecream import ic
+import oyaml as yaml
 
-with open(r"glyphdeck\config\logger_config.yaml", 'w') as f:
-    try:
-        data = yaml.safe_load(f)
-        print("\nBefore")
-        ic(data)
-        data["private_data"]["log_input"] = True
-        print("\nAfter")
-        ic(data)
+path = r"glyphdeck\config\logger_config.yaml"
 
-    except yaml.YAMLError as exc:
-        ic(exc)
+with open(path, "r") as f:
+    data = yaml.safe_load(f)
+    data["private_data"]["log_input"] = False
+
+with open(path, "w") as f:
+    yaml.dump(data, f)

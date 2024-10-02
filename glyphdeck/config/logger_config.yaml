@@ -1,25 +1,14 @@
-# Control logging of private data
 private_data:
   log_input: false
   log_output: false
-
-# Control where to access logger levels
-# Set as one of (default, custom, granular)
 source: default
-
-# Levels - 0 NOTSET | 10 DEBUG | 20 INFO | 30 WARNING | 40 ERROR | 50 CRITICAL
-# Set the level to over 50 if you want no logs to appear
-
-# Control the global settings
 globals:
   default:
     file: 99
-    console: 20  
+    console: 20
   custom:
     file: 10
     console: 10
-
-# Control the granular settings
 granular:
   data_types:
     file: 10
