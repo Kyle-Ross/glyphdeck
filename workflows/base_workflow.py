@@ -1,5 +1,7 @@
 import glyphdeck as gd
 
+gd.set_logging_config(setting_type="set_all",set_all_levels=(10, 10))
+
 # Set file vars
 source_file = r"tests\testdata.pizzashopreviews.xlsx"
 

@@ -5,7 +5,7 @@ import sys
 from typing import Type, Callable, Optional
 
 from glyphdeck.tools._directory_creators import check_logs_directory
-import glyphdeck.config.logger_defaults as logger_defaults
+import glyphdeck.config.logger_set_all as logger_set_all
 
 
 def log_and_raise_error(
@@ -400,8 +400,8 @@ class DataTypesLogger(BaseLogger):
         """Initializes the DataTypesLogger instance."""
         super().__init__(
             logger_name="validation.data_types",
-            file_log_level=logger_defaults.data_types_file_log_level,
-            console_log_level=logger_defaults.data_types_console_log_level,
+            file_log_level=logger_set_all.data_types_file_log_level,
+            console_log_level=logger_set_all.data_types_console_log_level,
         )
 
 
@@ -415,8 +415,8 @@ class PrepperLogger(BaseLogger):
         """Initializes the PrepperLogger instance."""
         super().__init__(
             logger_name="tools.prepper",
-            file_log_level=logger_defaults.prepper_file_log_level,
-            console_log_level=logger_defaults.prepper_console_log_level,
+            file_log_level=logger_set_all.prepper_file_log_level,
+            console_log_level=logger_set_all.prepper_console_log_level,
         )
 
 
@@ -430,8 +430,8 @@ class CascadeLogger(BaseLogger):
         """Initializes the CascadeLogger instance."""
         super().__init__(
             logger_name="processors.cascade",
-            file_log_level=logger_defaults.cascade_file_log_level,
-            console_log_level=logger_defaults.cascade_console_log_level,
+            file_log_level=logger_set_all.cascade_file_log_level,
+            console_log_level=logger_set_all.cascade_console_log_level,
         )
 
 
@@ -445,8 +445,8 @@ class SanitiserLogger(BaseLogger):
         """Initializes the SanitiserLogger instance."""
         super().__init__(
             logger_name="processors.sanitiser",
-            file_log_level=logger_defaults.sanitiser_file_log_level,
-            console_log_level=logger_defaults.sanitiser_console_log_level,
+            file_log_level=logger_set_all.sanitiser_file_log_level,
+            console_log_level=logger_set_all.sanitiser_console_log_level,
         )
 
 
@@ -460,8 +460,8 @@ class ValidatorsLogger(BaseLogger):
         """Initializes the ValidatorsLogger instance."""
         super().__init__(
             logger_name="validation.validators_models",
-            file_log_level=logger_defaults.validators_file_log_level,
-            console_log_level=logger_defaults.console_log_level_default,
+            file_log_level=logger_set_all.validators_file_log_level,
+            console_log_level=logger_set_all.set_all_console_log_level,
         )
 
 
@@ -475,8 +475,8 @@ class LLMHandlerLogger(BaseLogger):
         """Initializes the LLMHandlerLogger instance."""
         super().__init__(
             logger_name="processors.LLMHandler",
-            file_log_level=logger_defaults.llmhandler_file_log_level,
-            console_log_level=logger_defaults.llmhandler_console_log_level,
+            file_log_level=logger_set_all.llmhandler_file_log_level,
+            console_log_level=logger_set_all.llmhandler_console_log_level,
         )
 
 
@@ -490,8 +490,8 @@ class BaseWorkflowLogger(BaseLogger):
         """Initializes the BaseWorkflowLogger instance."""
         super().__init__(
             logger_name="base_workflow",
-            file_log_level=logger_defaults.base_workflow_file_log_level,
-            console_log_level=logger_defaults.base_workflow_console_log_level,
+            file_log_level=logger_set_all.workflow_file_log_level,
+            console_log_level=logger_set_all.workflow_console_log_level,
         )
 
 
@@ -505,8 +505,8 @@ class CacheLogger(BaseLogger):
         """Initializes the CacheLogger instance."""
         super().__init__(
             logger_name="processors.LLMHandler <---> tools.caching",
-            file_log_level=logger_defaults.cache_file_log_level,
-            console_log_level=logger_defaults.cache_console_log_level,
+            file_log_level=logger_set_all.cache_file_log_level,
+            console_log_level=logger_set_all.cache_console_log_level,
         )
 
 
@@ -520,8 +520,8 @@ class StringsToolsLogger(BaseLogger):
         """Initializes the StringsToolsLogger instance."""
         super().__init__(
             logger_name="tools.strings",
-            file_log_level=logger_defaults.tools_strings_file_log_level,
-            console_log_level=logger_defaults.tools_strings_console_log_level,
+            file_log_level=logger_set_all.strings_file_log_level,
+            console_log_level=logger_set_all.strings_console_log_level,
         )
 
 
@@ -535,8 +535,8 @@ class TimeToolsLogger(BaseLogger):
         """Initializes the TimeToolsLogger instance."""
         super().__init__(
             logger_name="tools.time",
-            file_log_level=logger_defaults.tools_time_file_log_level,
-            console_log_level=logger_defaults.tools_time_console_log_level,
+            file_log_level=logger_set_all.time_file_log_level,
+            console_log_level=logger_set_all.time_console_log_level,
         )
 
 
@@ -550,6 +550,6 @@ class FileImportersToolsLogger(BaseLogger):
         """Initializes the FileImportersToolsLogger instance."""
         super().__init__(
             logger_name="tools.file_importers",
-            file_log_level=logger_defaults.tools_file_importers_file_log_level,
-            console_log_level=logger_defaults.tools_file_importers_console_log_level,
+            file_log_level=logger_set_all.file_importers_file_log_level,
+            console_log_level=logger_set_all.file_importers_console_log_level,
         )

@@ -1,7 +1,7 @@
 private_data:
   log_input: false
   log_output: false
-  source: default
+setting_type: default
 set_all:
   file: 10
   console: 10
@@ -41,3 +41,4 @@ file_importers:
 unhandled_errors:
   file: 10
   console: 10
+source: set_all
