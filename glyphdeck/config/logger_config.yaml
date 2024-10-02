@@ -2,47 +2,42 @@ private_data:
   log_input: false
   log_output: false
 source: default
-globals:
-  default:
-    file: 99
-    console: 20
-  custom:
-    file: 10
-    console: 10
-granular:
-  data_types:
-    file: 10
-    console: 10
-  prepper:
-    file: 10
-    console: 10
-  cascade:
-    file: 10
-    console: 10
-  sanitiser:
-    file: 10
-    console: 10
-  validators:
-    file: 10
-    console: 10
-  llm_handler:
-    file: 10
-    console: 10
-  cache:
-    file: 10
-    console: 10
-  workflows:
-    file: 10
-    console: 10
-  unhandled:
-    file: 10
-    console: 10
-  strings:
-    file: 10
-    console: 10
-  time:
-    file: 10
-    console: 10
-  file_importers:
-    file: 10
-    console: 10
+set_all:
+  file: 10
+  console: 10
+data_types:
+  file: 10
+  console: 10
+prepper:
+  file: 10
+  console: 10
+cascade:
+  file: 10
+  console: 10
+sanitiser:
+  file: 10
+  console: 10
+validators:
+  file: 10
+  console: 10
+llm_handler:
+  file: 10
+  console: 10
+cache:
+  file: 10
+  console: 10
+workflows:
+  file: 10
+  console: 10
+unhandled:
+  file: 10
+  console: 10
+strings:
+  file: 10
+  console: 10
+time:
+  file: 10
+  console: 10
+file_importers:
+  file: 10
+  console: 10
