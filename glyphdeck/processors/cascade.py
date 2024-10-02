@@ -25,7 +25,7 @@ from glyphdeck.processors.sanitiser import Sanitiser
 from glyphdeck.processors.llm_handler import LLMHandler
 from glyphdeck.tools.prepper import type_conditional_prepare
 from glyphdeck.tools._directory_creators import create_files_directory
-from glyphdeck._path_constants import OUTPUT_FILES_DIR
+from glyphdeck.config._path_constants import OUTPUT_FILES_DIR
 
 logger = CascadeLogger().setup()
 

@@ -2,7 +2,7 @@ from typing import Tuple
 import logging
 import os
 
-from glyphdeck._path_constants import (
+from glyphdeck.config._path_constants import (
     OUTPUT_DIR,
     OUTPUT_LOGS_DIR,
     OUTPUT_CACHES_DIR,
