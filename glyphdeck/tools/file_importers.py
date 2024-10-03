@@ -14,7 +14,7 @@ from glyphdeck.tools.logging_ import (
 logger = FileImportersToolsLogger().setup()
 
 
-def assert_and_log_error_path(path: str, function_name: str):
+def _assert_and_log_error_path(path: str, function_name: str):
     """Asserts that a provided path is a string and logs an error if not.
 
     Args:
@@ -46,7 +46,7 @@ def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
         AssertionError: If the file_path is not a string or the file does not exist.
     """
     # Wrapper for pd.read_excel with additional logic
-    assert_and_log_error_path(file_path, "get_xlsx()")
+    _assert_and_log_error_path(file_path, "get_xlsx()")
     return pd.read_excel(file_path, engine="openpyxl", **kwargs)
 
 
@@ -64,7 +64,7 @@ def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
         AssertionError: If the file_path is not a string or the file does not exist.
     """
     # Wrapper for pd.read_csv with additional logic
-    assert_and_log_error_path(file_path, "get_csv()")
+    _assert_and_log_error_path(file_path, "get_csv()")
     return pd.read_csv(file_path, **kwargs)
 
 
