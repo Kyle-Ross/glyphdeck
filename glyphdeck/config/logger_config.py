@@ -68,7 +68,7 @@ def set_logging_config(
     This function allows you to modify various logging settings such as whether to log input and output data,
     the source of logging levels, and the logging levels for different components of the module.
 
-    Changes here affect the module globally for current and future use.
+    Changes here affect the module globally for current and future use, but won't take effect until the module is re-initialised.
 
     Privacy:
     --------
