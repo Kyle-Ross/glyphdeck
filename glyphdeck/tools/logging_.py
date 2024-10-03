@@ -93,7 +93,7 @@ def assert_and_log_error(
         )
 
 
-def check_logger_exists(logger_name: str) -> bool:
+def _check_logger_exists(logger_name: str) -> bool:
     """Checks if a logger with the provided name exists.
 
     Args:
@@ -234,7 +234,7 @@ def logger_setup(
     """
     # Initialises, configures and returns the logger_arg object if it doesn't exist yet
     # Check if the logger_arg already exists, if it does, return it and skip the rest of the function
-    if check_logger_exists(logger_name):
+    if _check_logger_exists(logger_name):
         return logging.getLogger(logger_name)
 
     # Otherwise, set up the logger_arg then return it
@@ -285,7 +285,7 @@ def global_exception_logger(exctype, value, tb):
 
     # Check if logger is already set up, if not, set it up
     try:
-        if not check_logger_exists("unhandled_errors_logger"):
+        if not _check_logger_exists("unhandled_errors_logger"):
             logger = logger_setup(
                 "unhandled_errors_logger",
                 "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
