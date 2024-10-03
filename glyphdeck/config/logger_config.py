@@ -13,7 +13,7 @@ def access_logging_config() -> dict:
     return config
 
 
-class LoggerConfig:
+class _LoggerConfig:
     """Context manager for modifying a YAML configuration file.
     Opens the config, makes your changes, and then saves it.
     """
@@ -30,13 +30,13 @@ class LoggerConfig:
         """
         with open(self.path, "r") as f:
             self.data = yaml.safe_load(f)
-            self.original_data = copy.deepcopy(self.data)
+            self._original_data = copy.deepcopy(self.data)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Writes the modified data back to the file."""
         # Only write if changes occurred
-        if self.data != self.original_data:
+        if self.data != self._original_data:
             with open(self.path, "w") as f:
                 yaml.dump(self.data, f)
 
@@ -134,7 +134,7 @@ def set_logging_config(
         d[key]["console"] = levels[1]
 
     # Use the context manager to address the yaml changes
-    with LoggerConfig() as config:
+    with _LoggerConfig() as config:
         # Context manager opens the config yaml as a dict called config
         # Me make changes to that dict
 
