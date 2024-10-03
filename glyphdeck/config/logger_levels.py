@@ -7,8 +7,10 @@ from glyphdeck.config.logger_config import access_logging_config  # noqa: F401
 # Get the dictionary from 
 config = access_logging_config()
 
+# -----------------
 # Set all levels
 # -----------------
+# The set all vars can be changed in different ways by either the default or set_all conditions
 if config["setting_type"] == "default":
     set_all_file_log_level: int = 99
     set_all_console_log_level: int = 20
