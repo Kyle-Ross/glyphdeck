@@ -199,7 +199,7 @@ def set_logging_config(
         if unhandled_errors_levels is not None:
             _set_levels(config.data, "unhandled_errors", unhandled_errors_levels)
 
-        # Context manager exits and writes the changes to config back to the yaml file
+        # On exit, context manager exits and writes the changes to config back to the yaml file
 
 
 def restore_logger_config():
