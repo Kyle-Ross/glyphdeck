@@ -4,7 +4,7 @@ import os
 import sys
 from typing import Type, Callable, Optional
 
-from glyphdeck.tools.directory_creators import check_logs_directory
+from glyphdeck.tools._directory_creators import check_logs_directory
 import glyphdeck.config.logger_levels as logger_levels
 
 

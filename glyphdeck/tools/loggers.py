@@ -3,7 +3,7 @@ import logging
 
 # Import the internal logging module
 # Contains the global syshook logger which is set on import
-from . import logging
+from . import _logging
 
 
 class Loggers:
@@ -83,7 +83,7 @@ class Loggers:
         """
         if self._cascade is None:
             self._cascade = self._get_or_create_logger(
-                "cascade", logging.CascadeLogger
+                "cascade", _logging.CascadeLogger
             )
         return self._cascade
 
@@ -97,7 +97,7 @@ class Loggers:
         """
         if self._llm_handler is None:
             self._llm_handler = self._get_or_create_logger(
-                "llm_handler", logging.LLMHandlerLogger
+                "llm_handler", _logging.LLMHandlerLogger
             )
         return self._llm_handler
 
@@ -111,7 +111,7 @@ class Loggers:
         """
         if self._sanitiser is None:
             self._sanitiser = self._get_or_create_logger(
-                "sanitiser", logging.SanitiserLogger
+                "sanitiser", _logging.SanitiserLogger
             )
         return self._sanitiser
 
@@ -124,7 +124,7 @@ class Loggers:
             logging.Logger: The Cache logger instance.
         """
         if self._cache is None:
-            self._cache = self._get_or_create_logger("cache", logging.CacheLogger)
+            self._cache = self._get_or_create_logger("cache", _logging.CacheLogger)
         return self._cache
 
     @property
@@ -137,7 +137,7 @@ class Loggers:
         """
         if self._file_importers is None:
             self._file_importers = self._get_or_create_logger(
-                "file_importers", logging.FileImportersToolsLogger
+                "file_importers", _logging.FileImportersToolsLogger
             )
         return self._file_importers
 
@@ -153,7 +153,7 @@ class Loggers:
             self._prepper
         if self._prepper is None:
             self._prepper = self._get_or_create_logger(
-                "prepper", logging.PrepperLogger
+                "prepper", _logging.PrepperLogger
             )
         return self._prepper
 
@@ -167,7 +167,7 @@ class Loggers:
         """
         if self._string_tools is None:
             self._string_tools = self._get_or_create_logger(
-                "string_tools", logging.StringsToolsLogger
+                "string_tools", _logging.StringsToolsLogger
             )
         return self._string_tools
 
@@ -181,7 +181,7 @@ class Loggers:
         """
         if self._time_tools is None:
             self._time_tools = self._get_or_create_logger(
-                "time_tools", logging.TimeToolsLogger
+                "time_tools", _logging.TimeToolsLogger
             )
         return self._time_tools
 
@@ -195,7 +195,7 @@ class Loggers:
         """
         if self._data_types is None:
             self._data_types = self._get_or_create_logger(
-                "data_types", logging.DataTypesLogger
+                "data_types", _logging.DataTypesLogger
             )
         return self._data_types
 
@@ -209,7 +209,7 @@ class Loggers:
         """
         if self._validators is None:
             self._validators = self._get_or_create_logger(
-                "validators", logging.ValidatorsLogger
+                "validators", _logging.ValidatorsLogger
             )
         return self._validators
 
@@ -223,7 +223,7 @@ class Loggers:
         """
         if self._workflow is None:
             self._workflow = self._get_or_create_logger(
-                "workflow", logging.BaseWorkflowLogger
+                "workflow", _logging.BaseWorkflowLogger
             )
         return self._workflow
 

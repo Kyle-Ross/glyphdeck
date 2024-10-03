@@ -15,7 +15,7 @@ from glyphdeck.validation.data_types import (
     RecordDict,
     RecordsDict,
 )
-from glyphdeck.tools.logging import (
+from glyphdeck.tools._logging import (
     CascadeLogger,
     assert_and_log_error,
     log_and_raise_error,
@@ -24,7 +24,7 @@ from glyphdeck.tools.logging import (
 from glyphdeck.processors.sanitiser import Sanitiser
 from glyphdeck.processors.llm_handler import LLMHandler
 from glyphdeck.tools.prepper import type_conditional_prepare
-from glyphdeck.tools.directory_creators import create_files_directory
+from glyphdeck.tools._directory_creators import create_files_directory
 from glyphdeck._path_constants import OUTPUT_FILES_DIR
 
 logger = CascadeLogger().setup()
