@@ -2,13 +2,13 @@ from typing import Union, List, Optional, Tuple
 
 import pandas as pd
 
-from glyphdeck.tools._logging import (
+from glyphdeck.tools.logging_ import (
     PrepperLogger,
     log_decorator,
     assert_and_log_error,
     log_and_raise_error,
 )
-from glyphdeck.tools._file_importers import get_xlsx, get_csv, file_validation
+from glyphdeck.tools.file_importers import get_xlsx, get_csv, file_validation
 from glyphdeck.validation.data_types import (
     DataDict,
     Optional_DataDict,

@@ -4,8 +4,8 @@ import os
 
 from diskcache import Cache
 
-from glyphdeck.tools._directory_creators import create_caches_directory
-from glyphdeck.tools._logging import CacheLogger, log_decorator
+from glyphdeck.tools.directory_creators import create_caches_directory
+from glyphdeck.tools.logging_ import CacheLogger, log_decorator
 
 logger = CacheLogger().setup()
 
