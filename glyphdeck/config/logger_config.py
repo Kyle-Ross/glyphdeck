@@ -3,7 +3,7 @@ import oyaml as yaml
 import copy
 
 # Path to store and access logger config yaml file from
-_config_path = r"glyphdeck\config\logger_config.yaml"
+_config_path = r"glyphdeck\config\_logger_config.yaml"
 
 
 def access_logging_config() -> dict:
