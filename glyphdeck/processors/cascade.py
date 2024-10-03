@@ -144,7 +144,7 @@ class Cascade:
                     f"Provided title argument '{title}' is not a string",
                 )
                 # Check new title is unique
-                self.outer_cascade.title_validator(title)
+                self.outer_cascade._title_validator(title)
                 # Sanitise the data
                 self.sanitise()
                 # Append and return self
@@ -159,7 +159,7 @@ class Cascade:
     # Inherit the LLMHandler class and add new run method which writes records and uses the latest_data by default
     # Abstractions required intricate juggling of args and kwargs to pass the context of the current cascade instance...
     # ... as well as implement a reference to that instance's self.latest_data property
-    class Handler(LLMHandler):
+    class _Handler(LLMHandler):
         """Inherits from LLMHandler, handles the interaction with LLM providers and manages the processing of input data for asynchronous querying.
 
         Attributes:
@@ -404,7 +404,7 @@ class Cascade:
             assert_and_log_is_type_or_list_of(
                 column_names, "column_names", [str], allow_none=True
             )
-            self.outer_cascade.title_validator(record_title)
+            self.outer_cascade._title_validator(record_title)
             # Assign values
             self.selected_column_names = (
                 self.active_column_names if column_names is None else column_names
@@ -429,7 +429,7 @@ class Cascade:
                 Handler: The Handler object, allowing further cascadeed operations.
             """
             # Check the new title is unique before proceeding
-            self.outer_cascade.title_validator(title)
+            self.outer_cascade._title_validator(title)
             # Set self.input_data (used by run_async) to the active_input_data
             self.input_data = self.active_input_data
             # Run the llm_handler
@@ -653,7 +653,7 @@ class Cascade:
         kwargs["outer_cascade"] = self  # noqa: E402
 
         # Set the llm_handler using the adapted arguments
-        self.llm_handler = self.Handler(*args, **kwargs)
+        self.llm_handler = self._Handler(*args, **kwargs)
 
     @property
     @log_decorator(logger, is_property=True)
@@ -762,7 +762,7 @@ class Cascade:
         return self
 
     @log_decorator(logger)
-    def key_validator(self, record_identifier: int):
+    def _key_validator(self, record_identifier: int):
         """Validates that records have identical keys, without any new or missing keys.
 
         Args:
@@ -808,7 +808,7 @@ class Cascade:
             log_and_raise_error(logger, "error", KeyError, key_validator_message)
 
     @log_decorator(logger)
-    def data_validator(self, record_identifier: int):
+    def _data_validator(self, record_identifier: int):
         """Validates that each list in the data of the target record has the expected length.
 
         Args:
@@ -846,7 +846,7 @@ class Cascade:
             log_and_raise_error(logger, "error", ValueError, data_validator_message)
 
     @log_decorator(logger)
-    def title_validator(self, potential_title: str):
+    def _title_validator(self, potential_title: str):
         """Validates that a given title does not already exist in the records.
 
         Args:
@@ -920,7 +920,7 @@ class Cascade:
             )
 
         # Check that the provided title doesn't exist yet
-        self.title_validator(title)
+        self._title_validator(title)
 
         # Build the record and validate the entry
         now: datetime = datetime.now()
@@ -936,8 +936,8 @@ class Cascade:
             if column_names is None
             else column_names,
         }
-        self.key_validator(new_key)
-        self.data_validator(new_key)
+        self._key_validator(new_key)
+        self._data_validator(new_key)
         return self
 
     @log_decorator(logger)
