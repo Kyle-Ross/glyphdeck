@@ -22,7 +22,7 @@ from .tools.loggers import loggers
 from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
 
 # Making the LogBlock context manager available
-from .tools._time import LogBlock
+from .tools.time import LogBlock
 
 # Explicitly defining __all__ for metadata and clarity
 # This makes it clear what the intended public interface is
