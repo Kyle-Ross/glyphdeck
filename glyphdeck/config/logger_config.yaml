@@ -3,41 +3,41 @@ private_data:
   log_output: false
 setting_type: default
 set_all:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 data_types:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 prepper:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 cascade:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 sanitiser:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 validators:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 llm_handler:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 cache:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 workflows:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 strings:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 time:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 file_importers:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
 unhandled_errors:
-  file: 10
-  console: 10
+  file: 90
+  console: 20
