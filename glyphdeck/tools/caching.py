@@ -1,3 +1,20 @@
+"""
+This module provides functionality to create and manage a cache directory for storing OpenAI completion results, utilizing disk-based caching to improve retrieval times and conserve API call limits.
+
+Functions
+-------
+**openai_cache**: Decorator to cache the results of the OpenAI completions. If the result is already cached, it will be returned from the cache; otherwise, the API is called, and the result is cached for future use.
+
+Usage
+-----
+Typical usage example:
+
+    @openai_cache(cache_dir="my_cache")
+    async def my_openai_completion_function(self, *args, **kwargs):
+        # Your function logic here
+        ...
+"""
+
 from typing import Tuple, Callable
 import hashlib
 import os

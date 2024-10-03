@@ -1,3 +1,24 @@
+"""
+A module for sanitising strings by replacing private information with placeholders.
+
+This module provides a `Sanitiser` class used to identify and replace pieces of private information
+within strings using regular expression patterns. It supports sanitisation of emails, URLs, file paths,
+folder paths, dates, and numbers.
+
+Classes
+-------
+**Sanitiser**
+    A class that sanitises strings by replacing private information with placeholders using predefined regex patterns.
+
+Usage
+-----
+Typical usage example:
+
+    sanitise = Sanitiser(input_data)
+    sanitise.add_pattern('custom_pattern', 'group_name', '<PLACEHOLDER>', 1.0, r'regex')
+    sanitise.sanitise()
+"""
+
 from typing import Union, Tuple, List, Dict, Any, Self
 import copy
 import re

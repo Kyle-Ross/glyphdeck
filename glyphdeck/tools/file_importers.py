@@ -1,3 +1,19 @@
+"""
+Provides functions to import data from Excel and CSV files, and validating file types.
+
+Functions
+---------
+**get_xlsx(file_path, **kwargs)**
+    Reads an Excel file and returns its content as a DataFrame.
+
+**get_csv(file_path, **kwargs)**
+    Reads a CSV file and returns its content as a DataFrame.
+
+**file_validation(file_path)**
+    Validates the provided file path and determines its type (either 'csv' or 'xlsx').
+
+"""
+
 from typing import Optional
 import os
 
@@ -41,7 +57,7 @@ def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: The content of the Excel file as a DataFrame.
-    
+
     Raises:
         AssertionError: If the file_path is not a string or the file does not exist.
     """
@@ -59,7 +75,7 @@ def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: The content of the CSV file as a DataFrame.
-    
+
     Raises:
         AssertionError: If the file_path is not a string or the file does not exist.
     """
@@ -77,7 +93,7 @@ def file_validation(file_path: str) -> str:
 
     Returns:
         str: The type of the file, either 'csv' or 'xlsx'.
-    
+
     Raises:
         AssertionError: If the file_path is not a string, the file does not exist, or the file type is unsupported.
     """

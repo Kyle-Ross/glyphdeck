@@ -1,3 +1,27 @@
+"""
+This module provides the `Cascade` class designed to manage and process a sequence of data records.
+
+Classes
+-------
+**Cascade**
+    Handles and processes data in a record-like structure, allowing for operations such as sanitization, data handling with LLMs, and more.
+
+Usage
+-----
+Typical usage example:
+
+    from <module_name> import Cascade
+
+    cascade_instance = Cascade(data_source="data.csv", id_column="record_id", data_columns=["column1", "column2"])
+    cascade_instance.sanitiser.run("Sanitise record")
+    cascade_instance.set_llm_handler(provider="openai", model="gpt-3", system_message="Process data.", validation_model=None, cache_identifier="example_cache")
+    cascade_instance.llm_handler.run("Process with LLM")
+    output_df = cascade_instance.get_output(record_identifiers=5, output_type="dataframe", rebase=True)
+    cascade_instance.write_output(file_type="csv", file_name_prefix="output", record_identifiers=[5], rebase=True)
+
+This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable. It makes use of validated data types, with assertions for correctness.
+"""
+
 from datetime import datetime, timedelta
 from functools import reduce
 from typing import Self, Union, Optional, List, Dict, Tuple

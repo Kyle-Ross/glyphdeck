@@ -1,3 +1,66 @@
+"""This module provides a comprehensive logging setup for various components
+of the application, defining classes and functions to create, configure, and manage
+loggers, ensuring consistent error handling across different parts of the
+system.
+
+Classes
+-------
+**BaseLogger**
+    Base class for setting up loggers.
+
+**DataTypesLogger**
+    Logger for handling data type validations.
+
+**PrepperLogger**
+    Logger for handling prepper tools.
+
+**CascadeLogger**
+    Logger for handling processor cascade.
+
+**SanitiserLogger**
+    Logger for handling data sanitisation.
+
+**ValidatorsLogger**
+    Logger for handling validation models.
+
+**LLMHandlerLogger**
+    Logger for handling LLM processing.
+
+**BaseWorkflowLogger**
+    Logger for handling workflows.
+
+**CacheLogger**
+    Logger for handling caching activities.
+
+**StringsToolsLogger**
+    Logger for handling string transforming function actions.
+
+**TimeToolsLogger**
+    Logger for handling time related functions.
+
+**FileImportersToolsLogger**
+    Logger for handling file importation.
+
+
+Functions
+---------
+**log_and_raise_error**
+    Logs and raises an error with the same message string.
+
+**assert_and_log_error**
+    Asserts a condition and logs the specified error.
+
+**log_decorator**
+    Function decorator to log the start and end of a function.
+
+**logger_setup**
+    Initializes, configures, and returns a logger instance.
+
+**global_exception_logger**
+    Global exception handler that logs uncaught exceptions.
+
+"""
+
 import traceback
 import logging
 import os

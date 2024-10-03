@@ -1,3 +1,25 @@
+"""Centralized logging configuration for application components.
+
+This module provides a centralized setup for various logging components
+within the application. It allows seamless access to different logger instances
+that are tailored for specific logging needs.
+
+Classes
+-------
+**Loggers**
+    A class for centralized logger creation and management. It provides access to
+    various logger instances, each aimed at handling specific types
+    of logging activities within the application.
+
+Example
+-------
+Typical usage example:
+
+    import glyphdeck as gd
+
+    logger = gd.logger.cascade
+"""
+
 # Import the python logging module
 import logging
 

@@ -1,3 +1,18 @@
+"""
+This module provides utility functions for data type assertions and validations.
+
+The provided functions aim to ensure that variables have expected types and
+log errors if the validation fails.
+
+Functions
+---------
+**assert_and_log_type_is_data**
+    Asserts and logs that a variable conforms to the 'DataDict' type specification.
+
+**assert_and_log_is_type_or_list_of**
+    Asserts and logs that a variable is either of a specified type or a list containing only instances of specified types.
+"""
+
 from datetime import datetime, timedelta
 from typing import Union, Dict, List, Optional
 

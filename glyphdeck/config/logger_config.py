@@ -1,3 +1,28 @@
+"""
+This module provides functionality for accessing, modifying, and restoring logger configurations
+using YAML files.
+
+Functions
+---------
+**access_logging_config()**
+    Reads the logger configuration YAML file and returns its content as a Python dictionary.
+
+**set_logging_config(...)**
+    Configure the logging settings by changing the configuration YAML file according to the
+    specified parameters.
+
+**restore_logger_config()**
+    Restores the logger configuration YAML file to its original state, useful for undoing changes.
+
+Usage
+-----
+Typical usage example:
+
+    logger_config = access_logging_config()
+    set_logging_config(log_input_data=True, setting_type="granular")
+    restore_logger_config()
+"""
+
 from typing import Optional, Tuple
 import oyaml as yaml
 import copy

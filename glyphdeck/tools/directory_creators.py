@@ -1,3 +1,28 @@
+"""
+This module provides functions for creating and managing output directories, and checking if they already exist.
+
+Functions
+---------
+**create_directory**(directory, directory_name, logger_arg)
+    Creates a specified directory if it doesn't exist and logs the action.
+
+**create_output_directory**(logger_arg)
+    Ensures the output directory exists and logs the result.
+
+**create_logs_directory**(logger_arg)
+    Ensures the logs directory exists and logs the result.
+
+**create_caches_directory**(logger_arg)
+    Ensures the caches directory exists and logs the result.
+
+**create_files_directory**(logger_arg)
+    Ensures the files directory exists and logs the result.
+
+**check_logs_directory**()
+    Checks if the logs directory exists, creates it if not, and returns status
+    information about the directory.
+"""
+
 from typing import Tuple
 import logging
 import os

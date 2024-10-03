@@ -1,3 +1,31 @@
+"""Handler for interacting with Large Language Models (LLMs) and managing settings, inputs, and outputs.
+
+This module provides functionalities for processing input data through a selected LLM, validating outputs,
+and retrieving results. It includes options for caching responses and handling asynchronous requests.
+
+Classes
+-------
+**LLMHandler**
+    Facilitates communication with LLMs, supporting asynchronous processing and output management.
+
+Usage
+-----
+Typical usage example:
+
+    input_data = <Provide your input data dictionary>
+    llm_handler = LLMHandler(
+        input_data=input_data,
+        provider="openai",
+        model="gpt-3",
+        system_message="Your system message here",
+        validation_model=YourValidationModel,
+        cache_identifier="your_unique_identifier"
+    )
+    llm_handler.run_async().flatten_output_data(column_names=["your_column_names"])
+    print(llm_handler.output_data)
+
+"""
+
 from typing import Optional, List, Tuple, Dict, Union, Coroutine
 import asyncio
 import copy

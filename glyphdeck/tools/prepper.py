@@ -1,3 +1,36 @@
+"""Module for preparing dataframes and extracting data in a standardized format.
+
+Provides functions to transform and extract data from dataframes,
+CSV files, and XLSX files into a unified dictionary format that maps unique IDs
+to lists of column values.
+
+Functions
+---------
+**prepare_df**
+    Prepares a dataframe into a common data dictionary format by validating and
+    extracting specified ID and data columns.
+
+**prepare_xlsx**
+    Loads data from an XLSX file and prepares it into a common data dictionary
+    format by validating and extracting specified ID and data columns.
+
+**prepare_csv**
+    Loads data from a CSV file and prepares it into a common data dictionary
+    format by validating and extracting specified ID and data columns.
+
+**type_conditional_prepare**
+    Conditionally prepares data from various formats (dataframe, XLSX, CSV) into
+    a common data dictionary format based on the type of data source provided.
+
+Usage
+-----
+Typical usage example:
+
+    df, data_dict = prepare_xlsx("file.xlsx", "id_column", ["data_column1", "data_column2"])
+    df, data_dict = prepare_csv("file.csv", "id_column", "data_column")
+
+"""
+
 from typing import Union, List, Optional, Tuple
 
 import pandas as pd
