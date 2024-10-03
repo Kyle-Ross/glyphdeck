@@ -524,7 +524,7 @@ class LLMHandler:
 
     @log_decorator(
         logger,
-        "info",
+        "debug",
         suffix_message="Convert output data for compatibility with cascade class",
         show_nesting=False,
     )
