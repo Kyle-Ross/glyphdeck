@@ -19,7 +19,7 @@ class LoggerConfig:
     """
 
     def __init__(self):
-        """Initializes the LoggerConfigManager with the path to the YAML config file."""
+        """Initializes the LoggerConfig with the path to the YAML config file."""
         self.path = _config_path
 
     def __enter__(self):
