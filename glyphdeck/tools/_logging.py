@@ -461,7 +461,7 @@ class ValidatorsLogger(BaseLogger):
         super().__init__(
             logger_name="validation.validators_models",
             file_log_level=logger_levels.validators_file_log_level,
-            console_log_level=logger_levels.set_all_console_log_level,
+            console_log_level=logger_levels.validators_console_log_level,
         )
 
 
