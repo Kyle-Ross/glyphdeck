@@ -6,7 +6,7 @@ logging.disable(logging.CRITICAL)
 import pandas as pd  # noqa: E402
 from icecream import ic  # noqa: E402
 
-from glyphdeck.processors.cascade import Cascade  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 # Establish test data
 test_data = {
@@ -23,7 +23,7 @@ test_df.columns = ["Word ID", "Word1", "Word2", "Word3"]  # Rename cols
 # (record key 1)
 # Initialise, preparing the first record
 print("\nInitialise cascade (Record Key 1)")
-cascade = Cascade(
+cascade = gd.Cascade(
     test_df,
     "Word ID",
     ["Word1", "Word2", "Word3"],

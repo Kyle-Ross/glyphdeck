@@ -8,11 +8,10 @@ import copy  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from glyphdeck.processors.cascade import Cascade  # noqa: E402
-from glyphdeck.validation.data_types import DataDict  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 # Example data with targets for removal
-data_record1: DataDict = {
+data_record1: gd.DataDict = {
     1: [
         r"Record One! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
@@ -30,7 +29,7 @@ data_record1: DataDict = {
     ],
 }
 
-data_record2: DataDict = {
+data_record2: gd.DataDict = {
     1: [
         r"Record Two! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
@@ -55,7 +54,7 @@ test_df.columns = ["Person Id", "Comment1", "Comment2", "Comment3"]  # Rename co
 
 # (Record Key 1)
 # Initialise, preparing the first record
-cascade = Cascade(
+cascade = gd.Cascade(
     test_df,
     "Person Id",
     ["Comment1", "Comment2", "Comment3"],

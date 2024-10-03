@@ -7,7 +7,7 @@ import unittest  # noqa: E402
 
 import pandas as pd  # noqa: E402
 
-from glyphdeck.tools.prepper import prepare_df, prepare_xlsx, prepare_csv, type_conditional_prepare  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 from glyphdeck.validation.data_types import assert_and_log_type_is_data  # noqa: E402
 
 
@@ -25,12 +25,12 @@ class TestPrepper(unittest.TestCase):
         )
 
     def test_prepare_df(self):
-        df, data = prepare_df(self.df, "id", ["data1", "data2"])
+        df, data = gd.prepper.prepare_df(self.df, "id", ["data1", "data2"])
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 
     def test_prepare_xlsx(self):
-        df, data = prepare_xlsx(
+        df, data = gd.prepper.prepare_xlsx(
             r"tests\testdata.pizzashopreviews.xlsx",
             "Review Id",
             ["Review Text"],
@@ -40,7 +40,7 @@ class TestPrepper(unittest.TestCase):
         assert_and_log_type_is_data(data, "data")
 
     def test_prepare_csv(self):
-        df, data = prepare_csv(
+        df, data = gd.prepper.prepare_csv(
             r"tests\testdata.pizzashopreviews.csv",
             "Review Id",
             "Review Text",
@@ -50,17 +50,17 @@ class TestPrepper(unittest.TestCase):
         assert_and_log_type_is_data(data, "data")
 
     def test_type_conditional_prepare_df(self):
-        df, data = type_conditional_prepare(self.df, "id", ["data1", "data2"], None, None)
+        df, data = gd.prepper.type_conditional_prepare(self.df, "id", ["data1", "data2"], None, None)
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 
     def test_type_conditional_prepare_csv(self):
-        df, data = type_conditional_prepare(r"tests\testdata.pizzashopreviews.csv", "Review Id", "Review Text", "ISO-8859-1", None)
+        df, data = gd.prepper.type_conditional_prepare(r"tests\testdata.pizzashopreviews.csv", "Review Id", "Review Text", "ISO-8859-1", None)
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 
     def test_type_conditional_prepare_xlsx(self):
-        df, data = type_conditional_prepare(r"tests\testdata.pizzashopreviews.xlsx", "Review Id", "Review Text", None, "Sheet1")
+        df, data = gd.prepper.type_conditional_prepare(r"tests\testdata.pizzashopreviews.xlsx", "Review Id", "Review Text", None, "Sheet1")
         self.assertIsInstance(df, pd.DataFrame)
         assert_and_log_type_is_data(data, "data")
 

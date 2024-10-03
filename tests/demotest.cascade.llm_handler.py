@@ -6,11 +6,9 @@ logging.disable(logging.CRITICAL)
 import pandas as pd  # noqa: E402
 from icecream import ic  # noqa: E402
 
-from glyphdeck.validation.data_types import DataDict  # noqa: E402
-from glyphdeck.processors.cascade import Cascade  # noqa: E402
-from glyphdeck.validation import validators  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
-meals_dict: DataDict = {
+meals_dict: gd.DataDict = {
     1: ["Sushi", "Ramen", "Tempura"],
     2: ["Paella", "Tapas", "Churros"],
     3: ["Pizza", "Pasta", "Gelato"],
@@ -27,7 +25,7 @@ print("Cascade initialisation and first record from that")
 # Initialise, preparing the first record
 print("cascade = ...")
 cascade = ic(
-    Cascade(
+    gd.Cascade(
         meals_df,
         "Meal Id",
         ["Meal1", "Meal2", "Meal3"],
@@ -65,7 +63,7 @@ ic(
             "Analyse the foods and provide a primary category "
             "representing their country of origin."
         ),
-        validation_model=validators.PrimaryCat,
+        validation_model=gd.validators.PrimaryCat,
         cache_identifier="cascade_llm_print_test_primary_category_food_country",
         use_cache=True,
         temperature=0.2,

@@ -5,12 +5,10 @@ logging.disable(logging.CRITICAL)
 
 from icecream import ic  # noqa: E402
 
-from glyphdeck.validation.data_types import DataDict  # noqa: E402
-from glyphdeck.processors.llm_handler import LLMHandler  # noqa: E402
-from glyphdeck.validation import validators  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 print("\nCreate the test data")
-test_data: DataDict = {
+test_data: gd.DataDict = {
     1: ["berries", "insects", "small mammals"],
     2: ["fruits", "fish", "seeds"],
     3: ["nuts", "leaves", "grubs"],
@@ -18,7 +16,7 @@ test_data: DataDict = {
 ic(test_data)
 
 print("\nCreate the handler object")
-handler = LLMHandler(
+handler = gd.LLMHandler(
     test_data,
     provider="OpenAI",
     model="gpt-4o-mini",
@@ -27,7 +25,7 @@ handler = LLMHandler(
         "Analyse the words and provide a primary category "
         "representing the animal most likely to eat them."
     ),
-    validation_model=validators.PrimaryCat,
+    validation_model=gd.validators.PrimaryCat,
     cache_identifier="cascade_llm_print_test_primary_category",
     use_cache=False,
     temperature=0.2,

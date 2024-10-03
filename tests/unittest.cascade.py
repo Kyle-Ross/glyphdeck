@@ -8,7 +8,7 @@ from datetime import datetime, timedelta  # noqa: E402
 import unittest  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from glyphdeck.processors.cascade import Cascade  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 
 class TestCascade(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestCascade(unittest.TestCase):
 
         # Initialise,
         # Creates a blank initialisation (record key 0), then appends the initial record (record key 1)
-        self.cascade = Cascade(
+        self.cascade = gd.Cascade(
             test_df,  # csv and xlsx inputs are tested elsewhere
             "Word ID",
             ["Word1", "Word2", "Word3"],

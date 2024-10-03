@@ -4,14 +4,13 @@ import logging
 logging.disable(logging.CRITICAL)
 
 import unittest  # noqa: E402
-from glyphdeck.tools.logging_ import SanitiserLogger  # noqa: E402
-from glyphdeck.processors.sanitiser import Sanitiser  # noqa: E402
-from glyphdeck.validation.data_types import DataDict, assert_and_log_type_is_data  # noqa: E402
 
-logger = SanitiserLogger().setup
+import glyphdeck as gd  # noqa: E402
+from glyphdeck.validation.data_types import assert_and_log_type_is_data  # noqa: E402
+
 
 # Example data with targets for removal
-test_data: DataDict = {
+test_data: gd.DataDict = {
     1: [
         r"Record One! - I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
@@ -33,7 +32,7 @@ test_data: DataDict = {
 class TestSanitiser(unittest.TestCase):
     def setUp(self):
         self.data_example = test_data
-        self.santiser_obj = Sanitiser(
+        self.santiser_obj = gd.Sanitiser(
             self.data_example, pattern_groups=["number", "date", "email"]
         )
 

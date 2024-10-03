@@ -5,11 +5,10 @@ logging.disable(logging.CRITICAL)
 
 from icecream import ic  # noqa: E402
 
-from glyphdeck.processors.sanitiser import Sanitiser  # noqa: E402
-from glyphdeck.validation.data_types import DataDict  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 # Example data with targets for removal
-data_example: DataDict = {
+data_example: gd.DataDict = {
     1: [
         r"I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
         "My birthday is 11/10/2021",
@@ -31,7 +30,7 @@ data_example: DataDict = {
 # If you don't add an argument it will use all of them
 print("\nInitialise the santiser_obj")
 print("Not specifying the groups will make all the default groups be used")
-santiser_obj = ic(Sanitiser(data_example, pattern_groups=["number", "date", "email"]))
+santiser_obj = ic(gd.Sanitiser(data_example, pattern_groups=["number", "date", "email"]))
 
 print("\nGroups based on __init__")
 ic(santiser_obj.all_groups)

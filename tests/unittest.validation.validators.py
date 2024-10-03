@@ -7,88 +7,104 @@ logging.disable(logging.CRITICAL)
 import unittest  # noqa: E402
 from pydantic import ValidationError  # noqa: E402
 
-from glyphdeck.validation.validators import (  # noqa: E402
-    Sentiment,
-    PrimaryCat,
-    Top5Cats,
-    SubCats,
-    PrimaryCatSentiment,
-    SubCatsSentiment,
-    TopCatsSentiment,
-    CatHierarchySentiment,
-)
+import glyphdeck as gd  # noqa: E402
 
 
 class TestValidators(unittest.TestCase):
     def test_sentiment_score(self):
-        self.assertIsInstance(Sentiment(sentiment_score=0.5), Sentiment)
+        self.assertIsInstance(
+            gd.validators.Sentiment(sentiment_score=0.5), gd.validators.Sentiment
+        )
         with self.assertRaises(ValidationError):
-            Sentiment(sentiment_score=1.5)
+            gd.validators.Sentiment(sentiment_score=1.5)
         with self.assertRaises(ValidationError):
-            Sentiment(sentiment_score=0.555)
+            gd.validators.Sentiment(sentiment_score=0.555)
         with self.assertRaises(ValidationError):
-            Sentiment(sentiment_score="not a float")
+            gd.validators.Sentiment(sentiment_score="not a float")
 
     def test_primary_category(self):
-        self.assertIsInstance(PrimaryCat(primary_category="Test"), PrimaryCat)
+        self.assertIsInstance(
+            gd.validators.PrimaryCat(primary_category="Test"), gd.validators.PrimaryCat
+        )
         with self.assertRaises(ValidationError):
-            PrimaryCat(primary_category=123)
+            gd.validators.PrimaryCat(primary_category=123)
 
     def test_top5_categories(self):
-        self.assertIsInstance(Top5Cats(top_categories=["Test1", "Test2"]), Top5Cats)
+        self.assertIsInstance(
+            gd.validators.Top5Cats(top_categories=["Test1", "Test2"]),
+            gd.validators.Top5Cats,
+        )
         with self.assertRaises(ValidationError):
-            Top5Cats(top_categories=["str1", "str2", "str3", "str4", "str5", "str6"])
+            gd.validators.Top5Cats(
+                top_categories=["str1", "str2", "str3", "str4", "str5", "str6"]
+            )
         with self.assertRaises(ValidationError):
-            Top5Cats(top_categories="not a list")
+            gd.validators.Top5Cats(top_categories="not a list")
 
     def test_sub_categories(self):
-        self.assertIsInstance(SubCats(sub_categories=["Test1"] * 10), SubCats)
+        self.assertIsInstance(
+            gd.validators.SubCats(sub_categories=["Test1"] * 10), gd.validators.SubCats
+        )
         with self.assertRaises(ValidationError):
-            SubCats(sub_categories=["T"] * 31)
+            gd.validators.SubCats(sub_categories=["T"] * 31)
         with self.assertRaises(ValidationError):
-            SubCats(sub_categories=0.55)
+            gd.validators.SubCats(sub_categories=0.55)
 
     def test_primary_category_and_sentiment(self):
         self.assertIsInstance(
-            PrimaryCatSentiment(primary_category="Test", sentiment_score=0.5),
-            PrimaryCatSentiment,
+            gd.validators.PrimaryCatSentiment(
+                primary_category="Test", sentiment_score=0.5
+            ),
+            gd.validators.PrimaryCatSentiment,
         )
         with self.assertRaises(ValidationError):
-            PrimaryCatSentiment(primary_category="Test", sentiment_score=0.555)
+            gd.validators.PrimaryCatSentiment(
+                primary_category="Test", sentiment_score=0.555
+            )
 
     def test_sub_categories_and_sentiment(self):
         self.assertIsInstance(
-            SubCatsSentiment(sub_categories=["Test1"] * 10, sentiment_score=0.5),
-            SubCatsSentiment,
+            gd.validators.SubCatsSentiment(
+                sub_categories=["Test1"] * 10, sentiment_score=0.5
+            ),
+            gd.validators.SubCatsSentiment,
         )
         with self.assertRaises(ValidationError):
-            SubCatsSentiment(sub_categories=["T"] * 31, sentiment_score=0.5)
+            gd.validators.SubCatsSentiment(
+                sub_categories=["T"] * 31, sentiment_score=0.5
+            )
         with self.assertRaises(ValidationError):
-            SubCatsSentiment(sub_categories=["T"] * 10, sentiment_score=-1.5)
+            gd.validators.SubCatsSentiment(
+                sub_categories=["T"] * 10, sentiment_score=-1.5
+            )
 
     def test_top_categories_and_sentiment(self):
         self.assertIsInstance(
-            TopCatsSentiment(top_categories=["Test1", "Test2"], sentiment_score=0.5),
-            TopCatsSentiment,
+            gd.validators.TopCatsSentiment(
+                top_categories=["Test1", "Test2"], sentiment_score=0.5
+            ),
+            gd.validators.TopCatsSentiment,
         )
         with self.assertRaises(ValidationError):
-            TopCatsSentiment(top_categories=["T", "Test2"], sentiment_score=1.5)
+            gd.validators.TopCatsSentiment(
+                top_categories=["T", "Test2"], sentiment_score=1.5
+            )
 
     def test_category_hierarchy_and_sentiment(self):
         self.assertIsInstance(
-            CatHierarchySentiment(
+            gd.validators.CatHierarchySentiment(
                 primary_category="Test",
                 sub_categories=["Test1"] * 10,
                 sentiment_score=0.5,
             ),
-            CatHierarchySentiment,
+            gd.validators.CatHierarchySentiment,
         )
         with self.assertRaises(ValidationError):
-            CatHierarchySentiment(
+            gd.validators.CatHierarchySentiment(
                 primary_category="T", sub_categories=["T"] * 31, sentiment_score=0.5
             )
         with self.assertRaises(ValidationError):
-            CatHierarchySentiment(
+            gd.validators.CatHierarchySentiment(
                 primary_category="T", sub_categories=["T"] * 10, sentiment_score=0.555
             )
 

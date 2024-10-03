@@ -6,7 +6,7 @@ logging.disable(logging.CRITICAL)
 from icecream import ic  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from glyphdeck.tools.prepper import prepare_df, prepare_xlsx, prepare_csv  # noqa: E402
+import glyphdeck as gd  # noqa: E402
 
 print("\nCreate example dataframe")
 df = pd.DataFrame(
@@ -22,11 +22,11 @@ df = pd.DataFrame(
 ic(df)
 
 print("\nPrepare directly on the dataframe")
-ic(prepare_df(df, "id", ["data1", "data2"]))
+ic(gd.prepare_df(df, "id", ["data1", "data2"]))
 
 print("\nPrepare via xlsx file")
 ic(
-    prepare_xlsx(
+    gd.prepare_xlsx(
         r"tests\testdata.pizzashopreviews.xlsx",
         "Review Id",
         [
@@ -38,7 +38,7 @@ ic(
 
 print("\nPrepare via csv file")
 ic(
-    prepare_csv(
+    gd.prepare_csv(
         r"tests\testdata.pizzashopreviews.csv",
         "Review Id",
         "Review Text",

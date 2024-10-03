@@ -1,16 +1,7 @@
 from pydantic import ValidationError
 import pprint
 
-from glyphdeck.validation.validators import (
-    Sentiment,
-    PrimaryCat,
-    Top5Cats,
-    SubCats,
-    PrimaryCatSentiment,
-    SubCatsSentiment,
-    TopCatsSentiment,
-    CatHierarchySentiment,
-)
+import glyphdeck as gd
 
 
 def test_validation(cls, args, should_pass):
@@ -45,68 +36,68 @@ print(f'{"-" * 30}\nVALIDATION TEST RESULTS\n{"-" * 30}\n')
 
 # Now you can use this function to perform your tests
 print("CLASS | SentimentScore\n")
-test_validation(Sentiment, {"sentiment_score": 0.5}, True)
-test_validation(Sentiment, {"sentiment_score": 1.5}, False)
-test_validation(Sentiment, {"sentiment_score": 0.555}, False)
-test_validation(Sentiment, {"sentiment_score": "not a float"}, False)
+test_validation(gd.validators.Sentiment, {"sentiment_score": 0.5}, True)
+test_validation(gd.validators.Sentiment, {"sentiment_score": 1.5}, False)
+test_validation(gd.validators.Sentiment, {"sentiment_score": 0.555}, False)
+test_validation(gd.validators.Sentiment, {"sentiment_score": "not a float"}, False)
 
 print_sub_title("PrimaryCategory")
-test_validation(PrimaryCat, {"primary_category": "Test"}, True)
-test_validation(PrimaryCat, {"primary_category": 123}, False)
+test_validation(gd.validators.PrimaryCat, {"primary_category": "Test"}, True)
+test_validation(gd.validators.PrimaryCat, {"primary_category": 123}, False)
 
 print_sub_title("Top5Categories")
-test_validation(Top5Cats, {"top_categories": ["Test1", "Test2"]}, True)
-test_validation(Top5Cats, {"top_categories": "not a list"}, False)
+test_validation(gd.validators.Top5Cats, {"top_categories": ["Test1", "Test2"]}, True)
+test_validation(gd.validators.Top5Cats, {"top_categories": "not a list"}, False)
 
 print_sub_title("SubCategories")
-test_validation(SubCats, {"sub_categories": ["Test1"] * 10}, True)
-test_validation(SubCats, {"sub_categories": ["T"] * 31}, False)
-test_validation(SubCats, {"sub_categories": 0.55}, False)
+test_validation(gd.validators.SubCats, {"sub_categories": ["Test1"] * 10}, True)
+test_validation(gd.validators.SubCats, {"sub_categories": ["T"] * 31}, False)
+test_validation(gd.validators.SubCats, {"sub_categories": 0.55}, False)
 
 print_sub_title("PrimaryCategoryAndSentiment")
 test_validation(
-    PrimaryCatSentiment,
+    gd.validators.PrimaryCatSentiment,
     {"primary_category": "Test", "sentiment_score": 0.5},
     True,
 )
 test_validation(
-    PrimaryCatSentiment,
+    gd.validators.PrimaryCatSentiment,
     {"primary_category": "Test", "sentiment_score": 0.555},
     False,
 )
 
 print_sub_title("SubCategoriesAndSentiment")
 test_validation(
-    SubCatsSentiment,
+    gd.validators.SubCatsSentiment,
     {"sub_categories": ["Test1"] * 10, "sentiment_score": 0.5},
     True,
 )
 test_validation(
-    SubCatsSentiment,
+    gd.validators.SubCatsSentiment,
     {"sub_categories": ["T"] * 31, "sentiment_score": 0.5},
     False,
 )
 test_validation(
-    SubCatsSentiment,
+    gd.validators.SubCatsSentiment,
     {"sub_categories": ["T"] * 10, "sentiment_score": -1.5},
     False,
 )
 
 print_sub_title("TopCategoriesAndSentiment")
 test_validation(
-    TopCatsSentiment,
+    gd.validators.TopCatsSentiment,
     {"top_categories": ["Test1", "Test2"], "sentiment_score": 0.5},
     True,
 )
 test_validation(
-    TopCatsSentiment,
+    gd.validators.TopCatsSentiment,
     {"top_categories": ["T", "Test2"], "sentiment_score": 1.5},
     False,
 )
 
 print_sub_title("CategoryHierarchyAndSentiment")
 test_validation(
-    CatHierarchySentiment,
+    gd.validators.CatHierarchySentiment,
     {
         "primary_category": "Test",
         "sub_categories": ["Test1"] * 10,
@@ -115,12 +106,12 @@ test_validation(
     True,
 )
 test_validation(
-    CatHierarchySentiment,
+    gd.validators.CatHierarchySentiment,
     {"primary_category": "T", "sub_categories": ["T"] * 31, "sentiment_score": 0.5},
     False,
 )
 test_validation(
-    CatHierarchySentiment,
+    gd.validators.CatHierarchySentiment,
     {
         "primary_category": "T",
         "sub_categories": ["T"] * 10,
