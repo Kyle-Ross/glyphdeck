@@ -11,7 +11,7 @@ logger = CacheLogger().setup()
 
 
 @log_decorator(logger, suffix_message="Check or create cache, return object and path")
-def cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
+def _cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
     """Creates a cache if it doesn't already exist and returns the cache object and its path.
 
     Args:
@@ -45,10 +45,10 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
         A decorator that caches the result of the decorated function.
     """
     # Finds or creates the cache folder and object, as well as returning the directory of the cache
-    cache, full_cache_dir = cache_creator(cache_dir, max_mb_size)
+    cache, full_cache_dir = _cache_creator(cache_dir, max_mb_size)
 
     # Define the actual decorator function
-    def decorator(func):
+    def _decorator(func):
         """Wraps the function for result caching.
 
         Args:
@@ -60,7 +60,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
         # counter for the amount of completions
         completions = 0
 
-        async def wrapper(self, *args, **kwargs):
+        async def _wrapper(self, *args, **kwargs):
             """Handles the caching mechanism before calling the original function.
 
             Returns:
@@ -117,7 +117,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
             return result
 
         # Return the wrapper function
-        return wrapper
+        return _wrapper
 
     # Return the decorator
-    return decorator
+    return _decorator
