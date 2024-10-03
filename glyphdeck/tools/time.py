@@ -64,7 +64,7 @@ class LogBlock:
         Returns:
             self: Returns the instance of LogBlock.
         """
-        self.start_time: float = time.time()
+        self._start_time: float = time.time()
         return self
 
     # On exit, compare the end time with the start and log the result
@@ -77,10 +77,10 @@ class LogBlock:
             exc_value: Exception value (if an exception was raised).
             exc_tb: Traceback object (if an exception was raised).
         """
-        self.end_time: float = time.time()
-        self.elapsed_time: float = self.end_time - self.start_time
-        self.elapsed_time_seconds: str = format(self.elapsed_time, ",.4f")
-        delta_time = delta_time_formatter(self.elapsed_time)
-        delta_seconds = f"{self.elapsed_time_seconds} sec"
+        self._end_time: float = time.time()
+        self._elapsed_time: float = self._end_time - self._start_time
+        self._elapsed_time_seconds: str = format(self._elapsed_time, ",.4f")
+        delta_time = delta_time_formatter(self._elapsed_time)
+        delta_seconds = f"{self._elapsed_time_seconds} sec"
         message = f" | Class | LogBlock | Finish | Total runtime - {self.message} | | | {delta_time} | {delta_seconds}"
         self.logger.info(message)
