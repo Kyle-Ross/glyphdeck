@@ -58,7 +58,7 @@ class LLMHandler:
         suffix_message="Check class is an instance or inheritance of the Pydantic BaseValidatorModel class",
         show_nesting=False,
     )
-    def check_validation_model(self):
+    def _check_validation_model(self):
         """Check if the validation model is an instance of Pydantic BaseValidatorModel.
 
         Raises:
@@ -188,7 +188,7 @@ class LLMHandler:
         self.input_data: DataDict = input_data
         # raw_output_data keeps keys, replaces with [None, None, ...] lists
         # Helps to insert output in the correct position later in 'await_tasks'
-        self.raw_output_data: DataDict = {
+        self._raw_output_data: DataDict = {
             key: [None] * len(value) for key, value in input_data.items()
         }
 
@@ -221,7 +221,7 @@ class LLMHandler:
         self.use_cache: bool = use_cache
 
         # Checks that model comes from customer Pydantic BaseValidatorModel class
-        self.check_validation_model()
+        self._check_validation_model()
 
         # Preparing openai client
         if self.provider_clean == "openai":
@@ -232,7 +232,7 @@ class LLMHandler:
 
             # Initialising the client
             # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
-            self.openai_client = instructor.patch(openai.AsyncOpenAI())
+            self._openai_client = instructor.patch(openai.AsyncOpenAI())
             logger.debug(
                 " | Step | LLMHandler.__init__() | Action | Set openai_client and patched with instructor"
             )
@@ -317,7 +317,7 @@ class LLMHandler:
     )
     # Can overwrite other args here which otherwise use default values
     @openai_cache("async_openai_cache")
-    async def async_openai(
+    async def _async_openai(
         self,
         input_text: str,
         key,
@@ -397,7 +397,7 @@ class LLMHandler:
 
         # Running the chat completion and saving as an instructor model
         logger.debug(" | Step | async_openai() | Start | Chat completion")
-        instructor_model = await self.openai_client.chat.completions.create(
+        instructor_model = await self._openai_client.chat.completions.create(
             **chat_params
         )
         logger.debug(" | Step | async_openai()  | Finish | Chat completion")
@@ -421,7 +421,7 @@ class LLMHandler:
         suffix_message="Create coroutines",
         show_nesting=False,
     )
-    async def create_coroutines(self, func) -> List[Coroutine]:
+    async def _create_coroutines(self, func) -> List[Coroutine]:
         """Creates coroutines for the provided input data using the specified LLM function.
 
         Args:
@@ -446,13 +446,13 @@ class LLMHandler:
         suffix_message="Await coroutines,  returning in order of completion",
         show_nesting=False,
     )
-    async def await_coroutines(self, func):
+    async def _await_coroutines(self, func):
         """Await coroutines and return results in completion order.
 
         Args:
             func: The function used to generate coroutines.
         """
-        coroutines = await self.create_coroutines(func)
+        coroutines = await self._create_coroutines(func)
         # Loop over the futures
         logger.debug(
             " | Step | await_coroutines() | Start | Looping over futures of coroutines using as_completed()"
@@ -473,7 +473,7 @@ class LLMHandler:
                 response = result[0]
                 key = result[1]
                 index = result[2]
-                self.raw_output_data[key][index] = response
+                self._raw_output_data[key][index] = response
         logger.debug(
             " | Step | await_coroutines() | Finish | Looping over futures of coroutines using as_completed()"
         )
@@ -491,7 +491,7 @@ class LLMHandler:
             self: Instance of the LLMHandler class.
         """
         if self.provider_clean == "openai":
-            asyncio.run(self.await_coroutines(self.async_openai))
+            asyncio.run(self._await_coroutines(self._async_openai))
         return self
 
     @log_decorator(
@@ -510,11 +510,11 @@ class LLMHandler:
             Dictionary of flattened output data.
         """
         # Storage for key: list pairs representing rows
-        new_output_data = {}
+        _new_output_data = {}
         # Storing a list of the column names corresponding to the ordered list
-        new_column_names = []
+        _new_column_names = []
 
-        for row_key, values_list in self.raw_output_data.items():
+        for row_key, values_list in self._raw_output_data.items():
             # For each row
             new_row_values = []
             for col_index, col_value in enumerate(values_list):
@@ -526,8 +526,8 @@ class LLMHandler:
                     # For each returned value
                     full_column_name = column_names[col_index] + "_" + returned_data_key
                     # Add the column to the list if it isn't there
-                    if full_column_name not in new_column_names:
-                        new_column_names.append(full_column_name)
+                    if full_column_name not in _new_column_names:
+                        _new_column_names.append(full_column_name)
                     # Flatten lists into comma delimited strings
                     if type(returned_data_value) is list:
                         # Ensuring items are strings
@@ -536,10 +536,10 @@ class LLMHandler:
                     # Storing the value (in order) to the new list
                     new_row_values.append(returned_data_value)
             # Storing the flattened list of values
-            new_output_data[row_key] = new_row_values
+            _new_output_data[row_key] = new_row_values
 
         # Save the new output data to self
-        self.new_output_data = new_output_data
+        self.new_output_data = _new_output_data
         # Save the new column names to self
-        self.new_column_names = new_column_names
+        self.new_column_names = _new_column_names
         return self
