@@ -59,7 +59,10 @@ logger = CascadeLogger().setup()
 
 class Cascade:
     """
-    Cascade class is designed to manage, validate and process a sequence of data records.
+    Handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
+    Automatically validates and enforces all data movements against a common id, ensuring that each record has a unique,
+    immutable identifier that remains consistent, regardless of other changes.
+
     This class is the primary interface for the glyphdeck library.
 
     Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
@@ -68,7 +71,7 @@ class Cascade:
         records (Dict[int, RecordDict]): A dictionary to hold all records.
         expected_len (int): The number of values expected in each list in the records data.
         sanitiser (Sanitiser): An instance of the Sanitiser class to handle data sanitization.
-        llm_handler (LLMHandler): An instance to handle operations related to large language models.
+        llm_handler (LLMHandler): An instance of LLMHandler to handle operations related to large language models.
     """
 
     @log_decorator(logger, "info", suffix_message="Initialise Cascade object")
