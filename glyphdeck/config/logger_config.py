@@ -1,6 +1,5 @@
 """
-This module provides functionality for accessing, modifying, and restoring logger configurations
-using YAML files.
+This module provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
 
 Functions
 ---------

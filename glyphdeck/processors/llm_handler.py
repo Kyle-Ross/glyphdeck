@@ -62,6 +62,8 @@ logger.debug(" | Step | llm_handler.py | Action | Initialised logger")
 class LLMHandler:
     """Handler for interacting with Large Language Models (LLMs) and managing their settings, inputs, and outputs.
 
+    It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.
+
     Attributes:
         input_data: Dictionary containing the input data.
         provider: Name of the LLM provider.

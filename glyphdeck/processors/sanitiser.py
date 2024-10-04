@@ -39,6 +39,8 @@ logger = SanitiserLogger().setup()
 class Sanitiser:
     """Sanitises strings by replacing private information with placeholders.
 
+    It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.
+
     Attributes:
         email_regex: A regex pattern string for matching email addresses.
         email_pattern: A compiled regex pattern for matching email addresses.

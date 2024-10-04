@@ -1,5 +1,8 @@
 """
-This module provides the `Cascade` class designed to manage and process a sequence of data records.
+This module provides the `Cascade` class designed to manage, validate and process a sequence of data records.
+This class is the primary interface for the glyphdeck library.
+
+Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
 
 Classes
 -------
@@ -56,7 +59,10 @@ logger = CascadeLogger().setup()
 
 class Cascade:
     """
-    Cascade class is designed to handle and process a sequence of data records.
+    Cascade class is designed to manage, validate and process a sequence of data records.
+    This class is the primary interface for the glyphdeck library.
+
+    Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
 
     Attributes:
         records (Dict[int, RecordDict]): A dictionary to hold all records.

@@ -4,7 +4,8 @@ based on the logging configuration retrieved from `access_logging_config`. The
 module supports configurations that allow uniform logging levels across
 all components or granular levels for each component individually.
 
-Logger levels should not be configured from this object.
+Logger levels should not be configured from this object, but instead from the `set_logging_config()`
+function in the `logger_config` module.
 
 Logging Levels
 --------------
