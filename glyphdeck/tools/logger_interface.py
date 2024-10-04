@@ -1,15 +1,12 @@
-"""Centralized logging configuration for application components.
-
-This module provides a centralized setup for various logging components
-within the application. It allows seamless access to different logger instances
-that are tailored for specific logging needs.
+"""This module primary accesses the content of logging_.py and makes it available to the public interface
+without changing the internal representation of the loggers themselves.
 
 Classes
 -------
 **Loggers**
-    A class for centralized logger creation and management. It provides access to
-    various logger instances, each aimed at handling specific types
-    of logging activities within the application.
+    A class for centralized logger access, in a Dataclass style interface.
+
+    Checks if loggers exist, and creates them if they do not.
 
 Example
 -------
@@ -33,17 +30,8 @@ class Loggers:
     A centralized logger setup for various components within the application,
     essentially adds loggers to the public interface without changing their internal representation.
 
-    This class sets up multiple loggers, each aimed at handling specific types of logging activities.
-    Each logger is an instance of its respective logging class and is initialized via its `setup` method.
-
-    This is run on import of glyphdeck, creating an instance of the Logger class called `logger`.
-    This means loggers can be accessed like this:
-
-    ```
-    import glyphdeck as gd
-
-    logger = gd.logger.cascade
-    ```
+    On importing the glyphdeck module, an instance of this class called `logger` is created,
+    allowing simplified access to various loggers within the in the interface.
 
     Attributes:
         cascade (logging.Logger): Handles Cascade related logging.
@@ -58,6 +46,13 @@ class Loggers:
         validators (logging.Logger): Logs validation operations.
         workflow (logging.Logger): Logs workflow-related activities.
         unhandled_errors (logging.Logger): Captures any other errors that are not explicitly handled.
+
+    Usage:
+    ----------
+    ```
+    import glyphdeck as gd
+    logger = gd.logger.cascade
+    ```
     """
 
     def __init__(self):
