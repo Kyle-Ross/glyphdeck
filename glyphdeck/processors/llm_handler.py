@@ -10,7 +10,7 @@ Classes
 
 Example:
 -------
-Typical usage example::
+Typical usage::
 
     import glyphdeck as gd
 
@@ -19,7 +19,7 @@ Typical usage example::
         2: ["fruits", "fish", "seeds"],
         3: ["nuts", "leaves", "grubs"],
     }
-    
+
     handler = gd.LLMHandler(
         input_data,
         provider="OpenAI",

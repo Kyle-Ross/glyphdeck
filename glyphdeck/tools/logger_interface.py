@@ -11,7 +11,7 @@ Classes
 
 Example:
 -------
-Typical usage example::
+Typical usage::
 
     import glyphdeck as gd
 
@@ -60,7 +60,7 @@ class Loggers:
 
     def __init__(self):
         """Initialize a new instance of the Loggers class.
-        
+
         All loggers are set to None initially and are created upon first access.
         """
         self._cascade = None

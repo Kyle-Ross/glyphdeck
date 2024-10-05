@@ -23,7 +23,7 @@ Functions
 
 Example:
 -------
-Typical usage example::
+Typical usage::
 
     # For dataframes
     df, data_dict = prepare_df(df, "id_column", ["data_column1", "data_column2"])

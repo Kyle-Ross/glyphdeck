@@ -11,27 +11,27 @@ Classes
 
 Example:
 -------
-Typical usage example::
+Typical usage::
 
     import glyphdeck as gd
 
     cascade = gd.Cascade(
-        data_source="data.csv", 
-        id_column="record_id", 
+        data_source="data.csv",
+        id_column="record_id",
         data_columns=["column1", "column2"]
     )
     cascade.sanitiser.run("Sanitise record")
     cascade.set_llm_handler(
-        provider="openai", 
-        model="gpt-3", 
-        system_message="Analyse the feedback and return results in the correct format.", 
-        validation_model=gd.validators.SubCats, 
+        provider="openai",
+        model="gpt-3",
+        system_message="Analyse the feedback and return results in the correct format.",
+        validation_model=gd.validators.SubCats,
         cache_identifier="PizzaShopComment_Sub_Categories")
     cascade.llm_handler.run("HandlerOutput1")
     cascade.write_output(
-        file_type="csv", 
-        file_name_prefix="output", 
-        record_identifiers=["HandlerOutput1"], 
+        file_type="csv",
+        file_name_prefix="output",
+        record_identifiers=["HandlerOutput1"],
         rebase=True
     )
 

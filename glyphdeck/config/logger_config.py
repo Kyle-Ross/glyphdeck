@@ -14,7 +14,7 @@ Functions
 
 Example:
 -------
-Typical usage example::
+Typical usage::
 
     logger_config = access_logging_config()
     set_logging_config(log_input_data=True, setting_type="granular")
