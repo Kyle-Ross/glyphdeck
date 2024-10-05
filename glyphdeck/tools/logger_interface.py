@@ -1,5 +1,6 @@
-"""This module primary accesses the content of logging_.py and makes it available to the public interface
-without changing the internal representation of the loggers themselves.
+"""Accesses the content of logging_.py and makes it available to the public interface.
+
+Does this without changing the internal representation of the loggers themselves.
 
 Classes
 -------
@@ -27,11 +28,12 @@ from . import logging_
 
 
 class Loggers:
-    """A centralized logger setup for various components within the application,
-    essentially adds loggers to the public interface without changing their internal representation.
+    """Centralized logger setup for various components within the application.
+
+    Primarily, it adds loggers to the public interface without changing their internal representation.
 
     On importing the glyphdeck module, an instance of this class called `logger` is created,
-    allowing simplified access to various loggers within the in the interface.
+    providing the interface for the loggers.
 
     Attributes:
         cascade (logging.Logger): Handles Cascade related logging.
@@ -57,8 +59,9 @@ class Loggers:
     """
 
     def __init__(self):
-        """Initializes a new instance of the Loggers class. All loggers are set
-        to None initially and are created upon first access.
+        """Initialize a new instance of the Loggers class.
+        
+        All loggers are set to None initially and are created upon first access.
         """
         self._cascade = None
         self._llm_handler = None
@@ -74,7 +77,7 @@ class Loggers:
         self._unhandled_errors = None
 
     def _get_or_create_logger(self, name, logger_class):
-        """Gets an existing logger by name or creates one using the provided logger class.
+        """Get an existing logger by name or creates one using the provided logger class.
 
         Args:
             name (str): The name of the logger.

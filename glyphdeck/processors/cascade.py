@@ -1,4 +1,5 @@
-"""This module provides the `Cascade` class designed to manage, validate and process a sequence of data records.
+"""Provides the `Cascade` class designed to manage, validate and process a sequence of data records.
+
 This class is the primary interface for the glyphdeck library.
 
 Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
@@ -21,7 +22,8 @@ Typical usage example:
     output_df = cascade_instance.get_output(record_identifiers=5, output_type="dataframe", rebase=True)
     cascade_instance.write_output(file_type="csv", file_name_prefix="output", record_identifiers=[5], rebase=True)
 
-This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable. It makes use of validated data types, with assertions for correctness.
+This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable. 
+It makes use of validated data types, with assertions for correctness.
 """
 
 from datetime import datetime, timedelta
@@ -58,6 +60,7 @@ logger = CascadeLogger().setup()
 
 class Cascade:
     """Handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
+    
     Automatically validates and enforces all data movements against a common id, ensuring that each record has a unique,
     immutable identifier that remains consistent, regardless of other changes.
 
@@ -82,7 +85,7 @@ class Cascade:
         encoding: str = "utf-8",
         sheet_name: Union[int, str] = 0,
     ):
-        """Initializes the Cascade instance with the provided data source and configuration parameters.
+        """Initialize the Cascade instance with the provided data source and configuration parameters.
 
         Args:
             data_source: The source of the data, which can be either a file path (str) or a DataFrame.
@@ -130,8 +133,7 @@ class Cascade:
 
         # Inherit the sanitiser class and add new run method which writes records and uses the latest_data by default
         class Sanitise(Sanitiser):
-            """Represents a sanitiser that is part of the Cascade class. This class inherits
-            from Sanitiser and is used to sanitise and append data to the cascade.
+            """Sanitiser that is part of the Cascade class. This class inherits from Sanitiser and is used to sanitise and append data to the cascade.
 
             Attributes:
                 outer_cascade: The Cascade instance that includes the Sanitise class.
@@ -142,7 +144,7 @@ class Cascade:
 
             @log_decorator(logger, "info", suffix_message="cascade.sanitiser object")
             def __init__(self, outer_cascade: Cascade, **kwargs):
-                """Initializes the Sanitise instance associated with the Cascade instance.
+                """Initialize the Sanitise instance associated with the Cascade instance.
 
                 Args:
                     outer_cascade: The Cascade instance that this Sanitise instance is a part of.
@@ -162,7 +164,7 @@ class Cascade:
 
             @log_decorator(logger, "info", suffix_message="Use cascade.sanitiser.run()")
             def run(self, title: str = "sanitised"):
-                """Runs the sanitiser and appends the result to the cascade.
+                """Run the sanitiser and appends the result to the cascade.
 
                 Args:
                     title: The title to be given to the sanitised record. Defaults to "sanitised".
@@ -210,7 +212,7 @@ class Cascade:
 
         @log_decorator(logger, "info", suffix_message="cascade.llm_handler object")
         def __init__(self, *args, **kwargs):
-            """Initializes the Handler class with the provided arguments and Keyword arguments.
+            """Initialize the Handler class with the provided arguments and Keyword arguments.
 
             This constructor method passes all input parameters to the superclass (LLMHandler) constructor,
             while also storing a reference to the Cascade instance it is associated with.
@@ -366,7 +368,7 @@ class Cascade:
             suffix_message="Set cascade.llm_handler to use the latest record",
         )
         def use_latest(self):
-            """Sets the LLMHandler to use the latest record in the Cascade.
+            """Set the LLMHandler to use the latest record in the Cascade.
 
             When invoked, this method ensures that the LLMHandler will operate
             on the latest record in the Cascade rather than any manually selected data.
@@ -388,7 +390,7 @@ class Cascade:
             suffix_message="Set cascade.llm_handler to use a specified record",
         )
         def use_record(self, record_identifier: Union[int, str]):
-            """Sets cascade.llm_handler to use a specified record.
+            """Set cascade.llm_handler to use a specified record.
 
             Args:
                 record_identifier: The identifier of the record to be used. Can be an integer representing the record key,
@@ -426,7 +428,7 @@ class Cascade:
             record_title: str,
             column_names: Optional[List[str]] = None,
         ):
-            """Updates selected data and column_names. Will use the self.latest_column names if column_names is not specified.
+            """Update selected data and column_names. Will use the self.latest_column names if column_names is not specified.
 
             When selected through this method, the handler will use the provided data,
             column names (if any), and record title for future processing steps.
@@ -458,7 +460,7 @@ class Cascade:
 
         @log_decorator(logger, "info", suffix_message="Use cascade.llm_handler.run()")
         def run(self, title):
-            """Runs the LLMHandler and appends the results to the cascade.
+            """Run the LLMHandler and appends the results to the cascade.
 
             The function will process the LLMHandler with the current settings and append
             the resulting output data to the cascade as a new record with the specified title.
@@ -489,7 +491,7 @@ class Cascade:
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
-        """Returns the record number for a given title.
+        """Return the record number for a given title.
 
         Args:
             title: The title of the record to retrieve the key for.
@@ -515,7 +517,7 @@ class Cascade:
 
     @log_decorator(logger)
     def record(self, record_identifier: Union[int, str]) -> RecordDict:
-        """Returns the record corresponding to the provided record number or record title.
+        """Return the record corresponding to the provided record number or record title.
 
         Args:
             record_identifier: The identifier for the record, which can be either an integer (record number) or a string (record title).
@@ -541,7 +543,7 @@ class Cascade:
 
     @log_decorator(logger)
     def title(self, record_identifier: Union[int, str]) -> str:
-        """Returns the title corresponding to the provided record_identifier number.
+        """Return the title corresponding to the provided record_identifier number.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -554,7 +556,7 @@ class Cascade:
 
     @log_decorator(logger)
     def dt(self, record_identifier: Union[int, str]) -> datetime:
-        """Returns the datetime corresponding to the provided record_identifier.
+        """Return the datetime corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -567,7 +569,7 @@ class Cascade:
 
     @log_decorator(logger)
     def data(self, record_identifier: Union[int, str]) -> DataDict:
-        """Returns the data dictionary corresponding to the provided record_identifier.
+        """Return the data dictionary corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -580,7 +582,7 @@ class Cascade:
 
     @log_decorator(logger)
     def df(self, record_identifier: Union[int, str], recreate=False) -> pd.DataFrame:
-        """Returns the dataframe corresponding to the provided record_identifier.
+        """Return the dataframe corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -596,7 +598,7 @@ class Cascade:
 
     @log_decorator(logger)
     def record_delta(self, record_identifier: Union[int, str]) -> timedelta:
-        """Returns the timedelta corresponding to the provided record_identifier.
+        """Return the timedelta corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -609,7 +611,7 @@ class Cascade:
 
     @log_decorator(logger)
     def column_names(self, record_identifier: Union[int, str]) -> List[str]:
-        """Returns the list of column names corresponding to the provided record_identifier.
+        """Return the list of column names corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
@@ -659,7 +661,7 @@ class Cascade:
         max_preprepared_coroutines: int = 10,
         max_awaiting_coroutines: int = 100,
     ):
-        """Sets up the LLMHandler for the Cascade instance.
+        """Create the LLMHandler instance for the Cascade instance.
 
         Rather than taking a input_data argument, it always uses self.latest_data. This can be changed.
         Also Passes a reference to the current cascade instance up through the kwargs.
@@ -807,7 +809,7 @@ class Cascade:
 
     @log_decorator(logger)
     def set_expected_len(self, value: int):
-        """Sets the expected length of the data lists in records.
+        """Set the expected length of the data lists in records.
 
         Args:
             value: The expected length for each list in the records data.
@@ -821,7 +823,7 @@ class Cascade:
 
     @log_decorator(logger)
     def _key_validator(self, record_identifier: int):
-        """Validates that records have identical keys, without any new or missing keys.
+        """Validate that records have identical keys, without any new or missing keys.
 
         Args:
             record_identifier: The identifier of the record to be validated.
@@ -868,7 +870,7 @@ class Cascade:
 
     @log_decorator(logger)
     def _data_validator(self, record_identifier: int):
-        """Validates that each list in the data of the target record has the expected length.
+        """Validate that each list in the data of the target record has the expected length.
 
         Args:
             record_identifier: The identifier of the record to be validated.
@@ -907,7 +909,7 @@ class Cascade:
 
     @log_decorator(logger)
     def _title_validator(self, potential_title: str):
-        """Validates that a given title does not already exist in the records.
+        """Validate that a given title does not already exist in the records.
 
         Args:
             potential_title: The title to be validated.
@@ -942,7 +944,7 @@ class Cascade:
         column_names: Optional[Union[str, List[str]]] = None,
         update_expected_len: bool = False,
     ):
-        """Adds a new record to the 'records' dictionary.
+        """Add a new record to the 'records' dictionary.
 
         Args:
             title: The title of the new record.
@@ -1009,7 +1011,7 @@ class Cascade:
         use_suffix: bool = False,
         recreate=False,
     ) -> Self:
-        """Creates dataframes for the specified records and optionally adds column name suffixes.
+        """Create dataframes for the specified records and optionally adds column name suffixes.
 
         Args:
             record_identifiers: A list of record identifiers (keys or titles) or a single identifier.
@@ -1076,7 +1078,7 @@ class Cascade:
 
     @log_decorator(logger)
     def get_combined(self, record_identifiers: list, recreate=False) -> pd.DataFrame:
-        """Combines the specified records into a single dataframe.
+        """Combine the specified records into a single dataframe.
 
         Args:
             record_identifiers: A list of record identifiers (keys or titles).
@@ -1113,7 +1115,7 @@ class Cascade:
         record_identifiers: Union[List[Union[int, str]], Union[int, str]],
         recreate=False,
     ) -> pd.DataFrame:
-        """Combines the specified records and joins them to the base dataframe.
+        """Combine the specified records and joins them to the base dataframe.
 
         Args:
             record_identifiers: A list of record identifiers (keys or titles), or a single identifier.
@@ -1168,7 +1170,7 @@ class Cascade:
         combine: bool = True,
         recreate: bool = False,
     ) -> Union[pd.DataFrame, List[pd.DataFrame], Dict[Union[int, str], pd.DataFrame]]:
-        """Retrieves the specified records in the requested output format.
+        """Retrieve the specified records in the requested output format.
 
         Args:
             record_identifiers: Optional list of record identifiers (keys or titles). If None, the latest record is used. Defaults to None.
@@ -1293,7 +1295,7 @@ class Cascade:
         xlsx_use_sheets: bool = True,
         recreate: bool = False,
     ) -> Self:
-        """Writes the output of the selected records to a file or files.
+        """Write the output of the selected records to a file or files.
 
         Args:
             file_type: The type of file to write the output to. Can be 'csv' or 'xlsx'.
@@ -1327,7 +1329,7 @@ class Cascade:
         )
 
         def make_path(title: str) -> str:
-            """Generates the file path for a record based on the title.
+            """Generate the file path for a record based on the title.
 
             Args:
                 title: The title of the record.

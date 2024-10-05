@@ -1,6 +1,6 @@
-"""This module provides Pydantic models, types, fields, and classes for data validation.
-These models are designed to validate sentiment scores and category
-information which might be required as part of provider calls.
+"""Pydantic models, types, fields, and classes for data validation.
+
+For use by the `LLMHandler` class to enforce specific output types from the LLM.
 
 Classes
 -------
@@ -73,6 +73,7 @@ sentiment_max = 1.00
 # Add field names to the field_validator arguments if you want them to be validated by a method
 class BaseValidatorModel(BaseModel):
     """Base class for validator models. Provides common field validations, which are used in columns match the arguments.
+
     Multiple validations can apply to a single field if the column name is in multiple validation rules.
 
     Args:
@@ -86,7 +87,7 @@ class BaseValidatorModel(BaseModel):
     # Decorator needed to check field uses since the item_model inherits from base
     @field_validator("sentiment_score", check_fields=False)
     def check_decimal_places(cls, v: Union[float, int]) -> Union[float, int]:
-        """Checks that the value has no more than two decimal places.
+        """Check that the value has no more than two decimal places.
 
         Args:
             v: The value to be validated, either float or int.
@@ -110,7 +111,7 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("sentiment_score", check_fields=False)
     def sentiment_float_in_range(cls, v: Union[float, int]) -> Union[float, int]:
-        """Ensures the sentiment score is within the allowed range.
+        """Ensure the sentiment score is within the allowed range.
 
         Args:
             v: The value to be validated, either float or int.
@@ -135,7 +136,7 @@ class BaseValidatorModel(BaseModel):
     def list_of_sentiment_floats_in_range(
         cls, v: List[Union[float, int]]
     ) -> List[Union[float, int]]:
-        """Validates a list of sentiment scores ensuring values are floats within the allowed range.
+        """Validate a list of sentiment scores ensuring values are floats within the allowed range.
 
         Args:
             v: The list of values to be validated.
@@ -172,7 +173,7 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("top_categories", check_fields=False)
     def list_1_to_5(cls, v: List) -> List:
-        """Validates that the list contains between 1 to 5 entries.
+        """Validate that the list contains between 1 to 5 entries.
 
         Args:
             v: The list to be validated.
@@ -194,7 +195,7 @@ class BaseValidatorModel(BaseModel):
 
     @field_validator("sub_categories", check_fields=False)
     def list_1_to_30(cls, v: List) -> List:
-        """Validates that the list contains between 1 to 30 entries.
+        """Validate that the list contains between 1 to 30 entries.
 
         Args:
             v: The list to be validated.
@@ -429,7 +430,7 @@ class CatHierarchySentiment(BaseValidatorModel):
 
 
 def list_models():
-    """Prints outs the built-in validation models, including their names and descriptions."""
+    """Print out the built-in validation models, including their names and descriptions."""
     # Models to print out
     validation_models = [
         Sentiment,
@@ -446,7 +447,7 @@ def list_models():
     ]
 
     def print_line(char: str, length: int, newlines_after: int):
-        """Prints a line consisting of a repeated character followed by a specified number of newlines.
+        """Print a line consisting of a repeated character followed by a specified number of newlines.
 
         Args:
             char (str): The character to repeat in the line.

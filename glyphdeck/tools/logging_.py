@@ -1,7 +1,7 @@
-"""This module provides a comprehensive logging setup for various components
-of the application, defining classes and functions to create, configure, and manage
-loggers, ensuring consistent error handling across different parts of the
-system.
+"""Comprehensive logging setup for various components of the application.
+
+Defines classes and functions to create, configure, and manage loggers,
+ensuring consistent error handling across different parts of the system.
 
 Classes
 -------
@@ -78,7 +78,7 @@ def log_and_raise_error(
     message: str,
     include_traceback: bool = False,
 ):
-    """Logs and raises an error with the same message string.
+    """Log and raise an error with the same message string.
 
     Args:
         logger_arg (logging.Logger): Logger instance to log the error.
@@ -89,6 +89,7 @@ def log_and_raise_error(
 
     Raises:
         HandledError: The logged error, wrapped in a custom HandledError to indicate it was handled.
+
     """
     # Later this will prevent it being re-raised as an log level CRITICAL unhandled error
 
@@ -98,6 +99,7 @@ def log_and_raise_error(
 
         Args:
             error_type (Type[BaseException]): The base exception type.
+
         """
 
         pass
@@ -141,7 +143,7 @@ def assert_and_log_error(
     message: str,
     include_traceback: bool = False,
 ):
-    """Asserts a condition and logs the specified error.
+    """Assert a condition and log the specified error.
 
     Args:
         logger_arg (logging.Logger): Logger instance to log the error.
@@ -149,6 +151,7 @@ def assert_and_log_error(
         condition (bool): Condition to be asserted.
         message (str): The error message to log if the assertion fails.
         include_traceback (bool, optional): Whether to include the traceback in the log. Defaults to False.
+
     """
     if not condition:
         log_and_raise_error(
@@ -157,13 +160,14 @@ def assert_and_log_error(
 
 
 def _check_logger_exists(logger_name: str) -> bool:
-    """Checks if a logger with the provided name exists.
+    """Check if a logger with the provided name exists.
 
     Args:
         logger_name (str): The name of the logger to check.
 
     Returns:
         bool: True if the logger exists, False otherwise.
+
     """
     # Checks if a logger_arg with the provided logger_name exists, and returns the name
     existing_loggers = logging.Logger.manager.loggerDict.keys()
@@ -184,7 +188,7 @@ def log_decorator(
     is_property: bool = False,
     show_nesting: bool = True,  # Include or exclude the nesting prefix
 ) -> Callable:
-    """Function decorator to log the start and end of a function.
+    """Decorate a function to log the start and end of its execution.
 
     Args:
         logger_arg (logging.Logger): Logger instance to log messages.
@@ -201,8 +205,8 @@ def log_decorator(
 
     Returns:
         Callable: The decorated function.
-    """
 
+    """
     # Set the prefix text
     if is_static_method:
         prefix = "Static method"
@@ -234,14 +238,15 @@ def log_decorator(
         finish_message = " | ".join(finish_message_list)
 
         def inner_wrapper(*args, **kwargs) -> Callable:
-            def conditional_log(message):
-                """_summary_
+            def conditional_log(message: str):
+                """Record a log at a level specified by the provided decorator argument.
 
                 Args:
-                    message (_type_): _description_
+                    message (str): Message to include in the log.
 
                 Raises:
-                    AssertionError: _description_
+                    AssertionError: If the provided level argument is not in the available levels list.
+
                 """
                 # Make a different type of log depending on the provided arguments
                 if level == "off":
@@ -283,7 +288,7 @@ def logger_setup(
     console_log_level: int,
     log_file_path: str,
 ) -> logging.Logger:
-    """Initializes, configures, and returns a logger instance.
+    """Initialize, configure, and return a logger instance.
 
     Args:
         logger_name (str): The name of the logger.
@@ -294,6 +299,7 @@ def logger_setup(
 
     Returns:
         logging.Logger: The configured logger instance.
+
     """
     # Initialises, configures and returns the logger_arg object if it doesn't exist yet
     # Check if the logger_arg already exists, if it does, return it and skip the rest of the function
@@ -341,6 +347,7 @@ def global_exception_logger(exctype, value, tb):
         value (BaseException): The exception instance raised.
         tb (traceback): Traceback object representing the point at which
             the exception was raised.
+
     """
     # Handled exceptions should have the name 'HandledError'
     if exctype.__name__ == "HandledError":
@@ -386,6 +393,7 @@ class BaseLogger:
         log_file_name (str): Name of the log file.
         format_string (str): Format string for log messages.
         log_file_path (str): Full path to the log file.
+
     """
 
     def __init__(
@@ -395,13 +403,14 @@ class BaseLogger:
         console_log_level: int,
         log_file_name: str = "base.log",
     ):
-        """Initializes the BaseLogger instance.
+        """Initialize the BaseLogger instance.
 
         Args:
             logger_name (str): The name of the logger.
             file_log_level (int): The log level for the file handler.
             console_log_level (int): The log level for the console handler.
             log_file_name (str, optional): The name of the log file. Defaults to "base.log".
+
         """
         self.logger_name: str = logger_name
         self.file_log_level: int = file_log_level
@@ -431,10 +440,11 @@ class BaseLogger:
             logging_logger.info(log_message)
 
     def setup(self) -> logging.Logger:
-        """Sets up the logger.
+        """Set up the logger.
 
         Returns:
             logging.Logger: The configured logger instance.
+
         """
         # Sets up the logger_arg
         logger = logger_setup(
@@ -460,7 +470,7 @@ class DataTypesLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the DataTypesLogger instance."""
+        """Initialize the DataTypesLogger instance."""
         super().__init__(
             logger_name="validation.data_types",
             file_log_level=logger_levels.data_types_file_log_level,
@@ -475,7 +485,7 @@ class PrepperLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the PrepperLogger instance."""
+        """Initialize the PrepperLogger instance."""
         super().__init__(
             logger_name="tools.prepper",
             file_log_level=logger_levels.prepper_file_log_level,
@@ -490,7 +500,7 @@ class CascadeLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the CascadeLogger instance."""
+        """Initialize the CascadeLogger instance."""
         super().__init__(
             logger_name="processors.cascade",
             file_log_level=logger_levels.cascade_file_log_level,
@@ -505,7 +515,7 @@ class SanitiserLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the SanitiserLogger instance."""
+        """Initialize the SanitiserLogger instance."""
         super().__init__(
             logger_name="processors.sanitiser",
             file_log_level=logger_levels.sanitiser_file_log_level,
@@ -520,7 +530,7 @@ class ValidatorsLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the ValidatorsLogger instance."""
+        """Initialize the ValidatorsLogger instance."""
         super().__init__(
             logger_name="validation.validators_models",
             file_log_level=logger_levels.validators_file_log_level,
@@ -535,7 +545,7 @@ class LLMHandlerLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the LLMHandlerLogger instance."""
+        """Initialize the LLMHandlerLogger instance."""
         super().__init__(
             logger_name="processors.LLMHandler",
             file_log_level=logger_levels.llmhandler_file_log_level,
@@ -550,7 +560,7 @@ class BaseWorkflowLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the BaseWorkflowLogger instance."""
+        """Initialize the BaseWorkflowLogger instance."""
         super().__init__(
             logger_name="base_workflow",
             file_log_level=logger_levels.workflow_file_log_level,
@@ -565,7 +575,7 @@ class CacheLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the CacheLogger instance."""
+        """Initialize the CacheLogger instance."""
         super().__init__(
             logger_name="processors.LLMHandler <---> tools.caching",
             file_log_level=logger_levels.cache_file_log_level,
@@ -580,7 +590,7 @@ class StringsToolsLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the StringsToolsLogger instance."""
+        """Initialize the StringsToolsLogger instance."""
         super().__init__(
             logger_name="tools.strings",
             file_log_level=logger_levels.strings_file_log_level,
@@ -595,7 +605,7 @@ class TimeToolsLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the TimeToolsLogger instance."""
+        """Initialize the TimeToolsLogger instance."""
         super().__init__(
             logger_name="tools.time",
             file_log_level=logger_levels.time_file_log_level,
@@ -610,7 +620,7 @@ class FileImportersToolsLogger(BaseLogger):
     """
 
     def __init__(self):
-        """Initializes the FileImportersToolsLogger instance."""
+        """Initialize the FileImportersToolsLogger instance."""
         super().__init__(
             logger_name="tools.file_importers",
             file_log_level=logger_levels.file_importers_file_log_level,

@@ -128,7 +128,7 @@ class LLMHandler:
         # High values will run faster incrementally faster, but consume more memory
         max_awaiting_coroutines: int = 100,
     ):
-        """Initializes the LLMHandler with necessary configurations and validations.
+        """Initialize the LLMHandler with necessary configurations and validations.
 
         Args:
             input_data: Dictionary containing the input data.
@@ -458,7 +458,7 @@ class LLMHandler:
         show_nesting=False,
     )
     async def _create_coroutines(self, func) -> List[Coroutine]:
-        """Creates coroutines for the provided input data using the specified LLM function.
+        """Create coroutines for the provided input data using the specified LLM function.
 
         Args:
             func: The function to generate coroutines for.

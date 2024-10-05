@@ -1,4 +1,4 @@
-"""This module provides functionality to create and manage a cache directory for storing OpenAI completion results, utilizing disk-based caching to improve retrieval times and conserve API call limits.
+"""Provides functionality to create and manage a cache directory for storing OpenAI completion results, utilizing disk-based caching to improve retrieval times and conserve API call limits.
 
 Functions
 -------
@@ -28,7 +28,7 @@ logger = CacheLogger().setup()
 
 @log_decorator(logger, suffix_message="Check or create cache, return object and path")
 def _cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
-    """Creates a cache if it doesn't already exist and returns the cache object and its path.
+    """Create a cache if it doesn't already exist and returns the cache object and its path.
 
     Args:
         cache_dir: Directory where the cache will be stored.
@@ -50,8 +50,9 @@ def _cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
     logger, suffix_message="Grab OpenAI completions if in cache, otherwise API"
 )
 def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
-    """Decorator to cache the results of OpenAI completions. Function result will be taken from the
-    cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
+    """Decorate a function to cache the results of OpenAI completions.
+    
+    Function result will be taken from the cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
     records will be culled.
 
     Args:
@@ -67,7 +68,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
 
     # Define the actual decorator function
     def _decorator(func):
-        """Wraps the function for result caching.
+        """Wrap the function for result caching.
 
         Args:
             func: The function being decorated.
@@ -80,7 +81,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
         completions = 0
 
         async def _wrapper(self, *args, **kwargs):
-            """Handles the caching mechanism before calling the original function.
+            """Handle the caching mechanism before calling the original function.
 
             Returns:
                 The result from the cache or the decorated function.

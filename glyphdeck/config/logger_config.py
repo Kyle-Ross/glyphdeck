@@ -1,4 +1,4 @@
-"""This module provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
+"""Provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
 
 Functions
 ---------
@@ -33,23 +33,21 @@ _config_path = os.path.join(
 
 
 def access_logging_config() -> dict:
-    """Reads the logger configuration YAML file and returns its content as a Python dictionary."""
+    """Read the logger configuration YAML file and returns its content as a Python dictionary."""
     with open(_config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
 
 
 class _LoggerConfig:
-    """Context manager for modifying a YAML configuration file.
-    Opens the config, makes your changes, and then saves it.
-    """
+    """Context manager for modifying a YAML configuration file. Opens the config, makes your changes, and then saves it."""
 
     def __init__(self):
-        """Initializes the LoggerConfig with the path to the YAML config file."""
+        """Initialize the LoggerConfig with the path to the YAML config file."""
         self.path = _config_path
 
     def __enter__(self):
-        """Loads the YAML data from the file, store it in self.data and returns self
+        """Load the YAML data from the file, store it in self.data and returns self.
 
         Returns:
             LoggerConfig: The LoggerConfig instance.
@@ -61,7 +59,7 @@ class _LoggerConfig:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Writes the modified data back to the file."""
+        """Write the modified data back to the file."""
         # Only write if changes occurred
         if self.data != self._original_data:
             with open(self.path, "w") as f:
@@ -90,7 +88,7 @@ def set_logging_config(
     file_importers_levels: Optional[Tuple[int]] = None,
     unhandled_errors_levels: Optional[Tuple[int]] = None,
 ):
-    """Configure the logging settings by changing the configuration yaml file.
+    r"""Configure the logging settings by changing the configuration yaml file.
 
     This function allows you to modify various logging settings such as whether to log input and output data,
     the source of logging levels, and the logging levels for different components of the module.
@@ -231,11 +229,11 @@ def set_logging_config(
 
 
 def restore_logger_config():
-    f"""This function restores the logger configuration yaml file '{_config_path}' in its original state.
+    """Restore the logger configuration yaml file to its original state.
+
     Useful if your changes have broken the file, but beware as this will overwrite any modifications
     in the config.
     """
-
     config = {
         "private_data": {"log_input": False, "log_output": False},
         "setting_type": "default",

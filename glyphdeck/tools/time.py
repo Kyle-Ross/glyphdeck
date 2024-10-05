@@ -1,4 +1,4 @@
-"""This module provides logging utilities for monitoring the and formatting the execution time of code segments.
+"""Logging utilities for monitoring and formatting the execution time of code segments.
 
 Classes
 -------
@@ -28,7 +28,7 @@ logger = TimeToolsLogger().setup()
 
 @log_decorator(logger)
 def delta_time_formatter(total_seconds: float) -> str:
-    """Formats a float representing seconds into a string with hours, minutes, and seconds.
+    """Format a float representing seconds into a string with hours, minutes, and seconds.
 
     Args:
         total_seconds: A float representing the total number of seconds.
@@ -46,6 +46,7 @@ def delta_time_formatter(total_seconds: float) -> str:
 
 class LogBlock:
     """Context manager that logs the time elapsed over the total runtime of a block.
+
     Useful for timing glyphdeck workflows.
 
     Usage:
@@ -68,7 +69,7 @@ class LogBlock:
     # Prepare the logger on initialisation
     @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __init__(self, message, logger_arg: logging.Logger = logger):
-        """Initializes LogBlock with a logger instance and a custom message.
+        """Initialize LogBlock with a logger instance and a custom message.
 
         Args:
             message (str): A custom message to include in the log.
@@ -81,7 +82,7 @@ class LogBlock:
     # On entry, record the time at the start of the block
     @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __enter__(self):
-        """Records the start time at the entry of the block.
+        """Record the start time at the entry of the block.
 
         Returns:
             self: Returns the instance of LogBlock.
@@ -93,7 +94,7 @@ class LogBlock:
     # On exit, compare the end time with the start and log the result
     @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __exit__(self, exc_type, exc_value, exc_tb):
-        """Logs the total runtime at the exit of the block.
+        """Log the total runtime at the exit of the block.
 
         Args:
             exc_type: Exception type (if an exception was raised).

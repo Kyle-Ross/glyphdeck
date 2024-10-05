@@ -1,4 +1,4 @@
-"""This module provides utility functions for data type assertions and validations.
+"""Utility functions for data type assertions and validations.
 
 The provided functions aim to ensure that variables have expected types and
 log errors if the validation fails.
@@ -32,7 +32,7 @@ RecordsDict = Dict[int, RecordDict]
 
 
 def assert_and_log_type_is_data(variable: DataDict, var_name: str):
-    """Asserts and logs that a variable is of type 'DataDict'.
+    """Assert and log that a variable is of type 'DataDict'.
 
     Args:
         variable (DataDict): The variable to check.
@@ -72,7 +72,7 @@ def assert_and_log_is_type_or_list_of(
     allowed_list_types: list,
     allow_none: bool = False,
 ):
-    """Asserts and logs that a variable is of an allowed type or a list containing only allowed types.
+    """Assert and log that a variable is of an allowed type or a list containing only allowed types.
 
     Args:
         variable: The variable to check. It can be of a type in allowed_list_types or a list of such types.

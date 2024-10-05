@@ -1,4 +1,4 @@
-"""Provides functions to import data from Excel and CSV files, and validating file types.
+"""Functions to import data from Excel and CSV files, and validating file types.
 
 Functions
 ---------
@@ -13,7 +13,7 @@ Functions
 
 """
 
-from typing import Optional
+from typing import Optional, Any
 import os
 
 import pandas as pd
@@ -30,7 +30,7 @@ logger = FileImportersToolsLogger().setup()
 
 
 def _assert_and_log_error_path(path: str, function_name: str):
-    """Asserts that a provided path is a string and logs an error if not.
+    """Assert that a provided path is a string and logs an error if not.
 
     Args:
         path (str): The path to be validated.
@@ -50,10 +50,11 @@ def _assert_and_log_error_path(path: str, function_name: str):
 
 @log_decorator(logger)
 def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
-    """Reads an Excel file and returns its content as a DataFrame.
+    """Read an Excel file and returns its content as a DataFrame.
 
     Args:
         file_path (str): The path to the Excel file.
+        **kwargs: Arguments passed to `pd.read_excel()` after checking `file_path`.
 
     Returns:
         pd.DataFrame: The content of the Excel file as a DataFrame.
@@ -69,10 +70,11 @@ def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
 
 @log_decorator(logger)
 def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
-    """Reads a CSV file and returns its content as a DataFrame.
+    """Read a CSV file and returns its content as a DataFrame.
 
     Args:
         file_path (str): The path to the CSV file.
+        **kwargs: Arguments passed to `pd.read_csv()` after checking `file_path`.
 
     Returns:
         pd.DataFrame: The content of the CSV file as a DataFrame.
@@ -88,7 +90,7 @@ def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
 
 @log_decorator(logger)
 def file_validation(file_path: str) -> str:
-    """Validates the provided file path and determines its type.
+    """Validate the provided file path and determines its type.
 
     Args:
         file_path (str): The path to the file to be validated.

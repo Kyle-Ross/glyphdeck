@@ -58,7 +58,7 @@ logger = PrepperLogger().setup()
 def prepare_df(
     source_table: pd.DataFrame, id_column: str, data_columns: Union[str, List[str]]
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Prepares a dataframe into a common data dictionary format.
+    """Prepare a dataframe into the common data dictionary format.
 
     This function transforms a dataframe into a dictionary where keys are unique IDs
     from a specified column, and values are lists of selected data column values. It
@@ -146,7 +146,7 @@ def prepare_df(
 def prepare_xlsx(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Loads data from an XLSX file and prepares it into a common data dictionary format.
+    """Load data from an XLSX file and prepare it into the common data dictionary format.
 
     Args:
         file_path (str): The path to the XLSX file to be loaded.
@@ -179,7 +179,7 @@ def prepare_xlsx(
 def prepare_csv(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Loads data from a CSV file and prepares it into a common data dictionary format.
+    """Load data from a CSV file and prepare it into the common data dictionary format.
 
     Args:
         file_path (str): The path to the CSV file to be loaded.
@@ -224,7 +224,7 @@ def type_conditional_prepare(
         data_columns (Union[str, List[str]]): A single column name or a list of
             column names that contain the data to be extracted.
         encoding (str): The encoding to use when reading text files.
-        sheet_name (Union[str, int]): The name or number of the sheet to read from in an XLSX file.
+        sheet (Union[str, int]): The name or number of the sheet to read from in an XLSX file.
 
     Returns:
         Tuple[pd.DataFrame, DataDict]: A tuple containing the prepared dataframe and

@@ -1,4 +1,4 @@
-"""This module provides functions for creating and managing output directories, and checking if they already exist.
+"""Functions for creating and managing output directories, and checking if they already exist.
 
 Functions
 ---------
@@ -39,7 +39,7 @@ from glyphdeck._path_constants import (
 def create_directory(
     directory: str, directory_name: str, logger_arg: logging.Logger
 ) -> str:
-    """Creates a directory if it doesn't exist and logs the action.
+    """Create a directory if it doesn't exist and logs the action.
 
     Args:
         directory: The path of the directory to create.
@@ -63,7 +63,7 @@ def create_directory(
 
 
 def create_output_directory(logger_arg: logging.Logger) -> str:
-    """Checks and creates the output directory and returns the path.
+    """Check and create the output directory and returns the path.
 
     Args:
         logger_arg: The logger used to log the outcome of the directory creation.
@@ -76,7 +76,7 @@ def create_output_directory(logger_arg: logging.Logger) -> str:
 
 
 def create_logs_directory(logger_arg: logging.Logger) -> str:
-    """Checks and creates the logs directory and returns the path.
+    """Check and creates the logs directory and returns the path.
 
     Args:
         logger_arg: The logger used to log the outcome of the directory creation.
@@ -89,7 +89,7 @@ def create_logs_directory(logger_arg: logging.Logger) -> str:
 
 
 def create_caches_directory(logger_arg: logging.Logger) -> str:
-    """Checks and creates the caches directory and returns the path.
+    """Check and create the caches directory and returns the path.
 
     Args:
         logger_arg: The logger used to log the outcome of the directory creation.
@@ -102,7 +102,7 @@ def create_caches_directory(logger_arg: logging.Logger) -> str:
 
 
 def create_files_directory(logger_arg: logging.Logger) -> str:
-    """Checks and creates the files directory and returns the path.
+    """Check and create the files directory and returns the path.
 
     Args:
         logger_arg: The logger used to log the outcome of the directory creation.
@@ -115,7 +115,7 @@ def create_files_directory(logger_arg: logging.Logger) -> str:
 
 
 def check_logs_directory() -> Tuple[bool, str, str]:
-    """Checks if the logs directory exists and creates it if not.
+    """Check if the logs directory exists and creates it if not.
 
     Returns:
         A tuple containing:

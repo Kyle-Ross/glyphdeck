@@ -183,7 +183,7 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def _placeholder_check(patterns_dict: PatternsDict):
-        """Checks that all placeholders in the patterns dictionary contain only allowed characters.
+        """Check that all placeholders in the patterns dictionary contain only allowed characters.
 
         Args:
             patterns_dict: A dictionary containing regex patterns and their associated metadata.
@@ -231,7 +231,7 @@ class Sanitiser:
     @staticmethod
     @log_decorator(logger, is_static_method=True)
     def _remove_arrows(input_string: str) -> str:
-        """Removes angle brackets from a string.
+        """Remove angle brackets from a string.
 
         Args:
             input_string: The string from which to remove '<' and '>'.
@@ -248,7 +248,7 @@ class Sanitiser:
     def _groups_where(
         patterns_dict: PatternsDict, active_type: Union[List, Tuple] = (True, False)
     ) -> List[str]:
-        """Returns a list of pattern groups based on their 'active' status.
+        """Return a list of pattern groups based on their 'active' status.
 
         Args:
             patterns_dict: A dictionary containing regex patterns and their associated metadata.
@@ -268,7 +268,7 @@ class Sanitiser:
 
     @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
     def __init__(self, input_data: DataDict, pattern_groups: List = None) -> None:
-        """Initializes a Sanitiser object with input data and optionally selected pattern groups.
+        """Initialize a Sanitiser object with input data and optionally selected pattern groups.
 
         Args:
             input_data: The data to be sanitized.
@@ -293,7 +293,7 @@ class Sanitiser:
 
     @log_decorator(logger)
     def _update_groups(self) -> Self:
-        """Updates the lists of all, active, and inactive pattern groups based on the current patterns dictionary.
+        """Update the lists of all, active, and inactive pattern groups based on the current patterns dictionary.
 
         Returns:
             Self: The updated instance of the Sanitiser class.
@@ -312,7 +312,7 @@ class Sanitiser:
 
     @log_decorator(logger, "off")  # Runs for every row, logs off by default
     def _update_match_counts(self) -> Self:
-        """Updates the match count dictionary and the overall match count.
+        """Update the match count dictionary and the overall match count.
 
         Returns:
             Self: The updated instance of the Sanitiser class.
@@ -335,7 +335,7 @@ class Sanitiser:
 
     @log_decorator(logger)
     def set_placeholders(self, placeholder_dict: Dict[str, str]) -> Self:
-        """Sets custom placeholders for the patterns.
+        """Set custom placeholders for the patterns.
 
         Args:
             placeholder_dict: A dictionary with group names as keys and custom placeholders as values.
@@ -405,7 +405,7 @@ class Sanitiser:
 
     @log_decorator(logger)
     def _sort_patterns(self) -> Self:
-        """Ensures patterns are sorted by their rank in ascending order.
+        """Ensure patterns are sorted by their rank in ascending order.
 
         Returns:
             Self: The updated instance of the Sanitiser class.
@@ -420,7 +420,7 @@ class Sanitiser:
     def add_pattern(
         self, pattern_name: str, group: str, placeholder: str, rank: float, regex: str
     ):
-        """Adds a new pattern to the sanitiser.
+        """Add a new pattern to the sanitiser.
 
         Args:
             pattern_name: The unique name for the pattern.
