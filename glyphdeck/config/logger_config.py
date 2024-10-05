@@ -2,14 +2,14 @@
 
 Functions
 ---------
-**access_logging_config()**
+**access_logging_config**
     Reads the logger configuration YAML file and returns its content as a Python dictionary.
 
-**set_logging_config(...)**
+**set_logging_config**
     Configure the logging settings by changing the configuration YAML file according to the
     specified parameters.
 
-**restore_logger_config()**
+**restore_logger_config**
     Restores the logger configuration YAML file to its original state, useful for undoing changes.
 
 Example:
