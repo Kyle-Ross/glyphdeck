@@ -8,7 +8,7 @@ glyphdeck.validation.data\_types module
 ---------------------------------------
 
 .. automodule:: glyphdeck.validation.data_types
-   :members:
+   :members: DataDict, Optional_DataDict, RecordDict, RecordsDict
    :show-inheritance:
 
 glyphdeck.validation.validators module
@@ -16,6 +16,7 @@ glyphdeck.validation.validators module
 
 .. automodule:: glyphdeck.validation.validators
    :members:
+   :exclude-members: sentiment_min, sentiment_max
    :show-inheritance:
 
 Module contents
