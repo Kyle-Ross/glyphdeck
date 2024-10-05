@@ -1,29 +1,29 @@
-glyphdeck.tools package
+.tools package
 =======================
 
-Submodules
-----------
+Contents
+---------------
 
-glyphdeck.tools.logger\_interface module
+.. automodule:: glyphdeck.tools
+   :members:
+
+Modules
+---------------
+
+.logger\_interface module
 ----------------------------------------
 
 .. automodule:: glyphdeck.tools.logger_interface
    :members: Loggers
 
-glyphdeck.tools.prepper module
+.prepper module
 ------------------------------
 
 .. automodule:: glyphdeck.tools.prepper
    :members: prepare
 
-glyphdeck.tools.time module
+.time module
 ---------------------------
 
 .. automodule:: glyphdeck.tools.time
    :members: LogBlock
-
-Module contents
----------------
-
-.. automodule:: glyphdeck.tools
-   :members:

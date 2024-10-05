@@ -1,24 +1,25 @@
-glyphdeck.validation package
+.validation package
 ============================
 
-Submodules
-----------
+Contents
+---------------
 
-glyphdeck.validation.data\_types module
+.. automodule:: glyphdeck.validation
+   :members:
+
+
+Modules
+---------------
+
+.data\_types module
 ---------------------------------------
 
 .. automodule:: glyphdeck.validation.data_types
    :members: DataDict, Optional_DataDict, RecordDict, RecordsDict
 
-glyphdeck.validation.validators module
+.validators module
 --------------------------------------
 
 .. automodule:: glyphdeck.validation.validators
    :members:
    :exclude-members: sentiment_min, sentiment_max
-
-Module contents
----------------
-
-.. automodule:: glyphdeck.validation
-   :members:

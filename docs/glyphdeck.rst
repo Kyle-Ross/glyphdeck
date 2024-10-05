@@ -1,8 +1,5 @@
-glyphdeck package
-=================
-
-Subpackages
------------
+glyphdeck
+=========
 
 .. toctree::
    :maxdepth: 4
@@ -12,8 +9,3 @@ Subpackages
    glyphdeck.config
    glyphdeck.tools
 
-Module contents
----------------
-
-.. automodule:: glyphdeck
-   :members:
