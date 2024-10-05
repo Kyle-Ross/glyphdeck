@@ -48,8 +48,12 @@ exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",
-    "config\logger_levels.py",
-    "_path_constants.py'",
+    "_path_constants.py",
+    "config/logger_levels.py",
+    "tools/strings.py",
+    "tools/file_importers.py",
+    "tools/directory_creators.py",
+    "tools/caching.py"
 ]
 
 # Set your HTML theme here

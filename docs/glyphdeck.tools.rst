@@ -4,27 +4,6 @@ glyphdeck.tools package
 Submodules
 ----------
 
-glyphdeck.tools.caching module
-------------------------------
-
-.. automodule:: glyphdeck.tools.caching
-   :members:
-   :show-inheritance:
-
-glyphdeck.tools.directory\_creators module
-------------------------------------------
-
-.. automodule:: glyphdeck.tools.directory_creators
-   :members:
-   :show-inheritance:
-
-glyphdeck.tools.file\_importers module
---------------------------------------
-
-.. automodule:: glyphdeck.tools.file_importers
-   :members:
-   :show-inheritance:
-
 glyphdeck.tools.logger\_interface module
 ----------------------------------------
 
@@ -43,13 +22,6 @@ glyphdeck.tools.prepper module
 ------------------------------
 
 .. automodule:: glyphdeck.tools.prepper
-   :members:
-   :show-inheritance:
-
-glyphdeck.tools.strings module
-------------------------------
-
-.. automodule:: glyphdeck.tools.strings
    :members:
    :show-inheritance:
 
