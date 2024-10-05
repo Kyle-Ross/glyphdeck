@@ -69,7 +69,7 @@ from .processors.cascade import Cascade
 from .processors.llm_handler import LLMHandler
 from .processors.sanitiser import Sanitiser
 from glyphdeck.validation import validators
-from .tools import prepper
+from .tools.prepper import prepare
 
 # Provide access to the set_logging_config
 from .config.logger_config import (
@@ -95,7 +95,7 @@ __all__ = [
     "LLMHandler",
     "Sanitiser",
     "validators",
-    "prepper",
+    "prepare",
     "access_logging_config",
     "set_logging_config",
     "restore_logger_config",
