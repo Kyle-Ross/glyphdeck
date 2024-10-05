@@ -1,4 +1,4 @@
-"""A module for sanitising strings by replacing private information with placeholders.
+r"""A module for sanitising strings by replacing private information with placeholders.
 
 This module provides a `Sanitiser` class used to identify and replace pieces of private information
 within strings using regular expression patterns. It supports sanitisation of emails, URLs, file paths,
@@ -11,11 +11,34 @@ Classes
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
-    sanitise = Sanitiser(input_data)
-    sanitise.add_pattern('custom_pattern', 'group_name', '<PLACEHOLDER>', 1.0, r'regex')
-    sanitise.sanitise()
+    import glyphdeck as gd
+
+    private_data: gd.DataDict = {
+        1: [
+            r"I like apple bottom jeans 156.a19878, 11/10/2020, jimbo@gmail.com",
+            "My birthday is 11/10/2021",
+            "Product info: https://t.co/KNkANrdypk To order",
+        ],
+    }
+
+    sanitiser = Sanitiser(private_data, pattern_groups=["number", "date", "email"])
+    santiser_obj.add_pattern(
+        pattern_name="custom",
+        group="custom_group",
+        placeholder="custom",
+        rank=0.5,
+        regex=r"jeans",
+    )
+    sanitiser.sanitise()
+    print(sanitiser.output_data)
+
+    # 1: [
+    #     'I like apple bottom <CUST> <NUM>, <DATE>, <EMAIL>',
+    #     'My birthday is <DATES>',
+    #     'Product info: <URL> To order'
+    # ],
 
 """
 
