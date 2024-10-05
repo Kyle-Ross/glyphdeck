@@ -249,16 +249,6 @@ categories_1_to_30: list = Field(
     "topics, with least 1 and no more than 30 categories. Each category name should be concise."
 )
 
-# Additional information on the fields above
-# Cannot sit in the classes or fields due to the way they are accessed by Pydantic, and would increase prompt size
-# Access this later by using the '__name__' attribute of the data classes
-field_schema: dict = {
-    "sentiment_score": {"structure": "single_value", "type": "float"},
-    "primary_category": {"structure": "single_value", "type": "str"},
-    "top_categories": {"structure": "list", "type": "str"},
-    "sub_categories": {"structure": "list", "type": "str"},
-}
-
 
 # ---CLASSES---
 # Classes use the common fields above
