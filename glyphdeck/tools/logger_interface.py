@@ -1,4 +1,4 @@
-"""Accesses the content of logging_.py and makes it available to the public interface.
+"""Accesses the loggers within logging_.py and makes them available to the public interface.
 
 Does this without changing the internal representation of the loggers themselves.
 
@@ -11,7 +11,7 @@ Classes
 
 Example:
 -------
-Typical usage::
+How to use the interface to access the loggers::
 
     import glyphdeck as gd
 
