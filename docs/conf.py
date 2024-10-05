@@ -6,20 +6,21 @@ import os
 sys.path.insert(0, os.path.abspath("../glyphdeck"))
 
 # Accessing the poetry config toml file
-with open("../pyproject.toml", "r") as f:
+pyproject_toml = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../pyproject.toml")
+with open(pyproject_toml, "r") as f:
     poetry_toml = toml.load(f)
 
 # Use the name from pyproject.toml
-project = poetry_toml["tool.poetry"]["name"]
+project = poetry_toml["tool"]["poetry"]["name"]
 
 # %Y is replaced with the current year
 copyright = "%Y, Kyle Ross"
 
 # Use the author from pyproject.toml
-author = poetry_toml["tool.poetry"]["authors"][0]
+author = poetry_toml["tool"]["poetry"]["authors"][0]
 
 # Use the release from pyproject.toml
-release = poetry_toml["tool.poetry"]["version"]
+release = poetry_toml["tool"]["poetry"]["version"]
 
 # Set extensions
 extensions = [
