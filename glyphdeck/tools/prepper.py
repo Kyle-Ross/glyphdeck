@@ -10,7 +10,7 @@ Functions
     a common data dictionary format based on the type of data source provided.
 
 Example:
--------
+--------
 Typical usage::
     df, data_dict = prepare(df_or_path_str, "id_column", "data_column")
 

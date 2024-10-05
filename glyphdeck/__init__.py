@@ -4,7 +4,7 @@ glyphdeck handles LLM data workflow data validation, sanitisation, transformatio
 facilitating the fast development of robust, error free LLM data workflows.
 
 glyphdeck.Cascade():
--------------------
+--------------------
 The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
 
 It validates and enforces all data movements against a common id, ensuring that each record has a unique, immutable identifier that remains consistent, regardless of other changes.
@@ -16,12 +16,12 @@ It validates and enforces all data movements against a common id, ensuring that 
     Optionally strip out private information before asynchronous requests are sent to the LLM.
 
 Telemetry:
----------
+----------
 glyphdeck is provided with a comprehensive logging facility that makes
 complex asyncronous LLM workflows much easier to configure, understand and debug.
 
 Example:
--------
+---------
 Here is a basic example of how to use the main features of the glyphdeck library::
 
     import glyphdeck as gd
@@ -59,8 +59,7 @@ Here is a basic example of how to use the main features of the glyphdeck library
         xlsx_use_sheets=False,
     )
 
-
-"""
+"""  # noqa: D100
 
 ## Most scripting should occur in a Cascade instance, which interfaces with the other functions
 from .processors.cascade import Cascade

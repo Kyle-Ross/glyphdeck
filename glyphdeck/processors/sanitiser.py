@@ -10,7 +10,7 @@ Classes
     A class that sanitises strings by replacing private information with placeholders using predefined regex patterns.
 
 Example:
--------
+--------
 Typical usage::
 
     import glyphdeck as gd

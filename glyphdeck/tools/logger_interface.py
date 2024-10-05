@@ -10,7 +10,7 @@ Classes
     Checks if loggers exist, and creates them if they do not.
 
 Example:
--------
+--------
 How to use the interface to access the loggers::
 
     import glyphdeck as gd

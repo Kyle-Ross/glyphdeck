@@ -46,7 +46,7 @@ Functions
     Prints out the built-in validation models, listing their names and descriptions.
 
 Example:
--------
+--------
 Typical usage:
 
     sentiment_model = Sentiment(sentiment_score=0.5)

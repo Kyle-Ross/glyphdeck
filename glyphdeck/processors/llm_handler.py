@@ -9,7 +9,7 @@ Classes
     Facilitates communication with LLMs, supporting asynchronous processing and output management.
 
 Example:
--------
+--------
 Typical usage::
 
     import glyphdeck as gd

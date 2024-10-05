@@ -10,7 +10,7 @@ Classes
     Handles and processes data in a record-like structure, allowing for operations such as sanitization, data handling with LLMs, and more.
 
 Example:
--------
+--------
 Typical usage::
 
     import glyphdeck as gd

@@ -13,7 +13,7 @@ Functions
     Restores the logger configuration YAML file to its original state, useful for undoing changes.
 
 Example:
--------
+--------
 Typical usage::
 
     logger_config = access_logging_config()
