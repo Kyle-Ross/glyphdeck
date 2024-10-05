@@ -33,12 +33,12 @@ Typical usage example::
     )
     sanitiser.sanitise()
     print(sanitiser.output_data)
-
-    # 1: [
-    #     'I like apple bottom <CUST> <NUM>, <DATE>, <EMAIL>',
-    #     'My birthday is <DATES>',
-    #     'Product info: <URL> To order'
-    # ],
+>>> 
+1: [
+    'I like apple bottom <CUST> <NUM>, <DATE>, <EMAIL>',
+    'My birthday is <DATES>',
+    'Product info: <URL> To order'
+],
 
 """
 
