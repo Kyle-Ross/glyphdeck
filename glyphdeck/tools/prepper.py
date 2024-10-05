@@ -189,6 +189,11 @@ def prepare_csv(
     return prepare_df(source_table, id_column, data_columns)
 
 
+@log_decorator(
+    logger,
+    "debug",
+    suffix_message="Running type conditional dataframe prepper",
+)
 def prepare(
     data_source: Union[str, pd.DataFrame],
     id_column: str,
