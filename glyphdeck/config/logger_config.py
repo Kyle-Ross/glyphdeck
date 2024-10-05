@@ -25,9 +25,10 @@ Typical usage example:
 from typing import Optional, Tuple
 import oyaml as yaml
 import copy
+import os
 
-# Path to store and access logger config yaml file from
-_config_path = r"glyphdeck\config\_logger_config.yaml"
+# Absolute path to store and access logger config yaml file from
+_config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_logger_config.yaml")
 
 
 def access_logging_config() -> dict:
