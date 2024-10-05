@@ -14,11 +14,12 @@ Functions:
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
     logger_config = access_logging_config()
     set_logging_config(log_input_data=True, setting_type="granular")
     restore_logger_config()
+
 """
 
 from typing import Optional, Tuple
