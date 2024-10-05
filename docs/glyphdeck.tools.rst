@@ -15,14 +15,14 @@ glyphdeck.tools.prepper module
 ------------------------------
 
 .. automodule:: glyphdeck.tools.prepper
-   :members:
+   :members: prepare
    :show-inheritance:
 
 glyphdeck.tools.time module
 ---------------------------
 
 .. automodule:: glyphdeck.tools.time
-   :members:
+   :members: LogBlock
    :show-inheritance:
 
 Module contents
