@@ -11,7 +11,7 @@ Classes
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
     import glyphdeck as gd
 
