@@ -33,11 +33,8 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
-# Source to store templates that override the theme
+# Types of paths to exclude
 templates_path = ["_templates"]
-
-# Types of paths to include/exclude
-include_patterns = []
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Set your HTML theme here
