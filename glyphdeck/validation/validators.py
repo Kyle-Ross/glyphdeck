@@ -47,7 +47,7 @@ Functions
 
 Example:
 -------
-Typical usage example:
+Typical usage:
 
     sentiment_model = Sentiment(sentiment_score=0.5)
     print(sentiment_model)
