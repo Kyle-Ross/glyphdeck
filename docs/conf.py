@@ -44,7 +44,7 @@ autodoc_default_options = {
 
 # Types of paths to exclude
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "config\logger_levels.py"]
 
 # Set your HTML theme here
 html_theme = "sphinx_rtd_theme"
