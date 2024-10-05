@@ -10,15 +10,6 @@ Functions
 **delta_time_formatter**
     Formats seconds into a string with hours, minutes, and seconds.
 
-Example:
--------
-Typical usage example::
-
-    import time
-
-    with LogBlock("log message"):
-        time.sleep(3)
-
 """
 
 import logging
@@ -52,18 +43,18 @@ class LogBlock:
 
     Useful for timing glyphdeck workflows.
 
-    Usage:
-    ```
-    with LogBlock("Workflow Runtime"):
-        # Your code here
-    ```
-
     Attributes:
         logger: The logger instance used for logging messages.
         start_time: Time recorded at the start of the block.
         end_time: Time recorded at the end of the block.
         elapsed_time: Total time elapsed during the execution of the block.
         elapsed_time_seconds: Elapsed time formatted as a string in seconds.
+
+    Example:
+        >>> import time
+        >>> 
+        >>> with LogBlock("log message"):
+        >>>    time.sleep(3)
 
     """
 
