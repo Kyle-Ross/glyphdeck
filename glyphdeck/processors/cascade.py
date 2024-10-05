@@ -62,7 +62,7 @@ from glyphdeck.tools.logging_ import (
 )
 from glyphdeck.processors.sanitiser import Sanitiser
 from glyphdeck.processors.llm_handler import LLMHandler
-from glyphdeck.tools.prepper import type_conditional_prepare
+from glyphdeck.tools.prepper import prepare
 from glyphdeck.tools.directory_creators import create_files_directory
 from glyphdeck._path_constants import OUTPUT_FILES_DIR
 
@@ -122,7 +122,7 @@ class Cascade:
         }
 
         # Prepare the data depending on the data_source type
-        prep_results: Tuple[pd.DataFrame, DataDict] = type_conditional_prepare(
+        prep_results: Tuple[pd.DataFrame, DataDict] = prepare(
             data_source, id_column, data_columns, encoding, sheet_name
         )
 
