@@ -6,7 +6,9 @@ import os
 sys.path.insert(0, os.path.abspath("../glyphdeck"))
 
 # Accessing the poetry config toml file
-pyproject_toml = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../pyproject.toml")
+pyproject_toml = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "../pyproject.toml"
+)
 with open(pyproject_toml, "r") as f:
     poetry_toml = toml.load(f)
 
@@ -32,6 +34,13 @@ extensions = [
     # By default will ignore private objects with _leading underscore
     "sphinx.ext.napoleon",
 ]
+
+# Default options for every rst file
+autodoc_default_options = {
+    "members": True,
+    "show-inheritance": True,
+    "undoc-members": False,
+}
 
 # Types of paths to exclude
 templates_path = ["_templates"]
