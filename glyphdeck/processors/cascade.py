@@ -4,26 +4,36 @@ This class is the primary interface for the glyphdeck library.
 
 Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
 
-Classes
+Classes:
 -------
 **Cascade**
     Handles and processes data in a record-like structure, allowing for operations such as sanitization, data handling with LLMs, and more.
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
-    from <module_name> import Cascade
+    import glyphdeck as gd
 
-    cascade_instance = Cascade(data_source="data.csv", id_column="record_id", data_columns=["column1", "column2"])
-    cascade_instance.sanitiser.run("Sanitise record")
-    cascade_instance.set_llm_handler(provider="openai", model="gpt-3", system_message="Process data.", validation_model=None, cache_identifier="example_cache")
-    cascade_instance.llm_handler.run("Process with LLM")
-    output_df = cascade_instance.get_output(record_identifiers=5, output_type="dataframe", rebase=True)
-    cascade_instance.write_output(file_type="csv", file_name_prefix="output", record_identifiers=[5], rebase=True)
-
-This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable.
-It makes use of validated data types, with assertions for correctness.
+    cascade = gd.Cascade(
+        data_source="data.csv", 
+        id_column="record_id", 
+        data_columns=["column1", "column2"]
+    )
+    cascade.sanitiser.run("Sanitise record")
+    cascade.set_llm_handler(
+        provider="openai", 
+        model="gpt-3", 
+        system_message="Analyse the feedback and return results in the correct format.", 
+        validation_model=gd.validators.SubCats, 
+        cache_identifier="PizzaShopComment_Sub_Categories")
+    cascade.llm_handler.run("HandlerOutput1")
+    cascade.write_output(
+        file_type="csv", 
+        file_name_prefix="output", 
+        record_identifiers=["HandlerOutput1"], 
+        rebase=True
+    )
 
 """
 
