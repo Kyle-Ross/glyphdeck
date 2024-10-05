@@ -1,6 +1,6 @@
 """Provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
 
-Functions
+Functions:
 ---------
 **access_logging_config()**
     Reads the logger configuration YAML file and returns its content as a Python dictionary.
@@ -12,8 +12,8 @@ Functions
 **restore_logger_config()**
     Restores the logger configuration YAML file to its original state, useful for undoing changes.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     logger_config = access_logging_config()

@@ -45,12 +45,13 @@ Functions
 **list_models**
     Prints out the built-in validation models, listing their names and descriptions.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     sentiment_model = Sentiment(sentiment_score=0.5)
     print(sentiment_model)
+
 """
 
 from typing import Union, List

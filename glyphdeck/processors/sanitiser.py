@@ -9,13 +9,14 @@ Classes
 **Sanitiser**
     A class that sanitises strings by replacing private information with placeholders using predefined regex patterns.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     sanitise = Sanitiser(input_data)
     sanitise.add_pattern('custom_pattern', 'group_name', '<PLACEHOLDER>', 1.0, r'regex')
     sanitise.sanitise()
+
 """
 
 from typing import Union, Tuple, List, Dict, Any, Self

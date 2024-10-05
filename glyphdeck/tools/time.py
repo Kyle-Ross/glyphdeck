@@ -10,12 +10,13 @@ Functions
 **delta_time_formatter**
     Formats seconds into a string with hours, minutes, and seconds.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     with LogBlock("Example Workflow"):
         # Your code here
+
 """
 
 import logging

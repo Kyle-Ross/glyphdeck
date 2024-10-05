@@ -22,8 +22,8 @@ Functions
     Conditionally prepares data from various formats (dataframe, XLSX, CSV) into
     a common data dictionary format based on the type of data source provided.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     df, data_dict = prepare_xlsx("file.xlsx", "id_column", ["data_column1", "data_column2"])

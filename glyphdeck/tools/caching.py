@@ -4,14 +4,15 @@ Functions
 -------
 **openai_cache**: Decorator to cache the results of the OpenAI completions. If the result is already cached, it will be returned from the cache; otherwise, the API is called, and the result is cached for future use.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     @openai_cache(cache_dir="my_cache")
     async def my_openai_completion_function(self, *args, **kwargs):
         # Your function logic here
         ...
+
 """
 
 from typing import Tuple, Callable
@@ -51,7 +52,7 @@ def _cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
 )
 def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
     """Decorate a function to cache the results of OpenAI completions.
-    
+
     Function result will be taken from the cache if available, otherwise the function will call the API. When max size is reached the 'least recent use'
     records will be culled.
 

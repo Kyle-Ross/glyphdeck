@@ -9,8 +9,8 @@ Classes
 **Cascade**
     Handles and processes data in a record-like structure, allowing for operations such as sanitization, data handling with LLMs, and more.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     from <module_name> import Cascade
@@ -22,8 +22,9 @@ Typical usage example:
     output_df = cascade_instance.get_output(record_identifiers=5, output_type="dataframe", rebase=True)
     cascade_instance.write_output(file_type="csv", file_name_prefix="output", record_identifiers=[5], rebase=True)
 
-This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable. 
+This module relies on logging through `CascadeLogger` and decorators for enhancing function behavior, including caching where applicable.
 It makes use of validated data types, with assertions for correctness.
+
 """
 
 from datetime import datetime, timedelta
@@ -60,7 +61,7 @@ logger = CascadeLogger().setup()
 
 class Cascade:
     """Handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
-    
+
     Automatically validates and enforces all data movements against a common id, ensuring that each record has a unique,
     immutable identifier that remains consistent, regardless of other changes.
 

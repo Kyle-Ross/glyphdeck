@@ -8,8 +8,8 @@ Classes
 **LLMHandler**
     Facilitates communication with LLMs, supporting asynchronous processing and output management.
 
-Usage
------
+Example:
+-------
 Typical usage example:
 
     input_data = <Provide your input data dictionary>
