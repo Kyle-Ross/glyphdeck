@@ -2,13 +2,13 @@
 
 Functions
 ---------
-**get_xlsx(file_path, **kwargs)**
-    Reads an Excel file and returns its content as a DataFrame.
+**get_xlsx**
+    Checks the file path, then reads an Excel file and returns its content as a DataFrame.
 
-**get_csv(file_path, **kwargs)**
-    Reads a CSV file and returns its content as a DataFrame.
+**get_csv**
+    Checks the file path, then reads a CSV file and returns its content as a DataFrame.
 
-**file_validation(file_path)**
+**file_validation**
     Validates the provided file path and determines its type (either 'csv' or 'xlsx').
 
 """
