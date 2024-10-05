@@ -7,10 +7,10 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   glyphdeck.config
    glyphdeck.processors
-   glyphdeck.tools
    glyphdeck.validation
+   glyphdeck.config
+   glyphdeck.tools
 
 Module contents
 ---------------
