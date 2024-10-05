@@ -12,10 +12,12 @@ Functions
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
-    with LogBlock("Example Workflow"):
-        # Your code here
+    import time
+
+    with LogBlock("log message"):
+        time.sleep(3)
 
 """
 
