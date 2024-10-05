@@ -38,7 +38,7 @@ extensions = [
 # Default options for every rst file
 autodoc_default_options = {
     "members": True,
-    "show-inheritance": True,
+    "show-inheritance": False,
     "undoc-members": False,
 }
 

@@ -17,4 +17,3 @@ Module contents
 
 .. automodule:: glyphdeck
    :members:
-   :show-inheritance:
