@@ -5,56 +5,65 @@ The module supports configurations that allow uniform logging levels across all 
 Logger levels should not be configured from this object, but instead from the `set_logging_config()`
 function in the `logger_config` module.
 
-Logging Levels
---------------
+Attributes
+----------
+set_all_file_log_level : int
+    The default logging level for files.
+set_all_console_log_level : int
+    The default logging level for console output.
+data_types_file_log_level : int
+    The file logging level for data_types.
+data_types_console_log_level : int
+    The console logging level for data_types.
+prepper_file_log_level : int
+    The file logging level for prepper.
+prepper_console_log_level : int
+    The console logging level for prepper.
+cascade_file_log_level : int
+    The file logging level for cascade.
+cascade_console_log_level : int
+    The console logging level for cascade.
+sanitiser_file_log_level : int
+    The file logging level for sanitiser.
+sanitiser_console_log_level : int
+    The console logging level for sanitiser.
+validators_file_log_level : int
+    The file logging level for validators.
+validators_console_log_level : int
+    The console logging level for validators.
+llmhandler_file_log_level : int
+    The file logging level for llmhandler.
+llmhandler_console_log_level : int
+    The console logging level for llmhandler.
+cache_file_log_level : int
+    The file logging level for cache.
+cache_console_log_level : int
+    The console logging level for cache.
+workflow_file_log_level : int
+    The file logging level for base_workflow.
+workflow_console_log_level : int
+    The console logging level for base_workflow.
+strings_file_log_level : int
+    The file logging level for strings.
+strings_console_log_level : int
+    The console logging level for strings.
+time_file_log_level : int
+    The file logging level for time.
+time_console_log_level : int
+    The console logging level for time.
+file_importers_file_log_level : int
+    The file logging level for file_importers.
+file_importers_console_log_level : int
+    The console logging level for file_importers.
+unhandled_errors_file_log_level : int
+    The file logging level for unhandled errors.
+unhandled_errors_console_log_level : int
+    The console logging level for unhandled errors.
+log_input_data : bool
+    Control if input data will be logged.
+log_output_data : bool
+    Control if output data will be logged.
 
-- **set_all_file_log_level**: The default logging level for files.
-- **set_all_console_log_level**: The default logging level for console output.
-
-Logging Data Control
---------------------
-
-- **log_input_data**: Boolean flag indicating whether input data will be logged.
-- **log_output_data**: Boolean flag indicating whether output data will be logged.
-
-Component Logging Levels
-------------------------
-
-- **data_types_file_log_level**: The file logging level for data_types.
-- **data_types_console_log_level**: The console logging level for data_types.
-
-- **prepper_file_log_level**: The file logging level for prepper.
-- **prepper_console_log_level**: The console logging level for prepper.
-
-- **cascade_file_log_level**: The file logging level for cascade.
-- **cascade_console_log_level**: The console logging level for cascade.
-
-- **sanitiser_file_log_level**: The file logging level for sanitiser.
-- **sanitiser_console_log_level**: The console logging level for sanitiser.
-
-- **validators_file_log_level**: The file logging level for validators.
-- **validators_console_log_level**: The console logging level for validators.
-
-- **llmhandler_file_log_level**: The file logging level for llmhandler.
-- **llmhandler_console_log_level**: The console logging level for llmhandler.
-
-- **cache_file_log_level**: The file logging level for cache.
-- **cache_console_log_level**: The console logging level for cache.
-
-- **workflow_file_log_level**: The file logging level for base_workflow.
-- **workflow_console_log_level**: The console logging level for base_workflow.
-
-- **strings_file_log_level**: The file logging level for strings.
-- **strings_console_log_level**: The console logging level for strings.
-
-- **time_file_log_level**: The file logging level for time.
-- **time_console_log_level**: The console logging level for time.
-
-- **file_importers_file_log_level**: The file logging level for file_importers.
-- **file_importers_console_log_level**: The console logging level for file_importers.
-
-- **unhandled_errors_file_log_level**: The file logging level for unhandled errors.
-- **unhandled_errors_console_log_level**: The console logging level for unhandled errors.
 """
 
 from glyphdeck.config.logger_config import access_logging_config  # noqa: F401
