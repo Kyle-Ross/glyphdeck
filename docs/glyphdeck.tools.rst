@@ -11,13 +11,6 @@ glyphdeck.tools.logger\_interface module
    :members:
    :show-inheritance:
 
-glyphdeck.tools.logging\_ module
---------------------------------
-
-.. automodule:: glyphdeck.tools.logging_
-   :members:
-   :show-inheritance:
-
 glyphdeck.tools.prepper module
 ------------------------------
 
