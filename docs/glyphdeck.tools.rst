@@ -8,7 +8,7 @@ glyphdeck.tools.logger\_interface module
 ----------------------------------------
 
 .. automodule:: glyphdeck.tools.logger_interface
-   :members:
+   :members: Loggers
    :show-inheritance:
 
 glyphdeck.tools.prepper module
