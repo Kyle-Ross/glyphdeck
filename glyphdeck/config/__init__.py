@@ -1,9 +1,7 @@
-"""
-This package provides configuration and management functionalities for logging.
+"""Provides configuration and management functionalities for logging.
 
 Modules
 -------
-
 **logger_config**
     Contains functions for accessing, modifying, and restoring logger configurations using a YAML file.
 
