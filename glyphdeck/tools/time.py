@@ -1,5 +1,4 @@
-"""
-This module provides logging utilities for monitoring the and formatting the execution time of code segments.
+"""This module provides logging utilities for monitoring the and formatting the execution time of code segments.
 
 Classes
 -------
@@ -36,6 +35,7 @@ def delta_time_formatter(total_seconds: float) -> str:
 
     Returns:
         A string formatted as 'HHhMMmSSs' representing hours, minutes, and seconds (e.g '05h30m45s').
+
     """
     hours = int(total_seconds // 3600)
     minutes = int((total_seconds % 3600) // 60)
@@ -60,6 +60,7 @@ class LogBlock:
         end_time: Time recorded at the end of the block.
         elapsed_time: Total time elapsed during the execution of the block.
         elapsed_time_seconds: Elapsed time formatted as a string in seconds.
+
     """
 
     decorator_message = "in LogBlock"
@@ -67,12 +68,12 @@ class LogBlock:
     # Prepare the logger on initialisation
     @log_decorator(logger, show_nesting=False, suffix_message=decorator_message)
     def __init__(self, message, logger_arg: logging.Logger = logger):
-        """
-        Initializes LogBlock with a logger instance and a custom message.
+        """Initializes LogBlock with a logger instance and a custom message.
 
         Args:
             message (str): A custom message to include in the log.
             logger_arg (logging.Logger): A logging.Logger instance used for logging messages. Defaults to module logger.
+
         """
         self.message = message
         self.logger = logger_arg
@@ -84,6 +85,7 @@ class LogBlock:
 
         Returns:
             self: Returns the instance of LogBlock.
+
         """
         self._start_time: float = time.time()
         return self
@@ -97,6 +99,7 @@ class LogBlock:
             exc_type: Exception type (if an exception was raised).
             exc_value: Exception value (if an exception was raised).
             exc_tb: Traceback object (if an exception was raised).
+
         """
         self._end_time: float = time.time()
         self._elapsed_time: float = self._end_time - self._start_time

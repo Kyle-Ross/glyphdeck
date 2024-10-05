@@ -80,6 +80,7 @@ def prepare_df(
             dataframe, or if the column contains duplicate values.
         AssertionError: If `data_columns` is neither a string nor a list of
             strings, or if the list contains duplicate column names.
+
     """
     # Prepares a dataframe into the common data dict where keys are ids and values are lists of selected data column values.
     # Validates the provided arguments for id_columns and data_columns.
@@ -163,6 +164,7 @@ def prepare_xlsx(
         FileNotFoundError: If the specified XLSX file does not exist.
         ValueError: If the file cannot be read as an XLSX.
         AssertionError: If there are issues validating `id_column` or `data_columns`.
+
     """
     # Wrapper for prepare_df() that loads data from an xlsx file.
     source_table = get_xlsx(file_path, **kwargs)
@@ -195,6 +197,7 @@ def prepare_csv(
         FileNotFoundError: If the specified CSV file does not exist.
         ValueError: If the file cannot be read as a CSV.
         AssertionError: If there are issues validating `id_column` or `data_columns`.
+
     """
     # Wrapper for prepare_df() that loads data from a csv file.
     source_table = get_csv(file_path, **kwargs)
@@ -233,6 +236,7 @@ def type_conditional_prepare(
         FileNotFoundError: If the specified CSV/XLSX file does not exist.
         ValueError: If the file cannot be read as a CSV/XLSX.
         AssertionError: If there are issues validating `id_column` or `data_columns`.
+
     """
     # Runs the prepare operation differently depending on input format. Supports DataFrames, csv and xlsx.
     # Initialising variables

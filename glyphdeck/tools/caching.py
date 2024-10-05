@@ -1,5 +1,4 @@
-"""
-This module provides functionality to create and manage a cache directory for storing OpenAI completion results, utilizing disk-based caching to improve retrieval times and conserve API call limits.
+"""This module provides functionality to create and manage a cache directory for storing OpenAI completion results, utilizing disk-based caching to improve retrieval times and conserve API call limits.
 
 Functions
 -------
@@ -37,6 +36,7 @@ def _cache_creator(cache_dir: str, max_mb_size: int) -> Tuple[Cache, str]:
 
     Returns:
         Tuple containing the Cache object and the full path to the cache directory.
+
     """
     # Creates the caches directory and returns the full cache file path within
     full_cache_dir = os.path.join(create_caches_directory(logger), cache_dir)
@@ -60,6 +60,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
 
     Returns:
         A decorator that caches the result of the decorated function.
+
     """
     # Finds or creates the cache folder and object, as well as returning the directory of the cache
     cache, full_cache_dir = _cache_creator(cache_dir, max_mb_size)
@@ -73,6 +74,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
 
         Returns:
             The wrapper function that manages the caching logic.
+
         """
         # counter for the amount of completions
         completions = 0
@@ -82,6 +84,7 @@ def openai_cache(cache_dir: str, max_mb_size: int = 1000) -> Callable:
 
             Returns:
                 The result from the cache or the decorated function.
+
             """
             nonlocal completions
             # Accessing the self variables from the class in which this decorator is used

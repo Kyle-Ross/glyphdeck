@@ -80,6 +80,7 @@ class LLMHandler:
         new_output_data: Flattened output data to be generated.
         new_column_names: Generated column names to be used in the flattened output data.
         available_providers: List of LLM providers that are available.
+
     """
 
     @log_decorator(
@@ -93,6 +94,7 @@ class LLMHandler:
 
         Raises:
             AssertionError: If the validation model is not a subclass of the Pydantic BaseValidatorModel class.
+
         """
         check: bool = issubclass(self.validation_model, validators.BaseValidatorModel)
         assert_and_log_error(
@@ -143,6 +145,7 @@ class LLMHandler:
 
         Raises:
             AssertionError: If any of the provided arguments are of incorrect type or invalid values.
+
         """
         logger.debug(
             " | Function | LLMHandler.__init__() | Start | Initialising LLMHandler object"
@@ -287,6 +290,7 @@ class LLMHandler:
 
         Raises:
             AssertionError: If output_data is accessed before flatten_output_data() has been run.
+
         """
         # Accesses output data but only if the data has been flattened.
         assert_and_log_error(
@@ -313,6 +317,7 @@ class LLMHandler:
 
         Raises:
             AssertionError: If column_names is accessed before flatten_output_data() has been run.
+
         """
         assert_and_log_error(
             logger,
@@ -375,6 +380,7 @@ class LLMHandler:
 
         Raises:
             AssertionError: If the temperature value is not between 0 and 1.
+
         """
         # If no arguments are provided, uses the values set in the handler class instance
         # Necessary to do it this way since self is not yet defined in this function definition
@@ -459,6 +465,7 @@ class LLMHandler:
 
         Returns:
             List[Coroutine]: A list of created coroutines.
+
         """
         # Create and store the tasks across the whole variable in a list
         coroutines = []
@@ -481,6 +488,7 @@ class LLMHandler:
 
         Args:
             func: The function used to generate coroutines.
+
         """
         coroutines = await self._create_coroutines(func)
         # Loop over the futures
@@ -519,6 +527,7 @@ class LLMHandler:
 
         Returns:
             self: Instance of the LLMHandler class.
+
         """
         if self.provider_clean == "openai":
             asyncio.run(self._await_coroutines(self._async_openai))
@@ -538,6 +547,7 @@ class LLMHandler:
 
         Returns:
             Dictionary of flattened output data.
+
         """
         # Storage for key: list pairs representing rows
         _new_output_data = {}

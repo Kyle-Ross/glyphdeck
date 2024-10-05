@@ -1,5 +1,4 @@
-"""
-Provides functions to import data from Excel and CSV files, and validating file types.
+"""Provides functions to import data from Excel and CSV files, and validating file types.
 
 Functions
 ---------
@@ -39,6 +38,7 @@ def _assert_and_log_error_path(path: str, function_name: str):
 
     Raises:
         AssertionError: If the path is not a string.
+
     """
     assert_and_log_error(
         logger,
@@ -60,6 +60,7 @@ def get_xlsx(file_path: str, **kwargs) -> pd.DataFrame:
 
     Raises:
         AssertionError: If the file_path is not a string or the file does not exist.
+
     """
     # Wrapper for pd.read_excel with additional logic
     _assert_and_log_error_path(file_path, "get_xlsx()")
@@ -78,6 +79,7 @@ def get_csv(file_path: str, **kwargs) -> pd.DataFrame:
 
     Raises:
         AssertionError: If the file_path is not a string or the file does not exist.
+
     """
     # Wrapper for pd.read_csv with additional logic
     _assert_and_log_error_path(file_path, "get_csv()")
@@ -96,6 +98,7 @@ def file_validation(file_path: str) -> str:
 
     Raises:
         AssertionError: If the file_path is not a string, the file does not exist, or the file type is unsupported.
+
     """
     # Takes a file path, checks that the file exists and is in one of the compatible types, then returns the file type.
     # Validating input

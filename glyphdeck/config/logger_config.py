@@ -1,5 +1,4 @@
-"""
-This module provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
+"""This module provides functionality for accessing, modifying, and restoring the logger configuration contained with the `_logger_config.yaml` file.
 
 Functions
 ---------
@@ -28,7 +27,9 @@ import copy
 import os
 
 # Absolute path to store and access logger config yaml file from
-_config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_logger_config.yaml")
+_config_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "_logger_config.yaml"
+)
 
 
 def access_logging_config() -> dict:
@@ -52,6 +53,7 @@ class _LoggerConfig:
 
         Returns:
             LoggerConfig: The LoggerConfig instance.
+
         """
         with open(self.path, "r") as f:
             self.data = yaml.safe_load(f)
@@ -142,6 +144,7 @@ def set_logging_config(
             d (dict): The dictionary to modify.
             key (str): The key in the dictionary to modify.
             levels (Tuple[int]): A tuple of two integers representing the logging levels for the file and console.
+
         """
         # Assert provided arguments
         assert isinstance(d, dict), f"d is type '{type(d)}', expected dict"

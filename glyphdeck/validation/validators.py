@@ -1,5 +1,4 @@
-"""
-This module provides Pydantic models, types, fields, and classes for data validation.
+"""This module provides Pydantic models, types, fields, and classes for data validation.
 These models are designed to validate sentiment scores and category
 information which might be required as part of provider calls.
 
@@ -81,6 +80,7 @@ class BaseValidatorModel(BaseModel):
 
     Returns:
         BaseValidatorModel: An instance of the base validator model.
+
     """
 
     # Decorator needed to check field uses since the item_model inherits from base
@@ -93,6 +93,7 @@ class BaseValidatorModel(BaseModel):
 
         Returns:
             The validated value if it passes the check.
+
         """
         if isinstance(v, float) or v in (
             -1,
@@ -116,6 +117,7 @@ class BaseValidatorModel(BaseModel):
 
         Returns:
             The validated value if it is within the specified range.
+
         """
         global sentiment_min, sentiment_max
         if isinstance(v, float) or v in (-1, 0, 1):
@@ -140,6 +142,7 @@ class BaseValidatorModel(BaseModel):
 
         Returns:
             The validated list of values.
+
         """
         global sentiment_min, sentiment_max
         if isinstance(v, list):
@@ -176,6 +179,7 @@ class BaseValidatorModel(BaseModel):
 
         Returns:
             The validated list if it passes the check.
+
         """
         if isinstance(v, list):
             minimum: int = 1
@@ -197,6 +201,7 @@ class BaseValidatorModel(BaseModel):
 
         Returns:
             The validated list if it passes the check.
+
         """
         if isinstance(v, list):
             minimum: int = 1
@@ -267,6 +272,7 @@ class Sentiment(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 1
@@ -280,6 +286,7 @@ class PrimaryCat(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         primary_category: The primary category identified.
+
     """
 
     _field_count: int = 1
@@ -292,6 +299,7 @@ class Top5Cats(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         top_categories: The top 1 to 5 sub-categories identified inside the input in order of relevance.
+
     """
 
     _field_count: int = 1
@@ -304,6 +312,7 @@ class SubCats(BaseValidatorModel):
     Attributes:
         _field_count: The number of fields in the model.
         sub_categories: All sub-categories identified inside the input in order of relevance.
+
     """
 
     _field_count: int = 1
@@ -317,6 +326,7 @@ class PrimaryCatSentiment(BaseValidatorModel):
         _field_count: The number of fields in the model.
         primary_category: The primary category identified.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 2
@@ -331,6 +341,7 @@ class PrimarySubCat(BaseValidatorModel):
         _field_count: The number of fields in the model.
         primary_category: The primary category identified.
         sub_categories: All sub-categories identified inside the input in order of relevance.
+
     """
 
     _field_count: int = 2
@@ -345,6 +356,7 @@ class SubCatsSentiment(BaseValidatorModel):
         _field_count: The number of fields in the model.
         sub_categories: All sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 2
@@ -359,6 +371,7 @@ class SubCatsPerItemSentiment(BaseValidatorModel):
         _field_count: The number of fields in the model.
         sub_categories: All sub-categories identified inside the input in order of relevance.
         per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
+
     """
 
     _field_count: int = 2
@@ -374,6 +387,7 @@ class SubCatsPerItemOverallSentiment(BaseValidatorModel):
         sub_categories: All sub-categories identified inside the input in order of relevance.
         per_sub_category_sentiment_scores: A list of sentiment scores corresponding to the list of identified sub-categories.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 3
@@ -389,6 +403,7 @@ class TopCatsSentiment(BaseValidatorModel):
         _field_count: The number of fields in the model.
         top_categories: The top 1 to 5 sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 2
@@ -404,6 +419,7 @@ class CatHierarchySentiment(BaseValidatorModel):
         primary_category: The primary category identified.
         sub_categories: All sub-categories identified inside the input in order of relevance.
         sentiment_score: The overall sentiment score.
+
     """
 
     _field_count: int = 3
@@ -430,8 +446,7 @@ def list_models():
     ]
 
     def print_line(char: str, length: int, newlines_after: int):
-        """
-        Prints a line consisting of a repeated character followed by a specified number of newlines.
+        """Prints a line consisting of a repeated character followed by a specified number of newlines.
 
         Args:
             char (str): The character to repeat in the line.
@@ -440,6 +455,7 @@ def list_models():
 
         Returns:
             None
+
         """
         line = char * length
         newlines = "\n" * newlines_after

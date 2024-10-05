@@ -8,13 +8,14 @@ Classes
 
     Checks if loggers exist, and creates them if they do not.
 
-Example
+Example:
 -------
 Typical usage example:
 
     import glyphdeck as gd
 
     logger = gd.logger.cascade
+
 """
 
 # Import the python logging module
@@ -26,8 +27,7 @@ from . import logging_
 
 
 class Loggers:
-    """
-    A centralized logger setup for various components within the application,
+    """A centralized logger setup for various components within the application,
     essentially adds loggers to the public interface without changing their internal representation.
 
     On importing the glyphdeck module, an instance of this class called `logger` is created,
@@ -53,11 +53,11 @@ class Loggers:
     import glyphdeck as gd
     logger = gd.logger.cascade
     ```
+
     """
 
     def __init__(self):
-        """
-        Initializes a new instance of the Loggers class. All loggers are set
+        """Initializes a new instance of the Loggers class. All loggers are set
         to None initially and are created upon first access.
         """
         self._cascade = None
@@ -74,8 +74,7 @@ class Loggers:
         self._unhandled_errors = None
 
     def _get_or_create_logger(self, name, logger_class):
-        """
-        Gets an existing logger by name or creates one using the provided logger class.
+        """Gets an existing logger by name or creates one using the provided logger class.
 
         Args:
             name (str): The name of the logger.
@@ -83,6 +82,7 @@ class Loggers:
 
         Returns:
             logging.Logger: The logger instance.
+
         """
         existing_logger = logging.getLogger(name)
         if existing_logger.hasHandlers():
@@ -92,11 +92,11 @@ class Loggers:
 
     @property
     def cascade(self):
-        """
-        Gets the Cascade logger, initializing it if it doesn't already exist.
+        """Gets the Cascade logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Cascade logger instance.
+
         """
         if self._cascade is None:
             self._cascade = self._get_or_create_logger(
@@ -106,11 +106,11 @@ class Loggers:
 
     @property
     def llm_handler(self):
-        """
-        Gets the LLM handler logger, initializing it if it doesn't already exist.
+        """Gets the LLM handler logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The LLM handler logger instance.
+
         """
         if self._llm_handler is None:
             self._llm_handler = self._get_or_create_logger(
@@ -120,11 +120,11 @@ class Loggers:
 
     @property
     def sanitiser(self):
-        """
-        Gets the Sanitiser logger, initializing it if it doesn't already exist.
+        """Gets the Sanitiser logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Sanitiser logger instance.
+
         """
         if self._sanitiser is None:
             self._sanitiser = self._get_or_create_logger(
@@ -134,11 +134,11 @@ class Loggers:
 
     @property
     def cache(self):
-        """
-        Gets the Cache logger, initializing it if it doesn't already exist.
+        """Gets the Cache logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Cache logger instance.
+
         """
         if self._cache is None:
             self._cache = self._get_or_create_logger("cache", logging_.CacheLogger)
@@ -146,11 +146,11 @@ class Loggers:
 
     @property
     def file_importers(self):
-        """
-        Gets the File Importers logger, initializing it if it doesn't already exist.
+        """Gets the File Importers logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The File Importers logger instance.
+
         """
         if self._file_importers is None:
             self._file_importers = self._get_or_create_logger(
@@ -160,11 +160,11 @@ class Loggers:
 
     @property
     def prepper(self):
-        """
-        Gets the Prepper logger, initializing it if it doesn't already exist.
+        """Gets the Prepper logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Prepper logger instance.
+
         """
         if self._prepper is None:
             self._prepper
@@ -176,11 +176,11 @@ class Loggers:
 
     @property
     def string_tools(self):
-        """
-        Gets the String Tools logger, initializing it if it doesn't already exist.
+        """Gets the String Tools logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The String Tools logger instance.
+
         """
         if self._string_tools is None:
             self._string_tools = self._get_or_create_logger(
@@ -190,11 +190,11 @@ class Loggers:
 
     @property
     def time_tools(self):
-        """
-        Gets the Time Tools logger, initializing it if it doesn't already exist.
+        """Gets the Time Tools logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Time Tools logger instance.
+
         """
         if self._time_tools is None:
             self._time_tools = self._get_or_create_logger(
@@ -204,11 +204,11 @@ class Loggers:
 
     @property
     def data_types(self):
-        """
-        Gets the Data Types logger, initializing it if it doesn't already exist.
+        """Gets the Data Types logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Data Types logger instance.
+
         """
         if self._data_types is None:
             self._data_types = self._get_or_create_logger(
@@ -218,11 +218,11 @@ class Loggers:
 
     @property
     def validators(self):
-        """
-        Gets the Validators logger, initializing it if it doesn't already exist.
+        """Gets the Validators logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Validators logger instance.
+
         """
         if self._validators is None:
             self._validators = self._get_or_create_logger(
@@ -232,11 +232,11 @@ class Loggers:
 
     @property
     def workflow(self):
-        """
-        Gets the Workflow logger, initializing it if it doesn't already exist.
+        """Gets the Workflow logger, initializing it if it doesn't already exist.
 
         Returns:
             logging.Logger: The Workflow logger instance.
+
         """
         if self._workflow is None:
             self._workflow = self._get_or_create_logger(

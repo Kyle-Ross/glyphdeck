@@ -1,5 +1,4 @@
-"""
-A module for sanitising strings by replacing private information with placeholders.
+"""A module for sanitising strings by replacing private information with placeholders.
 
 This module provides a `Sanitiser` class used to identify and replace pieces of private information
 within strings using regular expression patterns. It supports sanitisation of emails, URLs, file paths,
@@ -68,6 +67,7 @@ class Sanitiser:
         inactive_groups: A list of inactive group names from the patterns dictionary.
         group_matches: A dictionary recording the number of matches per group.
         total_matches: The total number of matches for all patterns.
+
     """
 
     # Takes a string and uses selected patterns to replace private information with placeholders.
@@ -190,6 +190,7 @@ class Sanitiser:
 
         Raises:
             TypeError: If any placeholder contains non-alphabet characters excluding '<' and '>'.
+
         """
         for key, value in patterns_dict.items():
             if not all(char.isalpha() or char in "<>" for char in value["placeholder"]):
@@ -214,6 +215,7 @@ class Sanitiser:
 
         Returns:
             Dict: The sorted dictionary of patterns.
+
         """
         # Change the dict to a list with nested tuples and sort it by ascending rank
         sorted_items: List[Tuple[Any, Any]] = sorted(
@@ -236,6 +238,7 @@ class Sanitiser:
 
         Returns:
             str: The string without angle brackets.
+
         """
         input_string = input_string.replace("<", "").replace(">", "")
         return input_string
@@ -253,6 +256,7 @@ class Sanitiser:
 
         Returns:
             List[str]: A list of group names with the desired 'active' statuses.
+
         """
         groups: List = [
             value["group"]
@@ -272,6 +276,7 @@ class Sanitiser:
 
         Returns:
             None
+
         """
         self.input_data: DataDict = input_data
         # Will be changed by processes below
@@ -292,6 +297,7 @@ class Sanitiser:
 
         Returns:
             Self: The updated instance of the Sanitiser class.
+
         """
         # Uses update_group() to update all group references
         # Storing all the available pattern groups in a distinct lists for reference
@@ -310,6 +316,7 @@ class Sanitiser:
 
         Returns:
             Self: The updated instance of the Sanitiser class.
+
         """
         # Updates the per group match count dictionary and the overall count variable.
         # Based on the per regex counts in the 'patterns' dictionary.
@@ -338,6 +345,7 @@ class Sanitiser:
 
         Raises:
             KeyError: If a provided key does not exist in the available patterns.
+
         """
         # Function to change the placeholders from their defaults
         # Check supplied patterns all exist
@@ -373,6 +381,7 @@ class Sanitiser:
 
         Raises:
             KeyError: If a provided group does not exist in the available patterns.
+
         """
         # Function to select groups of patterns to run, updating the 'active' attribute in the instance.
         # Check that each pattern exists
@@ -400,6 +409,7 @@ class Sanitiser:
 
         Returns:
             Self: The updated instance of the Sanitiser class.
+
         """
         # Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
         # Making sure the patterns are run in order of rank regardless of other actions.
@@ -424,6 +434,7 @@ class Sanitiser:
 
         Raises:
             TypeError: If the placeholder contains invalid characters.
+
         """
         # Adds a new pattern to the 'patterns' dictionary, that will be run during the sanitise method
         # in addition to the existing patterns.
@@ -452,6 +463,7 @@ class Sanitiser:
 
         Returns:
             Self: The updated instance of the Sanitiser class.
+
         """
         # Run all selected patterns in order, updating the 'raw_output_data'.
         # Run every selected regex pattern for every item, in every list, in every key, in the self.raw_output_data dict.

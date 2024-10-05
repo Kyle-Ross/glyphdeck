@@ -1,5 +1,4 @@
-"""
-This module provides the `Cascade` class designed to manage, validate and process a sequence of data records.
+"""This module provides the `Cascade` class designed to manage, validate and process a sequence of data records.
 This class is the primary interface for the glyphdeck library.
 
 Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
@@ -58,8 +57,7 @@ logger = CascadeLogger().setup()
 
 
 class Cascade:
-    """
-    Handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
+    """Handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
     Automatically validates and enforces all data movements against a common id, ensuring that each record has a unique,
     immutable identifier that remains consistent, regardless of other changes.
 
@@ -72,6 +70,7 @@ class Cascade:
         expected_len (int): The number of values expected in each list in the records data.
         sanitiser (Sanitiser): An instance of the Sanitiser class to handle data sanitization.
         llm_handler (LLMHandler): An instance of LLMHandler to handle operations related to large language models.
+
     """
 
     @log_decorator(logger, "info", suffix_message="Initialise Cascade object")
@@ -94,8 +93,8 @@ class Cascade:
 
         Returns:
             None
-        """
 
+        """
         # Initialise the records and expected_len variables
         self.expected_len = 0
         self.records: RecordsDict = {
@@ -138,6 +137,7 @@ class Cascade:
                 outer_cascade: The Cascade instance that includes the Sanitise class.
                 use_selected: A boolean indicating whether to use selected data or not.
                 selected_data: Optional data dictionary to use when use_selected is True.
+
             """
 
             @log_decorator(logger, "info", suffix_message="cascade.sanitiser object")
@@ -150,6 +150,7 @@ class Cascade:
 
                 Returns:
                     None
+
                 """
                 # Pass all arguments to superclass
                 super(Sanitise, self).__init__(**kwargs)
@@ -168,6 +169,7 @@ class Cascade:
 
                 Returns:
                     The Sanitiser object, capable of being further used to cascade additional operations
+
                 """
                 # Check argument type
                 assert_and_log_error(
@@ -203,6 +205,7 @@ class Cascade:
             selected_input_data: The data dictionary selected for use by the handler.
             selected_column_names: A list of column names to be used by the handler, if specified.
             selected_record_title: The title of the selected record, used to keep the cache identifier unique.
+
         """
 
         @log_decorator(logger, "info", suffix_message="cascade.llm_handler object")
@@ -216,6 +219,7 @@ class Cascade:
                 *args: Variable length argument list passed to the LLMHandler.
                 **kwargs: Arbitrary keyword arguments passed to the LLMHandler. One of these keyword arguments should be 'outer_cascade',
                            which is a reference to the Cascade instance.
+
             """
             # Take the outer cascade reference
             outer_cascade = kwargs["outer_cascade"]
@@ -253,8 +257,8 @@ class Cascade:
 
             Returns:
                 int: The key of the active record.
-            """
 
+            """
             # Use the selected key to access the record
             if self.use_selected_of_record:
                 assert_and_log_error(
@@ -279,6 +283,7 @@ class Cascade:
 
             Returns:
                 List[str]: The list of active column names.
+
             """
             # Use data stored in self.selected_column_names
             if self.use_selected:
@@ -301,14 +306,14 @@ class Cascade:
         @property
         @log_decorator(logger, is_property=True)
         def active_input_data(self) -> DataDict:
-            """
-            Returns the input data to be used by the Handler, determined by the current selection state.
+            """Returns the input data to be used by the Handler, determined by the current selection state.
 
             If `self.use_selected` is True, it returns `self.selected_input_data`.
             Otherwise, it returns the data of the active record key.
 
             Returns:
                 DataDict: The input data dictionary to be used by the Handler.
+
             """
             # Use data stored in self.selected_input_data
             if self.use_selected:
@@ -338,6 +343,7 @@ class Cascade:
 
             Returns:
                 str: The title of the active record.
+
             """
             # Use data stored in self.selected_record_title
             if self.use_selected:
@@ -360,8 +366,7 @@ class Cascade:
             suffix_message="Set cascade.llm_handler to use the latest record",
         )
         def use_latest(self):
-            """
-            Sets the LLMHandler to use the latest record in the Cascade.
+            """Sets the LLMHandler to use the latest record in the Cascade.
 
             When invoked, this method ensures that the LLMHandler will operate
             on the latest record in the Cascade rather than any manually selected data.
@@ -371,6 +376,7 @@ class Cascade:
 
             Returns:
                 None
+
             """
             # Reset selection state, leading control flow to use latest values for all cascade.llm_handler access properties
             self.use_selected: bool = False
@@ -390,6 +396,7 @@ class Cascade:
 
             Returns:
                 None
+
             """
             # Assert the input type and assign the new record key
             assert_and_log_error(
@@ -431,6 +438,7 @@ class Cascade:
 
             Returns:
                 None
+
             """
             # Assert argument types, and check record title is unique
             assert_and_log_type_is_data(data, "data")
@@ -460,6 +468,7 @@ class Cascade:
 
             Returns:
                 Handler: The Handler object, allowing further cascadeed operations.
+
             """
             # Check the new title is unique before proceeding
             self.outer_cascade._title_validator(title)
@@ -480,8 +489,7 @@ class Cascade:
 
     @log_decorator(logger)
     def title_key(self, title: str) -> int:
-        """
-        Returns the record number for a given title.
+        """Returns the record number for a given title.
 
         Args:
             title: The title of the record to retrieve the key for.
@@ -491,6 +499,7 @@ class Cascade:
 
         Raises:
             TypeError: If the provided title does not exist in the records.
+
         """
         for record_num, record_dict in self.records.items():
             try:
@@ -516,6 +525,7 @@ class Cascade:
 
         Raises:
             TypeError: If the provided record_identifier is not an integer or string.
+
         """
         if isinstance(record_identifier, int):
             return self.records[record_identifier]
@@ -538,19 +548,20 @@ class Cascade:
 
         Returns:
             str: The title of the specified record.
+
         """
         return self.record(record_identifier)["title"]
 
     @log_decorator(logger)
     def dt(self, record_identifier: Union[int, str]) -> datetime:
-        """
-        Returns the datetime corresponding to the provided record_identifier.
+        """Returns the datetime corresponding to the provided record_identifier.
 
         Args:
             record_identifier: The record identifier, which can be an integer or a string.
 
         Returns:
             datetime: The datetime of the specified record.
+
         """
         return self.record(record_identifier)["dt"]
 
@@ -563,6 +574,7 @@ class Cascade:
 
         Returns:
             DataDict: The data dictionary of the specified record.
+
         """
         return self.record(record_identifier)["data"]
 
@@ -576,6 +588,7 @@ class Cascade:
 
         Returns:
             pd.DataFrame: The dataframe of the specified record.
+
         """
         # Create the record's dataframe if it didn't exist yet, and return it
         self.create_dataframes(record_identifier, recreate=recreate)
@@ -590,6 +603,7 @@ class Cascade:
 
         Returns:
             timedelta: The timedelta of the specified record.
+
         """
         return self.record(record_identifier)["delta"]
 
@@ -602,6 +616,7 @@ class Cascade:
 
         Returns:
             List[str]: The list of column names for the specified record.
+
         """
         return self.record(record_identifier)["column_names"]
 
@@ -612,8 +627,8 @@ class Cascade:
 
         Returns:
             Sanitiser: The updated sanitiser object.
-        """
 
+        """
         # Define the data to used based on settings
         new_data = (
             self.base_sanitiser.selected_data
@@ -663,8 +678,8 @@ class Cascade:
 
         Returns:
             None
-        """
 
+        """
         # Grab the latest_data and put it in front of the args (which won't include it)
         args = (
             self.latest_data,
@@ -695,6 +710,7 @@ class Cascade:
 
         Returns:
             int: The key of the latest record.
+
         """
         return max(self.records.keys())
 
@@ -705,6 +721,7 @@ class Cascade:
 
         Returns:
             RecordDict: The latest record data.
+
         """
         return self.record(self.latest_key)
 
@@ -715,6 +732,7 @@ class Cascade:
 
         Returns:
             str: The title of the latest record.
+
         """
         return self.title(self.latest_key)
 
@@ -725,6 +743,7 @@ class Cascade:
 
         Returns:
             datetime: The datetime of the latest record.
+
         """
         return self.dt(self.latest_key)
 
@@ -735,6 +754,7 @@ class Cascade:
 
         Returns:
             DataDict: The data dictionary of the latest record.
+
         """
         return self.data(self.latest_key)
 
@@ -748,6 +768,7 @@ class Cascade:
 
         Returns:
             pd.DataFrame: The DataFrame of the latest record.
+
         """
         return self.df(self.latest_key, recreate=recreate)
 
@@ -758,6 +779,7 @@ class Cascade:
 
         Returns:
             timedelta: The timedelta of the latest record.
+
         """
         return self.record_delta(self.latest_key)
 
@@ -768,6 +790,7 @@ class Cascade:
 
         Returns:
             List[str]: The list of column names of the latest record.
+
         """
         return self.column_names(self.latest_key)
 
@@ -778,6 +801,7 @@ class Cascade:
 
         Returns:
             timedelta: The overall timedelta from the initialisation to the latest record.
+
         """
         return self.latest_dt - self.dt(0)
 
@@ -790,6 +814,7 @@ class Cascade:
 
         Returns:
             None
+
         """
         self.expected_len = value
         return self
@@ -803,6 +828,7 @@ class Cascade:
 
         Returns:
             None
+
         """
 
         def key_list(key) -> list:
@@ -849,6 +875,7 @@ class Cascade:
 
         Returns:
             None
+
         """
         target_data: DataDict = self.data(record_identifier)
         target_title: str = self.title(record_identifier)
@@ -887,6 +914,7 @@ class Cascade:
 
         Returns:
             None
+
         """
         # This is necessary to maintain the uniqueness of the cache per-accessed record across the lifetime of a cascade instance.
 
@@ -924,6 +952,7 @@ class Cascade:
 
         Returns:
             None
+
         """
         # Adds a new record to the 'records' dictionary.
         if self.latest_key == 0 or update_expected_len:
@@ -989,8 +1018,8 @@ class Cascade:
 
         Returns:
             Self: The Cascade instance.
-        """
 
+        """
         # Type assertions
         assert_and_log_error(
             logger,
@@ -1055,8 +1084,8 @@ class Cascade:
 
         Returns:
             pd.DataFrame: The combined dataframe.
-        """
 
+        """
         # Create dataframes in the selected records
         # Use suffix ensures that all columns are suffixed with the record title, preventing duplicate columns
         self.create_dataframes(record_identifiers, use_suffix=True, recreate=recreate)
@@ -1092,6 +1121,7 @@ class Cascade:
 
         Returns:
             pd.DataFrame: The rebased dataframe.
+
         """
         # Does not append anything to the cascade and is intended as an easy way to get your final output.
 
@@ -1149,8 +1179,8 @@ class Cascade:
 
         Returns:
             Union[pd.DataFrame, List[pd.DataFrame], Dict[Union[int, str], pd.DataFrame]]: The output in the specified format.
-        """
 
+        """
         # Check the provided keys
         assert_and_log_is_type_or_list_of(
             record_identifiers, "record_identifiers", [str, int], allow_none=True
@@ -1277,8 +1307,8 @@ class Cascade:
 
         Returns:
             Self: The Cascade object, allowing further cascadeed operations.
-        """
 
+        """
         # Sub in reference to the latest record if None was provided
         if record_identifiers is None:
             record_identifiers = [self.latest_key]
@@ -1297,16 +1327,15 @@ class Cascade:
         )
 
         def make_path(title: str) -> str:
-            """
-            Generates the file path for a record based on the title.
+            """Generates the file path for a record based on the title.
 
             Args:
                 title: The title of the record.
 
             Returns:
                 str: The generated file path.
-            """
 
+            """
             # unction to generate file paths for records.
             formatted_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
             path_parts = [file_name_prefix, formatted_time]

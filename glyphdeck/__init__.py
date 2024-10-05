@@ -5,7 +5,7 @@ facilitating the fast development of robust, error free LLM data workflows.
 
 glyphdeck.Cascade():
 -------------------
-The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs. 
+The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
 
 It validates and enforces all data movements against a common id, ensuring that each record has a unique, immutable identifier that remains consistent, regardless of other changes.
 

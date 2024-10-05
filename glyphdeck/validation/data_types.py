@@ -1,5 +1,4 @@
-"""
-This module provides utility functions for data type assertions and validations.
+"""This module provides utility functions for data type assertions and validations.
 
 The provided functions aim to ensure that variables have expected types and
 log errors if the validation fails.
@@ -41,6 +40,7 @@ def assert_and_log_type_is_data(variable: DataDict, var_name: str):
 
     Raises:
         AssertionError: If the variable is not a dictionary or the dictionary does not have the expected types.
+
     """
     # Assert and log that a variable is custom type 'Data', and that the contained data is also of the correct type
     assert_and_log_error(
@@ -85,6 +85,7 @@ def assert_and_log_is_type_or_list_of(
             - If the variable is None and allow_none is False.
             - If the variable type is not in the allowed list types.
             - If any item in a list-type variable is not in the allowed list types.
+
     """
     # Assert and log that a variable is one of the allowed types, or a list containing only those allowed types
 

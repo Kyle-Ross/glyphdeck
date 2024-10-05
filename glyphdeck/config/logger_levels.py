@@ -1,5 +1,4 @@
-"""
-This module stores and distributes the logging levels for various components in the system
+"""This module stores and distributes the logging levels for various components in the system
 based on the logging configuration retrieved from `access_logging_config`. The
 module supports configurations that allow uniform logging levels across
 all components or granular levels for each component individually.

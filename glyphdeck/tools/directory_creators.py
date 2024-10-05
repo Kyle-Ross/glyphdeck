@@ -1,5 +1,4 @@
-"""
-This module provides functions for creating and managing output directories, and checking if they already exist.
+"""This module provides functions for creating and managing output directories, and checking if they already exist.
 
 Functions
 ---------
@@ -49,6 +48,7 @@ def create_directory(
 
     Returns:
         The path of the directory.
+
     """
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -70,6 +70,7 @@ def create_output_directory(logger_arg: logging.Logger) -> str:
 
     Returns:
         The path of the output directory.
+
     """
     return create_directory(OUTPUT_DIR, "Output", logger_arg)
 
@@ -82,6 +83,7 @@ def create_logs_directory(logger_arg: logging.Logger) -> str:
 
     Returns:
         The path of the logs directory.
+
     """
     return create_directory(OUTPUT_LOGS_DIR, "Logs", logger_arg)
 
@@ -94,6 +96,7 @@ def create_caches_directory(logger_arg: logging.Logger) -> str:
 
     Returns:
         The path of the caches directory.
+
     """
     return create_directory(OUTPUT_CACHES_DIR, "Caches", logger_arg)
 
@@ -106,6 +109,7 @@ def create_files_directory(logger_arg: logging.Logger) -> str:
 
     Returns:
         The path of the files directory.
+
     """
     return create_directory(OUTPUT_FILES_DIR, "Files", logger_arg)
 
@@ -118,6 +122,7 @@ def check_logs_directory() -> Tuple[bool, str, str]:
             - A boolean indicating whether the logs directory existed.
             - A log message describing the action taken.
             - The path of the logs directory.
+
     """
     # Checks and creates the logs directory and returns log messages but does not make the actual log
     if not os.path.exists(OUTPUT_LOGS_DIR):
