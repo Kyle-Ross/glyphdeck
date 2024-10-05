@@ -17,5 +17,4 @@ Module contents
 
 .. automodule:: glyphdeck
    :members:
-   :undoc-members:
    :show-inheritance:

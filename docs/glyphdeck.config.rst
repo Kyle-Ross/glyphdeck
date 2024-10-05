@@ -8,16 +8,7 @@ glyphdeck.config.logger\_config module
 --------------------------------------
 
 .. automodule:: glyphdeck.config.logger_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-glyphdeck.config.logger\_levels module
---------------------------------------
-
-.. automodule:: glyphdeck.config.logger_levels
-   :members:
-   :undoc-members:
+   :members: access_logging_config, set_logging_config, restore_logger_config
    :show-inheritance:
 
 Module contents
@@ -25,5 +16,4 @@ Module contents
 
 .. automodule:: glyphdeck.config
    :members:
-   :undoc-members:
    :show-inheritance:
