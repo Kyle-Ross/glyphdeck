@@ -28,7 +28,7 @@ from . import logging_
 
 
 class Loggers:
-    """Centralized logger setup for various components within the application.
+    """Centralized logger access for different types of loggers within the application.
 
     Primarily, it adds loggers to the public interface without changing their internal representation.
 
