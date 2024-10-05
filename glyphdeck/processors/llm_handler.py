@@ -10,19 +10,26 @@ Classes
 
 Example:
 -------
-Typical usage example:
+Typical usage example::
 
-    input_data = <Provide your input data dictionary>
-    llm_handler = LLMHandler(
-        input_data=input_data,
-        provider="openai",
-        model="gpt-3",
-        system_message="Your system message here",
-        validation_model=YourValidationModel,
-        cache_identifier="your_unique_identifier"
+    import glyphdeck as gd
+
+    input_data: gd.DataDict = {
+        1: ["berries", "insects", "small mammals"],
+        2: ["fruits", "fish", "seeds"],
+        3: ["nuts", "leaves", "grubs"],
+    }
+    
+    handler = gd.LLMHandler(
+        input_data,
+        provider="OpenAI",
+        model="gpt-4o-mini",
+        system_message=("Analyse & categorise the provided foods"),
+        validation_model=gd.validators.PrimaryCat,
+        cache_identifier="foodcategorisation"
     )
-    llm_handler.run_async().flatten_output_data(column_names=["your_column_names"])
-    print(llm_handler.output_data)
+    handler.flatten_output_data(["Col1", "Col2", "Col3"])
+    handler.output_data
 
 """
 
