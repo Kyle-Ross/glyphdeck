@@ -15,6 +15,7 @@
 
 .. automodule:: glyphdeck.tools.prepper
    :members: prepare
+   :exclude-members: prepare_df, prepare_csv, prepare_xlsx
 
 .time module
 ---------------------------
