@@ -1,6 +1,11 @@
 Quickstart
 =======================
 
+The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments.
+
+glyphdeck handles LLM data workflow data validation, sanitisation, transformation and step chaining,
+facilitating the fast development of robust, error free LLM data workflows.
+
 Installation
 ----------------------------------
 
