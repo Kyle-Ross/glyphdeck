@@ -139,7 +139,7 @@ class Cascade:
 
         # Inherit the sanitiser class and add new run method which writes records and uses the latest_data by default
         class Sanitise(BaseSanitiser):
-            """Sanitiser that is part of the Cascade class. This class inherits from Sanitiser and is used to sanitise and append data to the cascade.
+            """Sanitiser that is part of the Cascade class. This class inherits from BaseSanitiser and is used to sanitise and append data to the cascade.
 
             Attributes:
                 outer_cascade: The Cascade instance that includes the Sanitise class.
@@ -154,7 +154,7 @@ class Cascade:
 
                 Args:
                     outer_cascade: The Cascade instance that this Sanitise instance is a part of.
-                    **kwargs: Additional keyword arguments to be passed to the Sanitiser superclass.
+                    **kwargs: Additional keyword arguments to be passed to the BaseSanitiser superclass.
 
                 Returns:
                     None
