@@ -1,6 +1,6 @@
 """Pydantic models, types, fields, and classes for data validation.
 
-For use by the `LLMHandler` class to enforce specific output types from the LLM.
+For use by the `BaseLLMHandler` class to enforce specific output types from the LLM.
 
 Example:
 --------
