@@ -76,14 +76,9 @@ class BaseSanitiser:
         date_pattern3 (re.Pattern): A compiled regex pattern for matching dates like 1-mar-2022 and variations.
         number_regex (str): A regex pattern string for matching words that contain one or more digits.
         number_pattern (re.Pattern): A compiled regex pattern for matching words that contain one or more digits.
-        input_data (DataDict): The data to be sanitized.
-        output_data (DataDict): A deepcopy of input_data which will be modified.
         overall_run_state (bool): Indicates if any sanitisation has been run.
-        all_groups (List[str]): A list of all group names from the patterns dictionary.
         active_groups (List[str]): Active group names from the patterns dictionary.
         inactive_groups (List[str]): Inactive group names from the patterns dictionary.
-        group_matches (Dict[str, int]): A dictionary recording the number of matches per group.
-        total_matches (int): The total number of matches for all patterns.
 
     """
 
@@ -290,6 +285,13 @@ class BaseSanitiser:
         Args:
             input_data: The data to be sanitized.
             pattern_groups: A list of pattern groups to activate. Defaults to Non, which means all will be activated.
+
+        Attributes:
+            all_groups (List[str]): A list of all group names from the patterns dictionary.
+            group_matches (Dict[str, int]): A dictionary recording the number of matches per group.
+            input_data (DataDict): The data to be sanitized.
+            output_data (DataDict): A deepcopy of input_data which will be modified.
+            total_matches (int): The total number of matches for all patterns.
 
         Returns:
             None
