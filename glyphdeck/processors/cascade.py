@@ -114,6 +114,10 @@ class Cascade:
             }
         }
 
+        # If it's a string, put it in a list
+        if isinstance(data_columns, str):
+            data_columns = [data_columns]
+
         # Prepare the data depending on the data_source type
         prep_results: Tuple[pd.DataFrame, DataDict] = prepare(
             data_source, id_column, data_columns, encoding, sheet_name
