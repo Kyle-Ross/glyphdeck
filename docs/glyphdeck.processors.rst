@@ -20,12 +20,12 @@ Modules
 ----------------------------------------
 
 .. automodule:: glyphdeck.processors.llm_handler
-   :members: LLMHandler
+   :members: BaseLLMHandler
    :no-index:
 
 .sanitiser module
 -------------------------------------
 
 .. automodule:: glyphdeck.processors.sanitiser
-   :members: Sanitiser
+   :members: BaseLLMHandler
    :no-index:
