@@ -60,32 +60,30 @@ class BaseSanitiser:
     It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.
 
     Attributes:
-        email_regex: A regex pattern string for matching email addresses.
-        email_pattern: A compiled regex pattern for matching email addresses.
-        folder_path_regex: A regex pattern string for matching folder paths.
-        folder_path_pattern: A compiled regex pattern for matching folder paths.
-        file_path_regex: A regex pattern string for matching full file paths.
-        file_path_pattern: A compiled regex pattern for matching full file paths.
-        url_regex: A regex pattern string for matching URLs.
-        url_pattern: A compiled regex pattern for matching URLs.
-        date_regex1: A regex pattern string for matching dates in the form dd-mm-yyyy.
-        date_pattern1: A compiled regex pattern for matching dates in the form dd-mm-yyyy.
-        date_regex2: A regex pattern string for matching dates like 1 Jan 22 and variations.
-        date_pattern2: A compiled regex pattern for matching dates like 1 Jan 22 and variations.
-        date_regex3: A regex pattern string for matching dates like 1-mar-2022 and variations.
-        date_pattern3: A compiled regex pattern for matching dates like 1-mar-2022 and variations.
-        number_regex: A regex pattern string for matching words that contain one or more digits.
-        number_pattern: A compiled regex pattern for matching words that contain one or more digits.
-        PatternsDict: Typing alias for a dictionary of patterns.
-        patterns: A dictionary containing regex patterns and their associated metadata.
-        input_data: The data to be sanitized.
-        output_data: A deepcopy of input_data which will be modified.
-        overall_run_state: A boolean indicating if any sanitisation has been run.
-        all_groups: A list of all group names from the patterns dictionary.
-        active_groups: A list of active group names from the patterns dictionary.
-        inactive_groups: A list of inactive group names from the patterns dictionary.
-        group_matches: A dictionary recording the number of matches per group.
-        total_matches: The total number of matches for all patterns.
+        email_regex (str): A regex pattern string for matching email addresses.
+        email_pattern (re.Pattern): A compiled regex pattern for matching email addresses.
+        folder_path_regex (str): A regex pattern string for matching folder paths.
+        folder_path_pattern (re.Pattern): A compiled regex pattern for matching folder paths.
+        file_path_regex (str): A regex pattern string for matching full file paths.
+        file_path_pattern (re.Pattern): A compiled regex pattern for matching full file paths.
+        url_regex (str): A regex pattern string for matching URLs.
+        url_pattern (re.Pattern): A compiled regex pattern for matching URLs.
+        date_regex1 (str): A regex pattern string for matching dates in the form dd-mm-yyyy.
+        date_pattern1 (re.Pattern): A compiled regex pattern for matching dates in the form dd-mm-yyyy.
+        date_regex2 (str): A regex pattern string for matching dates like 1 Jan 22 and variations.
+        date_pattern2 (re.Pattern): A compiled regex pattern for matching dates like 1 Jan 22 and variations.
+        date_regex3 (str): A regex pattern string for matching dates like 1-mar-2022 and variations.
+        date_pattern3 (re.Pattern): A compiled regex pattern for matching dates like 1-mar-2022 and variations.
+        number_regex (str): A regex pattern string for matching words that contain one or more digits.
+        number_pattern (re.Pattern): A compiled regex pattern for matching words that contain one or more digits.
+        input_data (DataDict): The data to be sanitized.
+        output_data (DataDict): A deepcopy of input_data which will be modified.
+        overall_run_state (bool): Indicates if any sanitisation has been run.
+        all_groups (List[str]): A list of all group names from the patterns dictionary.
+        active_groups (List[str]): Active group names from the patterns dictionary.
+        inactive_groups (List[str]): Inactive group names from the patterns dictionary.
+        group_matches (Dict[str, int]): A dictionary recording the number of matches per group.
+        total_matches (int): The total number of matches for all patterns.
 
     """
 
