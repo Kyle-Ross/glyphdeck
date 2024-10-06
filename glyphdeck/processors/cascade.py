@@ -4,11 +4,6 @@ This class is the primary interface for the glyphdeck library.
 
 Inherits the functionalities of other modules across the library for seemless use, including the sanitiser & llm_handler.
 
-Classes
--------
-**Cascade**
-    Handles and processes data in a record-like structure, allowing for operations such as sanitization, data handling with LLMs, and more.
-
 Example:
 --------
 Typical usage::

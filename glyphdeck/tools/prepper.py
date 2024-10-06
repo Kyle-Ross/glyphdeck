@@ -3,12 +3,6 @@
 Provides functions to transform and extract data from dataframes,
 CSV files, and XLSX files into the common Data dictionary format.
 
-Functions
----------
-**prepare**
-    Prepares data from various formats (dataframe, XLSX, CSV) into
-    a common data dictionary format based on the type of data source provided.
-
 Example:
 --------
 Typical usage::

@@ -2,49 +2,6 @@
 
 For use by the `LLMHandler` class to enforce specific output types from the LLM.
 
-Classes
--------
-**BaseValidatorModel**
-    Acts as a base class providing common field validation methods for sentiment and category related data.
-
-**Sentiment**
-    A validation model representing sentiment scores.
-
-**PrimaryCat**
-    A validation model representing the primary category identified from the input.
-
-**Top5Cats**
-    A validation model for representing the top 1 to 5 categories identified.
-
-**SubCats**
-    A validation model representing sub-categories identified from the input.
-
-**PrimaryCatSentiment**
-    A validation model combining a primary category with its associated sentiment score.
-
-**PrimarySubCat**
-    A validation model pairing a primary category with its sub-categories.
-
-**SubCatsSentiment**
-    A validation model for sub-categories with an associated overall sentiment score.
-
-**SubCatsPerItemSentiment**
-    A validation model representing sub-categories each with individual sentiment scores.
-
-**SubCatsPerItemOverallSentiment**
-    A validation model for sub-categories having individual sentiment scores as well as an overall sentiment score.
-
-**TopCatsSentiment**
-    A validation model for top sub-categories with an associated overall sentiment score.
-
-**CatHierarchySentiment**
-    A validation model representing a category hierarchy with an associated overall sentiment score.
-
-Functions
----------
-**list_models**
-    Prints out the built-in validation models, listing their names and descriptions.
-
 Example:
 --------
 Typical usage:

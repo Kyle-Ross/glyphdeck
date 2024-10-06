@@ -4,11 +4,6 @@ This module provides a `Sanitiser` class used to identify and replace pieces of 
 within strings using regular expression patterns. It supports sanitisation of emails, URLs, file paths,
 folder paths, dates, and numbers.
 
-Classes
--------
-**Sanitiser**
-    A class that sanitises strings by replacing private information with placeholders using predefined regex patterns.
-
 Example:
 --------
 Typical usage::

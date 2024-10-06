@@ -1,17 +1,4 @@
-"""Functions to import data from Excel and CSV files, and validating file types.
-
-Functions
----------
-**get_xlsx**
-    Checks the file path, then reads an Excel file and returns its content as a DataFrame.
-
-**get_csv**
-    Checks the file path, then reads a CSV file and returns its content as a DataFrame.
-
-**file_validation**
-    Validates the provided file path and determines its type (either 'csv' or 'xlsx').
-
-"""
+"""Functions to import data from Excel and CSV files, and validating file types."""
 
 from typing import Optional, Any
 import os

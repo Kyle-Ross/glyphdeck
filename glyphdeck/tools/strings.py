@@ -1,11 +1,4 @@
-"""Tools for cleaning strings in the application.
-
-Functions
----------
-**string_cleaner**
-    Cleans a given string by trimming whitespace, converting it to lowercase,
-    and removing spaces.
-"""
+"""Tools for cleaning strings in the application."""
 
 from glyphdeck.tools.logging_ import StringsToolsLogger, log_decorator
 

@@ -1,26 +1,4 @@
-"""Functions for checking, creating and managing output directories.
-
-Functions
----------
-**create_directory**
-    Creates a specified directory if it doesn't exist and logs the action.
-
-**create_output_directory**
-    Ensures the output directory exists and logs the result.
-
-**create_logs_directory**
-    Ensures the logs directory exists and logs the result.
-
-**create_caches_directory**
-    Ensures the caches directory exists and logs the result.
-
-**create_files_directory**
-    Ensures the files directory exists and logs the result.
-
-**check_logs_directory**
-    Checks if the logs directory exists, creates it if not, and returns status
-    information about the directory.
-"""
+"""Functions for checking, creating and managing output directories."""
 
 from typing import Tuple
 import logging

@@ -7,8 +7,8 @@ different components of the project. All paths are configured relative to the
 root directory, which is assumed to be the directory where this script is
 located.
 
-Paths
------
+Attributes
+----------
 **ROOT_DIR**
   Root directory of the project.
 
@@ -35,6 +35,7 @@ Paths
 
 **OUTPUT_LOGS_DIR**
   Path to the logs directory within the output directory.
+
 """
 
 import os

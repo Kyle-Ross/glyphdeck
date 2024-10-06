@@ -1,16 +1,4 @@
-"""Logging utilities for monitoring and formatting the execution time of code segments.
-
-Classes
--------
-**LogBlock**
-    Context manager that logs the time elapsed over the total runtime of a block. Useful for timing workflows.
-
-Functions
----------
-**delta_time_formatter**
-    Formats seconds into a string with hours, minutes, and seconds.
-
-"""
+"""Logging utilities for monitoring and formatting the execution time of code segments."""
 
 import logging
 import time

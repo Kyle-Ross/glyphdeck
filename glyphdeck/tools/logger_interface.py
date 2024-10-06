@@ -16,18 +16,18 @@ class Loggers:
     providing the interface for the loggers.
 
     Attributes:
-        cascade (type: logging.Logger): Handles Cascade related logging.
-        llm_handler (type: logging.Logger): Handles logging for language model handler operations.
-        sanitiser (type: logging.Logger): Logs activities related to the Sanitiser class.
-        cache (type: logging.Logger): Manages cache-related logging.
-        file_importers (type: logging.Logger): Logs events related to file importing tools.
-        prepper (type: logging.Logger): Logs activities in data preparation.
-        string_tools (type: logging.Logger): Handles logging for string manipulation tools.
-        time_tools (type: logging.Logger): Logs activities related to time-related tools.
-        data_types (type: logging.Logger): Manages logging for data type operations.
-        validators (type: logging.Logger): Logs validation operations.
-        workflow (type: logging.Logger): Logs workflow-related activities.
-        unhandled_errors (type: logging.Logger): Captures any other errors that are not explicitly handled.
+        cascade (`logging.Logger`): Handles Cascade related logging.
+        llm_handler (`logging.Logger`): Handles logging for language model handler operations.
+        sanitiser (`logging.Logger`): Logs activities related to the Sanitiser class.
+        cache (`logging.Logger`): Manages cache-related logging.
+        file_importers (`logging.Logger`): Logs events related to file importing tools.
+        prepper (`logging.Logger`): Logs activities in data preparation.
+        string_tools (`logging.Logger`): Handles logging for string manipulation tools.
+        time_tools (`logging.Logger`): Logs activities related to time-related tools.
+        data_types (`logging.Logger`): Manages logging for data type operations.
+        validators (`logging.Logger`): Logs validation operations.
+        workflow (`logging.Logger`): Logs workflow-related activities.
+        unhandled_errors (`logging.Logger`): Captures any other errors that are not explicitly handled.
 
     Usage:
     ----------

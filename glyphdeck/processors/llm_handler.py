@@ -3,11 +3,6 @@
 This module provides functionalities for processing input data through a selected LLM, validating outputs,
 and retrieving results. It includes options for caching responses and handling asynchronous requests.
 
-Classes
--------
-**LLMHandler**
-    Facilitates communication with LLMs, supporting asynchronous processing and output management.
-
 Example:
 --------
 Typical usage::

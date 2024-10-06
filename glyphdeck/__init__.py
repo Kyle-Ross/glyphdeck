@@ -3,17 +3,12 @@
 glyphdeck handles LLM data workflow data validation, sanitisation, transformation and step chaining,
 facilitating the fast development of robust, error free LLM data workflows.
 
-glyphdeck.Cascade():
---------------------
+Interface:
+----------
+
 The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
 
 It validates and enforces all data movements against a common id, ensuring that each record has a unique, immutable identifier that remains consistent, regardless of other changes.
-
-**cascade.llm_handler**
-    Handles the complex asynchronous interaction with LLM providers in the Cascade instance.
-
-**cascade.sanitiser**
-    Optionally strip out private information before asynchronous requests are sent to the LLM.
 
 Telemetry:
 ----------
