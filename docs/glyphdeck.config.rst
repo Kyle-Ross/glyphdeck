@@ -1,9 +1,6 @@
 .config package
 ========================
 
-About
----------------
-
 .. automodule:: glyphdeck.config
    :members:
 

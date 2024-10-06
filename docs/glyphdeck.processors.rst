@@ -1,9 +1,6 @@
 .processors package
 ============================
 
-About
----------------
-
 .. automodule:: glyphdeck.processors
 
 .cascade module

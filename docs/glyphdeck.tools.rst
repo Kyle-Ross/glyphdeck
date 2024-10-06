@@ -1,9 +1,6 @@
 .tools package
 =======================
 
-About
----------------
-
 .. automodule:: glyphdeck.tools
    :members:
 

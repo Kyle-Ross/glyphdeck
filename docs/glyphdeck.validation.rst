@@ -1,12 +1,6 @@
 .validation package
 ============================
 
-About
----------------
-
-.. automodule:: glyphdeck.validation
-   :members:
-
 
 .data\_types module
 ---------------------------------------

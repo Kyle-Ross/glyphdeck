@@ -54,7 +54,7 @@ exclude_patterns = [
     "tools/file_importers.py",
     "tools/directory_creators.py",
     "tools/caching.py",
-    "tools/logging_.py"
+    "tools/logging_.py",
 ]
 
 # Set your HTML theme here
