@@ -4,11 +4,12 @@ Defines classes and functions to create, configure, and manage loggers,
 ensuring consistent error handling across different parts of the system.
 """
 
+from typing import Type, Callable, Optional
+from functools import wraps
 import traceback
 import logging
 import os
 import sys
-from typing import Type, Callable, Optional
 
 from glyphdeck.tools.directory_creators import check_logs_directory
 import glyphdeck.config.logger_levels as logger_levels
@@ -180,6 +181,8 @@ def log_decorator(
         )
         finish_message = " | ".join(finish_message_list)
 
+        # Adding wrapper to maintain docstring of original function
+        @wraps(func)
         def inner_wrapper(*args, **kwargs) -> Callable:
             def conditional_log(message: str):
                 """Record a log at a level specified by the provided decorator argument.
