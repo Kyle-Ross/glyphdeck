@@ -77,8 +77,8 @@ class Cascade:
     Attributes:
         records (Dict[int, RecordDict]): A dictionary to hold all records.
         expected_len (int): The number of values expected in each list in the records data.
-        sanitiser (Sanitiser): An instance of the Sanitiser class to handle data sanitization.
-        llm_handler (LLMHandler): An instance of LLMHandler to handle operations related to large language models.
+        sanitiser (BaseSanitiser): An instance of the BaseSanitiser class to handle data sanitization.
+        llm_handler (BaseLLMHandler): An instance of BaseLLMHandler to handle operations related to large language models.
 
     """
 
@@ -199,11 +199,11 @@ class Cascade:
         # Call this using the self.sanitiser property so input_data is updated with the default latest data
         self.base_sanitiser = Sanitise(outer_cascade=self, input_data=self.latest_data)
 
-    # Inherit the LLMHandler class and add new run method which writes records and uses the latest_data by default
+    # Inherit the BaseLLMHandler class and add new run method which writes records and uses the latest_data by default
     # Abstractions required intricate juggling of args and kwargs to pass the context of the current cascade instance...
     # ... as well as implement a reference to that instance's self.latest_data property
     class _Handler(BaseLLMHandler):
-        """Inherits from LLMHandler, handles the interaction with LLM providers and manages the processing of input data for asynchronous querying.
+        """Inherits from BaseLLMHandler, handles the interaction with LLM providers and manages the processing of input data for asynchronous querying.
 
         Attributes:
             outer_cascade: Reference to the Cascade instance that this Handler is associated with.
@@ -220,12 +220,12 @@ class Cascade:
         def __init__(self, *args, **kwargs):
             """Initialize the Handler class with the provided arguments and Keyword arguments.
 
-            This constructor method passes all input parameters to the superclass (LLMHandler) constructor,
+            This constructor method passes all input parameters to the superclass (BaseLLMHandler) constructor,
             while also storing a reference to the Cascade instance it is associated with.
 
             Args:
-                *args: Variable length argument list passed to the LLMHandler.
-                **kwargs: Arbitrary keyword arguments passed to the LLMHandler. One of these keyword arguments should be 'outer_cascade',
+                *args: Variable length argument list passed to the BaseLLMHandler.
+                **kwargs: Arbitrary keyword arguments passed to the BaseLLMHandler. One of these keyword arguments should be 'outer_cascade',
                            which is a reference to the Cascade instance.
 
             """
@@ -374,9 +374,9 @@ class Cascade:
             suffix_message="Set cascade.llm_handler to use the latest record",
         )
         def use_latest(self):
-            """Set the LLMHandler to use the latest record in the Cascade.
+            """Set the _Handler to use the latest record in the Cascade.
 
-            When invoked, this method ensures that the LLMHandler will operate
+            When invoked, this method ensures that the _Handler will operate
             on the latest record in the Cascade rather than any manually selected data.
 
             Args:
@@ -466,16 +466,16 @@ class Cascade:
 
         @log_decorator(logger, "info", suffix_message="Use cascade.llm_handler.run()")
         def run(self, title):
-            """Run the LLMHandler and appends the results to the cascade.
+            """Run the _Handler and appends the results to the cascade.
 
-            The function will process the LLMHandler with the current settings and append
+            The function will process the _Handler with the current settings and append
             the resulting output data to the cascade as a new record with the specified title.
 
             Args:
                 title (str): The title to be assigned to the new record in the cascade.
 
             Returns:
-                Handler: The Handler object, allowing further cascadeed operations.
+                _Handler: The _Handler object, allowing further cascadeed operations.
 
             """
             # Check the new title is unique before proceeding
