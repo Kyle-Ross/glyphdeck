@@ -1,15 +1,12 @@
-gd.config
+gd.config\\
 =================================
 
 .. automodule:: glyphdeck.config
    :members:
 
 
-Modules
-----------------------------------
-
 .logger\_config
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 .. automodule:: glyphdeck.config.logger_config
    :members: access_logging_config, set_logging_config, restore_logger_config

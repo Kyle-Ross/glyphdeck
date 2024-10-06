@@ -1,18 +1,15 @@
-gd.validation
+gd.validation\\
 ============================
 
-Modules
-----------------------------------
-
 .data\_types
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 .. automodule:: glyphdeck.validation.data_types
    :members: DataDict, Optional_DataDict, 
              RecordDict, RecordsDict
 
 .validators
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 .. automodule:: glyphdeck.validation.validators
    :members:
