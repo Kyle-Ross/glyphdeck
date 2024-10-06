@@ -1,3 +1,4 @@
+from datetime import datetime
 import toml
 import sys
 import os
@@ -15,8 +16,9 @@ with open(pyproject_toml, "r") as f:
 # Use the name from pyproject.toml
 project = poetry_toml["tool"]["poetry"]["name"]
 
-# %Y is replaced with the current year
-copyright = "%Y, Kyle Ross"
+# Set copyright with the current year
+current_year = datetime.now().year
+copyright = f"{current_year}, Kyle Ross"
 
 # Use the author from pyproject.toml
 author = poetry_toml["tool"]["poetry"]["authors"][0]
