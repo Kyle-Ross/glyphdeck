@@ -77,8 +77,6 @@ class Cascade:
     Attributes:
         records (Dict[int, RecordDict]): A dictionary to hold all records.
         expected_len (int): The number of values expected in each list in the records data.
-        sanitiser (BaseSanitiser): An instance of the BaseSanitiser class to handle data sanitization.
-        llm_handler (BaseLLMHandler): An instance of BaseLLMHandler to handle operations related to large language models.
 
     """
 
