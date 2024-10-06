@@ -4,9 +4,11 @@
 Contents
 ---------------
 
+.. Just gets the package docstring
 .. automodule:: glyphdeck.validation
-   :members:
-
+   :members: 
+   :exclude-members: *
+   :no-index:
 
 Modules
 ---------------

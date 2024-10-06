@@ -4,8 +4,11 @@
 Contents
 ---------------
 
+.. Just gets the package docstring
 .. automodule:: glyphdeck.processors
-   :members:
+   :members: 
+   :exclude-members: *
+   :no-index:
 
 Modules
 ---------------
@@ -20,12 +23,11 @@ Modules
 ----------------------------------------
 
 .. automodule:: glyphdeck.processors.llm_handler
-   :members: LLMHandler
-   :no-index:
+   :members: BaseLLMHandler
 
 .sanitiser module
 -------------------------------------
 
 .. automodule:: glyphdeck.processors.sanitiser
-   :members: Sanitiser
+   :members: BaseSanitiser
    :no-index:
