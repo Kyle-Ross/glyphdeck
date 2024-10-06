@@ -35,8 +35,6 @@ extensions = [
     # Support for Google and NumPy style docstrings
     # By default will ignore private objects with _leading underscore
     "sphinx.ext.napoleon",
-    # Makes the search results look better
-    "sphinxprettysearchresults",
     # Adds emoji compatibility
     "sphinxemoji.sphinxemoji",
 ]
