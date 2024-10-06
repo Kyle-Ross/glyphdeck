@@ -1,0 +1,5 @@
+glyphdeck
+=========
+
+.. automodule:: glyphdeck
+   :members:

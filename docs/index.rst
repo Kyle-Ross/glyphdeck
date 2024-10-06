@@ -14,6 +14,7 @@ documentation for details.
 .. toctree::
    :maxdepth: 3
 
+   glyphdeck
    glyphdeck.processors
    glyphdeck.validation
    glyphdeck.config
