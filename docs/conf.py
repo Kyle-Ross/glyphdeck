@@ -62,5 +62,9 @@ exclude_patterns = [
 ]
 
 # Set your HTML theme here
-html_theme = "furo"
+html_theme = "insegel"
 html_static_path = ["_static"]
+html_theme_options = {
+    'navigation_depth': 1
+}
+html_logo = "logo.png"
