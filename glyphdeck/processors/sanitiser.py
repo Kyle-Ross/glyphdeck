@@ -1,6 +1,6 @@
 r"""A module for sanitising strings by replacing private information with placeholders.
 
-This module provides a `Sanitiser` class used to identify and replace pieces of private information
+This module provides a `BaseSanitiser` class used to identify and replace pieces of private information
 within strings using regular expression patterns. It supports sanitisation of emails, URLs, file paths,
 folder paths, dates, and numbers.
 
@@ -18,7 +18,7 @@ Typical usage::
         ],
     }
 
-    sanitiser = Sanitiser(private_data, pattern_groups=["number", "date", "email"])
+    sanitiser = BaseSanitiser(private_data, pattern_groups=["number", "date", "email"])
     santiser_obj.add_pattern(
         pattern_name="custom",
         group="custom_group",
@@ -54,7 +54,7 @@ from glyphdeck.validation.data_types import DataDict
 logger = SanitiserLogger().setup()
 
 
-class Sanitiser:
+class BaseSanitiser:
     """Sanitises strings by replacing private information with placeholders.
 
     It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.

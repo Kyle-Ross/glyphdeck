@@ -16,7 +16,7 @@ test_data: gd.DataDict = {
 ic(test_data)
 
 print("\nCreate the handler object")
-handler = gd.LLMHandler(
+handler = gd.BaseLLMHandler(
     test_data,
     provider="OpenAI",
     model="gpt-4o-mini",

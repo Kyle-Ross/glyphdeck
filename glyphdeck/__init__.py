@@ -60,8 +60,8 @@ Here is a basic example of how to use the main features of the glyphdeck library
 from .processors.cascade import Cascade
 
 # These are for direct access to Data transformation outside of the chain
-from .processors.llm_handler import LLMHandler
-from .processors.sanitiser import Sanitiser
+from .processors.llm_handler import BaseLLMHandler
+from .processors.sanitiser import CoreSanitiser
 from glyphdeck.validation import validators
 from .tools.prepper import prepare
 
@@ -86,8 +86,8 @@ from .tools.time import LogBlock
 # This makes it clear what the intended public interface is
 __all__ = [
     "Cascade",
-    "LLMHandler",
-    "Sanitiser",
+    "BaseLLMHandler",
+    "CoreSanitiser",
     "validators",
     "prepare",
     "access_logging_config",

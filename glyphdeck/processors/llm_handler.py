@@ -15,7 +15,7 @@ Typical usage::
         3: ["nuts", "leaves", "grubs"],
     }
 
-    handler = gd.LLMHandler(
+    handler = gd.BaseLLMHandler(
         input_data,
         provider="OpenAI",
         model="gpt-4o-mini",
@@ -61,7 +61,7 @@ logger = LLMHandlerLogger().setup()
 logger.debug(" | Step | llm_handler.py | Action | Initialised logger")
 
 
-class LLMHandler:
+class BaseLLMHandler:
     """Handler for interacting with Large Language Models (LLMs) and managing their settings, inputs, and outputs.
 
     It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.

@@ -32,7 +32,7 @@ test_data: gd.DataDict = {
 class TestSanitiser(unittest.TestCase):
     def setUp(self):
         self.data_example = test_data
-        self.santiser_obj = gd.Sanitiser(
+        self.santiser_obj = gd.CoreSanitiser(
             self.data_example, pattern_groups=["number", "date", "email"]
         )
 

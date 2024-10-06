@@ -30,7 +30,9 @@ data_example: gd.DataDict = {
 # If you don't add an argument it will use all of them
 print("\nInitialise the santiser_obj")
 print("Not specifying the groups will make all the default groups be used")
-santiser_obj = ic(gd.Sanitiser(data_example, pattern_groups=["number", "date", "email"]))
+santiser_obj = ic(
+    gd.CoreSanitiser(data_example, pattern_groups=["number", "date", "email"])
+)
 
 print("\nGroups based on __init__")
 ic(santiser_obj.all_groups)
