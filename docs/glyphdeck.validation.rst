@@ -6,7 +6,6 @@ About
 
 .. automodule:: glyphdeck.validation
    :members:
-   :no-index:
 
 
 .data\_types module
@@ -15,7 +14,6 @@ About
 .. automodule:: glyphdeck.validation.data_types
    :members: DataDict, Optional_DataDict, 
              RecordDict, RecordsDict
-   :no-index:
 
 .validators module
 --------------------------------------
