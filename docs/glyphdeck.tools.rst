@@ -22,3 +22,4 @@
 
 .. automodule:: glyphdeck.tools.time
    :members: LogBlock
+   :exclude-members: delta_time_formatter
