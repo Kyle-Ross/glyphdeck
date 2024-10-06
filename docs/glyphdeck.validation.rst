@@ -6,6 +6,7 @@ Contents
 
 .. automodule:: glyphdeck.validation
    :members:
+   :no-index:
 
 
 Modules
@@ -16,6 +17,7 @@ Modules
 
 .. automodule:: glyphdeck.validation.data_types
    :members: DataDict, Optional_DataDict, RecordDict, RecordsDict
+   :no-index:
 
 .validators module
 --------------------------------------
@@ -23,3 +25,4 @@ Modules
 .. automodule:: glyphdeck.validation.validators
    :members:
    :exclude-members: sentiment_min, sentiment_max
+   :no-index:

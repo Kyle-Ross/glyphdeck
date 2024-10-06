@@ -5,7 +5,8 @@ Contents
 ---------------
 
 .. automodule:: glyphdeck.processors
-   :members:
+   :no-index:
+
 
 Modules
 ---------------
@@ -27,5 +28,5 @@ Modules
 -------------------------------------
 
 .. automodule:: glyphdeck.processors.sanitiser
-   :members: BaseLLMHandler
+   :members: BaseSanitiser
    :no-index:
