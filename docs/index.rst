@@ -18,20 +18,28 @@ Installation
    
    import glyphdeck as gd
 
-Cascades
+Cascades |:ocean:|
 ----------------------------------
-The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
+The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for LLM data handling workflows.
 
 It validates and enforces all data movements against a common id, ensuring that each record has a unique, immutable identifier that remains consistent, regardless of other changes.
 
 This all combines to let you spin up LLM workflows in record time.
 
-.. code-block:: python
-    cascade = gd.Cascade(
-        data_source=r"pizzashopreviews.xlsx",
-        id_column="Review Id",
-        data_columns=["Review Text", "Reason for score"],
-    )
+.. literalinclude :: _static/index_workflow_example.py
+   :language: python3
+
+Output
+""""""""
+
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+------------------------------+
+| Review Id | Review Text                                                                                                                             | Review Text_sub_categories                                                     | Review Text_sentiment_score  |
++===========+=========================================================================================================================================+================================================================================+==============================+
+| 1         | I love this place, fantastic pizza and great service. It's family run and it shows. Out of heaps of good local options it is still the… | Pizza Quality,Service Quality,Family Run,Local Options,Pricing,Parking         | 0.95                         |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+------------------------------+
+| 2         | Got disappointed. Not good customer service. definitely not great pizza.We went there yesterday to…                                     | Customer Service,Pizza Quality,Dine-In Experience,Promotions,Family Experience | -0.75                        |
++-----------+-----------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+------------------------------+
+
 
 .. toctree::
    :maxdepth: 2
