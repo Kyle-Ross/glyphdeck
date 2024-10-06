@@ -14,7 +14,9 @@
 ------------------------------
 
 .. automodule:: glyphdeck.tools.prepper
-   :members: prepare
+   :members:
+
+.. autofunction:: glyphdeck.tools.prepper.prepare
 
 .time module
 ---------------------------
