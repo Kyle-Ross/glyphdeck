@@ -1,15 +1,10 @@
 .processors package
 ============================
 
-Contents
+About
 ---------------
 
 .. automodule:: glyphdeck.processors
-   :no-index:
-
-
-Modules
----------------
 
 .cascade module
 -----------------------------------
@@ -22,11 +17,9 @@ Modules
 
 .. automodule:: glyphdeck.processors.llm_handler
    :members: BaseLLMHandler
-   :no-index:
 
 .sanitiser module
 -------------------------------------
 
 .. automodule:: glyphdeck.processors.sanitiser
    :members: BaseSanitiser
-   :no-index:
