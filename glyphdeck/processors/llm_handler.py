@@ -150,7 +150,7 @@ class BaseLLMHandler:
 
         """
         logger.debug(
-            " | Function | LLMHandler.__init__() | Start | Initialising LLMHandler object"
+            " | Function | BaseLLMHandler.__init__() | Start | Initialising BaseLLMHandler object"
         )
 
         # Assert the variable type of the provided arguments
@@ -269,11 +269,11 @@ class BaseLLMHandler:
             # instructor patches in variable validation via pydantic with the response_model and max_retries attributes
             self._openai_client = instructor.patch(openai.AsyncOpenAI())
             logger.debug(
-                " | Step | LLMHandler.__init__() | Action | Set openai_client and patched with instructor"
+                " | Step | BaseLLMHandler.__init__() | Action | Set openai_client and patched with instructor"
             )
 
         logger.debug(
-            " | Function | LLMHandler.__init__() | Finish | Initialising LLMHandler object"
+            " | Function | BaseLLMHandler.__init__() | Finish | Initialising BaseLLMHandler object"
         )
 
     @property
@@ -528,7 +528,7 @@ class BaseLLMHandler:
         """Asynchronously query the selected LLM across the whole data and save results to the output.
 
         Returns:
-            self: Instance of the LLMHandler class.
+            self: Instance of the BaseLLMHandler class.
 
         """
         if self.provider_clean == "openai":
