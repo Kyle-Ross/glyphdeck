@@ -1,28 +1,46 @@
-.. glyphdeck documentation master file, created by
-   sphinx-quickstart on Sat Oct  5 17:26:03 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-glyphdeck documentation
+Quickstart
 =======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+Installation
+----------------------------------
 
+.. code-block::
+   
+   pip install glyphdeck
+
+.. code-block:: python
+   
+   import glyphdeck as gd
+
+Usage
+----------------------------------
+
+Do this
+
+Do that
+
+And then do another thing
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :caption: INTERFACE
+   :hidden:
 
    glyphdeck
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API
+   :hidden:
+
    glyphdeck.processors
    glyphdeck.validation
    glyphdeck.config
    glyphdeck.tools
 
+.. toctree::
+   :maxdepth: 1
+   :caption: OTHER
+   :hidden:
 
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   gen_index

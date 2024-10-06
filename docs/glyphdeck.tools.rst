@@ -1,24 +1,27 @@
-.tools package
+gd.tools
 =======================
 
 .. automodule:: glyphdeck.tools
    :members:
 
-.logger\_interface module
-----------------------------------------
+Modules
+----------------------------------
+
+.logger\_interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.tools.logger_interface
    :members: Loggers
 
-.prepper module
-------------------------------
+.prepper
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.tools.prepper
    :members: prepare
    :exclude-members: prepare_df, prepare_csv, prepare_xlsx
 
-.time module
----------------------------
+.time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.tools.time
    :members: LogBlock

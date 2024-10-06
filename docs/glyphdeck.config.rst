@@ -1,4 +1,4 @@
-.config package
+gd.config
 =================================
 
 .. automodule:: glyphdeck.config
@@ -8,7 +8,7 @@
 Modules
 ----------------------------------
 
-.logger\_config module
+.logger\_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.config.logger_config

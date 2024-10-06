@@ -61,10 +61,12 @@ exclude_patterns = [
     "tools/logging_.py",
 ]
 
-# Set your HTML theme here
+# Set your HTML stuff here
 html_theme = "insegel"
 html_static_path = ["_static"]
-html_theme_options = {
-    'navigation_depth': 1
-}
-html_logo = "logo.png"
+html_theme_options = {"navigation_depth": 2}
+html_logo = "_static\logo.png"
+html_show_sourcelink = False
+
+# Enable pygment lexers
+pygments_style = "sphinx"

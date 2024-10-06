@@ -1,22 +1,25 @@
-.processors package
+gd.processors
 ============================
 
 .. automodule:: glyphdeck.processors
 
-.cascade module
------------------------------------
+Modules
+----------------------------------
+
+.cascade
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.processors.cascade
    :members: Cascade
 
-.llm\_handler module
-----------------------------------------
+.llm\_handler
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.processors.llm_handler
    :members: BaseLLMHandler
 
-.sanitiser module
--------------------------------------
+.sanitiser
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: glyphdeck.processors.sanitiser
    :members: BaseSanitiser

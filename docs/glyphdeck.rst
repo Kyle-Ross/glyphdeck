@@ -1,5 +1,5 @@
-glyphdeck
-=========
+gd.
+==============================
 
 .. automodule:: glyphdeck
    :members:
