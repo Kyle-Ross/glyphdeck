@@ -55,7 +55,7 @@ from glyphdeck.tools.logging_ import (
     log_and_raise_error,
     log_decorator,
 )
-from glyphdeck.processors.sanitiser import CoreSanitiser
+from glyphdeck.processors.sanitiser import BaseSanitiser
 from glyphdeck.processors.llm_handler import BaseLLMHandler
 from glyphdeck.tools.prepper import prepare
 from glyphdeck.tools.directory_creators import create_files_directory
@@ -138,7 +138,7 @@ class Cascade:
         )
 
         # Inherit the sanitiser class and add new run method which writes records and uses the latest_data by default
-        class Sanitise(CoreSanitiser):
+        class Sanitise(BaseSanitiser):
             """Sanitiser that is part of the Cascade class. This class inherits from Sanitiser and is used to sanitise and append data to the cascade.
 
             Attributes:

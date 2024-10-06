@@ -61,7 +61,7 @@ from .processors.cascade import Cascade
 
 # These are for direct access to Data transformation outside of the chain
 from .processors.llm_handler import BaseLLMHandler
-from .processors.sanitiser import CoreSanitiser
+from .processors.sanitiser import BaseSanitiser
 from glyphdeck.validation import validators
 from .tools.prepper import prepare
 
@@ -87,7 +87,7 @@ from .tools.time import LogBlock
 __all__ = [
     "Cascade",
     "BaseLLMHandler",
-    "CoreSanitiser",
+    "BaseSanitiser",
     "validators",
     "prepare",
     "access_logging_config",

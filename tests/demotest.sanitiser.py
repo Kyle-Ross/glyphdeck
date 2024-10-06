@@ -31,7 +31,7 @@ data_example: gd.DataDict = {
 print("\nInitialise the santiser_obj")
 print("Not specifying the groups will make all the default groups be used")
 santiser_obj = ic(
-    gd.CoreSanitiser(data_example, pattern_groups=["number", "date", "email"])
+    gd.BaseSanitiser(data_example, pattern_groups=["number", "date", "email"])
 )
 
 print("\nGroups based on __init__")
