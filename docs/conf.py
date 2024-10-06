@@ -61,6 +61,7 @@ exclude_patterns = [
     "tools/directory_creators.py",
     "tools/caching.py",
     "tools/logging_.py",
+    "custom_extensions/add_header",
 ]
 
 # Set your HTML theme here
