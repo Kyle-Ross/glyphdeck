@@ -5,7 +5,7 @@
    :members:
 
 
-glyphdeck.config.logger\_config module
+.logger\_config module
 --------------------------------------
 
 .. automodule:: glyphdeck.config.logger_config
