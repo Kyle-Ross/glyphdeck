@@ -1,60 +1,9 @@
 """The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments.
 
-glyphdeck handles LLM data workflow data validation, sanitisation, transformation and step chaining,
-facilitating the fast development of robust, error free LLM data workflows.
+Common aspects of the LLM data workflow are handled end-to-end data validation, sanitisation, transformation and step chaining, facilitating the fast development of robust, error free LLM data workflows.
 
-Interface
-----------
-
-The Cascade class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for data handling workflows with LLMs.
-
-It validates and enforces all data movements against a common id, ensuring that each record has a unique, immutable identifier that remains consistent, regardless of other changes.
-
-Telemetry
----------
-glyphdeck is provided with a comprehensive logging facility that makes
-complex asyncronous LLM workflows much easier to configure, understand and debug.
-
-Example:
---------
-Here is a basic example of how to use the main features of the glyphdeck library::
-
-    import glyphdeck as gd
-
-    # Intialising a cascade object, setting its first record from the source file
-    cascade = gd.Cascade(
-        data_source=r"pizzashopreviews.xlsx",
-        id_column="Review Id",
-        data_columns=["Review Text", "Reason for score"],
-    )
-
-    # Sanitising the data of sensitive information, replacing with placeholders
-    cascade.sanitiser.run()
-
-    # Set the LLM Handler for this cascade instance
-    cascade.set_llm_handler(
-        provider="OpenAI",
-        model="gpt-4o-mini",
-        system_message="You are an expert customer feedback analyst nlp system. Analyse the feedback and return results in the correct format.",
-        validation_model=gd.validators.SubCats,
-        cache_identifier="PizzaShopComment_Sub_Categories",
-        use_cache=True,
-    )
-
-    # Run the llm_handler
-    cascade.llm_handler.run("HandlerOutput1")
-
-    # Output the result in the specified format
-    # Latest record is used by default, but we specify it here
-    cascade.write_output(
-        file_type="xlsx",
-        file_name_prefix="Cascade Test",
-        record_identifiers=["sanitised", "HandlerOutput1"],
-        rebase=True,
-        xlsx_use_sheets=False,
-    )
-
-"""  # noqa: D100
+Its also equiped with a configurable logging facility that makes complex asyncronous LLM workflows much easier to configure, understand and debug.
+"""
 
 ## Most scripting should occur in a Cascade instance, which interfaces with the other functions
 from .processors.cascade import Cascade
