@@ -1,4 +1,3 @@
-
 # Import the python logging module
 import logging
 
@@ -14,20 +13,6 @@ class Loggers:
 
     On importing the glyphdeck module, an instance of this class called `logger` is created,
     providing the interface for the loggers.
-
-    Attributes:
-        cascade (`logging.Logger`): Handles Cascade related logging.
-        llm_handler (`logging.Logger`): Handles logging for language model handler operations.
-        sanitiser (`logging.Logger`): Logs activities related to the Sanitiser class.
-        cache (`logging.Logger`): Manages cache-related logging.
-        file_importers (`logging.Logger`): Logs events related to file importing tools.
-        prepper (`logging.Logger`): Logs activities in data preparation.
-        string_tools (`logging.Logger`): Handles logging for string manipulation tools.
-        time_tools (`logging.Logger`): Logs activities related to time-related tools.
-        data_types (`logging.Logger`): Manages logging for data type operations.
-        validators (`logging.Logger`): Logs validation operations.
-        workflow (`logging.Logger`): Logs workflow-related activities.
-        unhandled_errors (`logging.Logger`): Captures any other errors that are not explicitly handled.
 
     Usage:
     ----------
@@ -54,7 +39,8 @@ class Loggers:
         self._data_types = None
         self._validators = None
         self._workflow = None
-        self._unhandled_errors = None
+
+    # Note - unhandled error is not here deliberately - no use providing that to the interface.
 
     def _get_or_create_logger(self, name, logger_class):
         """Get an existing logger by name or creates one using the provided logger class.
@@ -77,6 +63,8 @@ class Loggers:
     def cascade(self):
         """Gets the Cascade logger, initializing it if it doesn't already exist.
 
+        Handles Cascade related logging.
+
         Returns:
             logging.Logger: The Cascade logger instance.
 
@@ -90,6 +78,8 @@ class Loggers:
     @property
     def llm_handler(self):
         """Gets the LLM handler logger, initializing it if it doesn't already exist.
+
+        Handles logging for language model handler operations.
 
         Returns:
             logging.Logger: The LLM handler logger instance.
@@ -105,6 +95,8 @@ class Loggers:
     def sanitiser(self):
         """Gets the Sanitiser logger, initializing it if it doesn't already exist.
 
+        Logs activities related to the Sanitiser class.
+
         Returns:
             logging.Logger: The Sanitiser logger instance.
 
@@ -119,6 +111,8 @@ class Loggers:
     def cache(self):
         """Gets the Cache logger, initializing it if it doesn't already exist.
 
+        Manages cache-related logging.
+
         Returns:
             logging.Logger: The Cache logger instance.
 
@@ -130,6 +124,8 @@ class Loggers:
     @property
     def file_importers(self):
         """Gets the File Importers logger, initializing it if it doesn't already exist.
+
+        Logs events related to file importing tools.
 
         Returns:
             logging.Logger: The File Importers logger instance.
@@ -144,6 +140,8 @@ class Loggers:
     @property
     def prepper(self):
         """Gets the Prepper logger, initializing it if it doesn't already exist.
+
+        Logs activities in data preparation.
 
         Returns:
             logging.Logger: The Prepper logger instance.
@@ -161,6 +159,8 @@ class Loggers:
     def string_tools(self):
         """Gets the String Tools logger, initializing it if it doesn't already exist.
 
+        Handles logging for string manipulation tools.
+
         Returns:
             logging.Logger: The String Tools logger instance.
 
@@ -174,6 +174,8 @@ class Loggers:
     @property
     def time_tools(self):
         """Gets the Time Tools logger, initializing it if it doesn't already exist.
+
+        Logs activities related to time-related tools.
 
         Returns:
             logging.Logger: The Time Tools logger instance.
@@ -189,6 +191,8 @@ class Loggers:
     def data_types(self):
         """Gets the Data Types logger, initializing it if it doesn't already exist.
 
+        Manages logging for data type operations.
+
         Returns:
             logging.Logger: The Data Types logger instance.
 
@@ -203,6 +207,8 @@ class Loggers:
     def validators(self):
         """Gets the Validators logger, initializing it if it doesn't already exist.
 
+        Logs validation operations.
+
         Returns:
             logging.Logger: The Validators logger instance.
 
@@ -216,6 +222,8 @@ class Loggers:
     @property
     def workflow(self):
         """Gets the Workflow logger, initializing it if it doesn't already exist.
+
+        Logs workflow-related activities.
 
         Returns:
             logging.Logger: The Workflow logger instance.
