@@ -492,6 +492,7 @@ class Cascade:
             self.outer_cascade.append(
                 title=title,
                 data=self.output_data,
+                column_names=self.new_column_names,
                 # Updating len since the llm validators can produce multiple columns per input
                 update_expected_len=True,
             )
