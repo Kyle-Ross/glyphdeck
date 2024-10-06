@@ -285,9 +285,9 @@ class BaseSanitiser:
         groups = list(set(groups))  # Remove duplicates
         return groups
 
-    @log_decorator(logger, "info", suffix_message="Initialise Sanitiser object")
+    @log_decorator(logger, "info", suffix_message="Initialise BaseSanitiser object")
     def __init__(self, input_data: DataDict, pattern_groups: List = None) -> None:
-        """Initialize a Sanitiser object with input data and optionally selected pattern groups.
+        """Initialize a BaseSanitiser object with input data and optionally selected pattern groups.
 
         Args:
             input_data: The data to be sanitized.
@@ -315,7 +315,7 @@ class BaseSanitiser:
         """Update the lists of all, active, and inactive pattern groups based on the current patterns dictionary.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         """
         # Uses update_group() to update all group references
@@ -360,7 +360,7 @@ class BaseSanitiser:
             placeholder_dict: A dictionary with group names as keys and custom placeholders as values.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         Raises:
             KeyError: If a provided key does not exist in the available patterns.
@@ -396,7 +396,7 @@ class BaseSanitiser:
             pattern_groups: A list of pattern groups to activate. All others are deactivated.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         Raises:
             KeyError: If a provided group does not exist in the available patterns.
@@ -427,7 +427,7 @@ class BaseSanitiser:
         """Ensure patterns are sorted by their rank in ascending order.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         """
         # Just runs the static method 'order_patterns' on the instance, applying the result to the instance.
@@ -439,7 +439,7 @@ class BaseSanitiser:
     def add_pattern(
         self, pattern_name: str, group: str, placeholder: str, rank: float, regex: str
     ):
-        """Add a new pattern to the sanitiser.
+        """Add a new pattern to the BaseSanitiser.
 
         Args:
             pattern_name: The unique name for the pattern.
@@ -481,7 +481,7 @@ class BaseSanitiser:
         """Sanitises the input data using active patterns.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         """
         # Run all selected patterns in order, updating the 'raw_output_data'.
