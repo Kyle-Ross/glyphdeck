@@ -13,7 +13,8 @@ About
 ---------------------------------------
 
 .. automodule:: glyphdeck.validation.data_types
-   :members: DataDict, Optional_DataDict, RecordDict, RecordsDict
+   :members: DataDict, Optional_DataDict, 
+             RecordDict, RecordsDict
    :no-index:
 
 .validators module
@@ -22,4 +23,7 @@ About
 .. automodule:: glyphdeck.validation.validators
    :members:
    :exclude-members: sentiment_min, sentiment_max
-   :no-index:
+   :no-index: Sentiment, PrimaryCat, Top5Cats, SubCats, 
+              PrimaryCatSentiment, PrimarySubCat, SubCatsSentiment,
+              SubCatsPerItemSentiment, SubCatsPerItemOverallSentiment,
+              TopCatsSentiment, CatHierarchySentiment
