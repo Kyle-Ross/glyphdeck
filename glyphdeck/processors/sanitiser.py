@@ -334,7 +334,7 @@ class BaseSanitiser:
         """Update the match count dictionary and the overall match count.
 
         Returns:
-            Self: The updated instance of the Sanitiser class.
+            Self: The updated instance of the BaseSanitiser class.
 
         """
         # Updates the per group match count dictionary and the overall count variable.
