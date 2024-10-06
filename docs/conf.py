@@ -60,5 +60,5 @@ exclude_patterns = [
 ]
 
 # Set your HTML theme here
-html_theme = "alabaster"
+html_theme = "furo"
 html_static_path = ["_static"]
