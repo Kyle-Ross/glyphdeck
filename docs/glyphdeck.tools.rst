@@ -1,15 +1,12 @@
 .tools package
 =======================
 
-Contents
+About
 ---------------
 
 .. automodule:: glyphdeck.tools
    :members:
    :no-index:
-
-Modules
----------------
 
 .logger\_interface module
 ----------------------------------------

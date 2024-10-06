@@ -1,16 +1,13 @@
 .validation package
 ============================
 
-Contents
+About
 ---------------
 
 .. automodule:: glyphdeck.validation
    :members:
    :no-index:
 
-
-Modules
----------------
 
 .data\_types module
 ---------------------------------------
