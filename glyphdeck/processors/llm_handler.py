@@ -98,7 +98,9 @@ class BaseLLMHandler:
             AssertionError: If the validation model is not a subclass of the Pydantic BaseValidatorModel class.
 
         """
-        check: bool = issubclass(self.validation_model, validators.BaseValidatorModel)
+        check: bool = issubclass(
+            self.validation_model, validators.BaseValidatorModel
+        ) or issubclass(self.validation_model, BaseModel)
         assert_and_log_error(
             logger,
             "error",
