@@ -192,5 +192,6 @@ if _config["setting_type"] == "granular":
     file_importers_console_log_level: int = _config["file_importers"]["console"]
 
     # Unhandled errors as used in workflow files
+    # This is used by the global_exception_logger - which logs exclusively at CRITICAL level (50)
     unhandled_errors_file_log_level: int = _config["unhandled_errors"]["file"]
     unhandled_errors_console_log_level: int = _config["unhandled_errors"]["console"]
