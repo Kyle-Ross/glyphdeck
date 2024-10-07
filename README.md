@@ -14,6 +14,8 @@ Its also equiped with caching and a configurable logging facility that
 makes complex asyncronous LLM workflows much easier to configure,
 understand and debug.
 
+[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
+
 ## Features
 
 -   **Asynchronous**: Rip through tabular data with asynchronous llm
