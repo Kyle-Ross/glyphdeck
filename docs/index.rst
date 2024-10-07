@@ -1,4 +1,4 @@
-Quickstart |:speedboat:|
+|:speedboat:| Quickstart
 =================================
 
 The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments.
