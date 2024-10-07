@@ -1,16 +1,6 @@
 .validation
 ============================
 
-.data\_types
-----------------------------------
-
-.. automodule:: glyphdeck.validation.data_types
-   :members: DataDict, Optional_DataDict, 
-             RecordDict, RecordsDict
-
-.validators
-----------------------------------
-
 .. automodule:: glyphdeck.validation.validators
    :members:
    :exclude-members: sentiment_min, sentiment_max,

@@ -90,6 +90,7 @@ create feedback loops |:repeat:| and more - all with blazing |:fire:| asynchrono
 
    cascade
    _validators/validators
+   data_types
    logs
 
 .. toctree::
