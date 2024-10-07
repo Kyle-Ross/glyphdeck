@@ -78,12 +78,13 @@ This all combines to let you spin up LLM workflows in record time.
 ----------------------------------
 
 .. tip:: That's just the start!
+
 Glyphdeck is highly customisable |:infinity:|  with useful optional commands in every function, 
 class & method. Use the Cascade and other tools to mix and match, 
 create feedback loops |:repeat:| and more - all with blazing |:fire:| asynchronous speed through the OpenAI API.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: INTERFACE API
    :hidden:
 
