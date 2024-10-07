@@ -1,4 +1,4 @@
-|:speedboat:| Quickstart
+Quickstart
 =================================
 
 The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments.
@@ -7,7 +7,7 @@ Common aspects of the LLM data workflow are handled end-to-end including async l
 
 Its also equiped with caching and a configurable logging facility that makes complex asyncronous LLM workflows much easier to configure, understand and debug.
 
-|:mag_right:| Features
+Features
 ----------------------------------
 
 - **Asynchronous**: Rip through tabular data with asynchronous llm usage
@@ -21,17 +21,17 @@ Its also equiped with caching and a configurable logging facility that makes com
 - **Automatic caching**: Save on API costs and re-use results
 - **Logging**: Built-in logging facility helps to debug your set-ups & peer inside the event loop
 
-|:wrench:| Set-up 
+Set-up 
 ----------------------------------
 
-|:package:| Install
+Install
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
    
    pip install glyphdeck
 
-|:clipboard:| Set API Key
+Set API Key
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Set your ``OPENAI_API_KEY`` with a `command <https://platform.openai.com/docs/quickstart?language-preference=python>`_, or add it to your `environment variables <https://en.wikipedia.org/wiki/Environment_variable>`_.
@@ -40,17 +40,17 @@ Set your ``OPENAI_API_KEY`` with a `command <https://platform.openai.com/docs/qu
    
    setx OPENAI_API_KEY "your_api_key_here"
 
-|:inbox_tray:| Import 
+Import 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
    
    import glyphdeck as gd
 
-|:toolbox:| Usage
+Usage
 ----------------------------------
 
-|:ocean:| Cascades
+Cascades
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The ``Cascade`` class is the primary interface for the glyphdeck library. It handles and processes data in a record-like structure, providing easy to use syntax for LLM data handling workflows.
 
@@ -58,13 +58,13 @@ It validates and enforces all data movements against a common id, ensuring that 
 
 This all combines to let you spin up LLM workflows in record time.
 
-|:man_surfing:| Example
+Example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. literalinclude :: _static/index_workflow_example.py
    :language: python3
 
-|:beach:| Output
+Output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 +-----------+-----------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+------------------------------+
