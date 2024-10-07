@@ -67,18 +67,18 @@ class BaseLLMHandler:
     It can be used separately in this module but can also be accessed in a more streamlined way as within the Cascade class.
 
     Attributes:
-        input_data: Dictionary containing the input data.
-        provider: Name of the LLM provider.
-        model: Model identifier for the LLM.
-        system_message: The system message to provide in the LLM prompts.
+        input_data (DataDict): Dictionary containing the input data.
+        provider (str): Name of the LLM provider.
+        model (str): Model identifier for the LLM.
+        system_message (str): The system message to provide in the LLM prompts.
         validation_model: Pydantic class used for validating LLM outputs.
-        cache_identifier: Unique string used to identify discrete jobs and avoid cache mixing.
-        use_cache: Boolean indicating whether to use cache or not.
-        temperature: Determines if the responses are deterministic (lower value) or random (higher value).
-        max_validation_retries: Maximum number of retries for validation attempts.
-        max_preprepared_coroutines_semaphore: Semaphore to limit the number of pre-prepared coroutines.
-        max_awaiting_coroutines_semaphore: Semaphore to limit the number of awaiting coroutines.
-        raw_output_data: Dictionary to store the intermediate LLM outputs.
+        cache_identifier (str): Unique string used to identify discrete jobs and avoid cache mixing.
+        use_cache (bool): Boolean indicating whether to use cache or not.
+        temperature (float): Determines if the responses are deterministic (lower value) or random (higher value).
+        max_validation_retries (2): Maximum number of retries for validation attempts.
+        max_preprepared_coroutines (10): Semaphore to limit the number of pre-prepared coroutines.
+        max_awaiting_coroutines (100): Semaphore to limit the number of awaiting coroutines.
+        _raw_output_data: Dictionary to store the intermediate LLM outputs.
         new_output_data: Flattened output data to be generated.
         new_column_names: Generated column names to be used in the flattened output data.
         available_providers: List of LLM providers that are available.
@@ -133,17 +133,17 @@ class BaseLLMHandler:
         """Initialize the LLMHandler with necessary configurations and validations.
 
         Args:
-            input_data: Dictionary containing the input data.
-            provider: Name of the LLM provider.
-            model: Model identifier for the LLM.
-            system_message: The system message to provide to the LLM in prompts.
+            input_data (DataDict): Dictionary containing the input data.
+            provider (str): Name of the LLM provider.
+            model(str): Model identifier for the LLM.
+            system_message (str): The system message to provide to the LLM in prompts.
             validation_model: Pydantic class used for validating output.
-            cache_identifier: Unique string used to identify discrete jobs and avoid cache mixing.
-            use_cache: Boolean indicating whether to use cache or not. Defaults to True.
-            temperature: Determines if the responses are deterministic (lower value) or random (higher value). Defaults to 0.2.
-            max_validation_retries: Maximum number of retries for failed validation attempts. Defaults to 2.
-            max_preprepared_coroutines: Maximum number of prepared coroutines before awaiting. Defaults to 10.
-            max_awaiting_coroutines: Maximum number of coroutines awaiting at once. Defaults to 100.
+            cache_identifier (str): Unique string used to identify discrete jobs and avoid cache mixing.
+            use_cache (bool): Boolean indicating whether to use cache or not. Defaults to True.
+            temperature (float): Determines if the responses are deterministic (lower value) or random (higher value). Defaults to 0.2.
+            max_validation_retries (int): Maximum number of retries for failed validation attempts. Defaults to 2.
+            max_preprepared_coroutines (int): Maximum number of prepared coroutines before awaiting. Defaults to 10.
+            max_awaiting_coroutines (int): Maximum number of coroutines awaiting at once. Defaults to 100.
 
         Raises:
             AssertionError: If any of the provided arguments are of incorrect type or invalid values.
@@ -221,7 +221,7 @@ class BaseLLMHandler:
 
         # Storing the input variable, of the 'Data' type as typically delivered by a 'Cascade' object
         self.input_data: DataDict = input_data
-        # raw_output_data keeps keys, replaces with [None, None, ...] lists
+        # _raw_output_data keeps keys, replaces with [None, None, ...] lists
         # Helps to insert output in the correct position later in 'await_tasks'
         self._raw_output_data: DataDict = {
             key: [None] * len(value) for key, value in input_data.items()
