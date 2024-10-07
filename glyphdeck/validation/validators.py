@@ -1,14 +1,6 @@
 """Pydantic models, types, fields, and classes for data validation.
 
 For use by the `BaseLLMHandler` class to enforce specific output types from the LLM.
-
-Example:
---------
-Typical usage:
-
-    sentiment_model = Sentiment(sentiment_score=0.5)
-    print(sentiment_model)
-
 """
 
 from typing import Union, List
