@@ -70,3 +70,14 @@ html_show_sourcelink = False
 highlight_language = "python3"
 pygments_style = "borland"
 pygments_style_dark = "nord"
+
+# Object signatures
+
+# Value of 1 means every argument is on its own line
+maximum_signature_line_length = 1
+
+# Ride the repeating parent paths from the toctree
+toc_object_entries_show_parents = "hide"
+
+# Ref
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
