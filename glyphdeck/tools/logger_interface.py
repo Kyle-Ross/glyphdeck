@@ -9,18 +9,10 @@ from . import logging_
 class Loggers:
     """Centralized logger access for different types of loggers within the application.
 
-    Primarily, it adds loggers to the public interface without changing their internal representation.
+    Primarily, it adds component loggers to the public interface without replacing their internal representation.
 
     On importing the glyphdeck module, an instance of this class called `logger` is created,
     providing the interface for the loggers.
-
-    Usage:
-    ----------
-    ```
-    import glyphdeck as gd
-    logger = gd.logger.cascade
-    ```
-
     """
 
     def __init__(self):

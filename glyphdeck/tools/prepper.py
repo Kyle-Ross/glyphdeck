@@ -2,12 +2,6 @@
 
 Provides functions to transform and extract data from dataframes,
 CSV files, and XLSX files into the common Data dictionary format.
-
-Example:
---------
-Typical usage::
-    df, data_dict = prepare(df_or_path_str, "id_column", "data_column")
-
 """
 
 from typing import Union, List, Optional, Tuple
