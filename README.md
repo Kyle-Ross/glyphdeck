@@ -115,8 +115,9 @@ cascade.llm_handler.run("llm_category_sentiment")
 
 ------------------------------------------------------------------------
 
->[!TIP] That's just the start!
->Glyphdeck is highly customisable with useful optional commands in every
->function, class & method. Use the Cascade and other tools to mix and
->match, create feedback loops and more - all with blazing asynchronous
->speed through the OpenAI API.
+#### 🚀 That's just the start!
+
+Glyphdeck is highly customisable with useful optional commands in every
+function, class & method. Use the Cascade and other tools to mix and
+match, create feedback loops and more - all with blazing asynchronous
+speed through the OpenAI API.
