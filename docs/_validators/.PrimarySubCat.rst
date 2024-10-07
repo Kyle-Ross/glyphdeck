@@ -1,0 +1,11 @@
+:orphan:
+
+.PrimarySubCat
+=====================================
+
+``gd.validators.PrimarySubCat``
+
+.. autoclass:: glyphdeck.validators.PrimarySubCat
+    :exclude-members: model_computed_fields, model_config, model_post_init
+    :show-inheritance:
+    :no-index:

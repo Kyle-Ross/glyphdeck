@@ -1,0 +1,11 @@
+:orphan:
+
+.Top5Cats
+=====================================
+
+``gd.validators.Top5Cats``
+
+.. autoclass:: glyphdeck.validators.Top5Cats
+    :exclude-members: model_computed_fields, model_config, model_post_init
+    :show-inheritance:
+    :no-index:
