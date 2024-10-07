@@ -84,44 +84,24 @@ def configure_logging(
 
     Changes here affect the module globally for current and future use, but won't take effect until the module is re-initialised.
 
-    Privacy:
-    --------
-    - log_input_data: Optional[bool]
-    - log_output_data: Optional[bool]
+    Args:
+        log_input_data (Optional[bool]): Include input data in logs
+        log_output_data (Optional[bool]): Include LLM output data in logs
+        setting_type (Optional[str]): ("default", "set_all" or "granular") Controls status of other levels
+        set_all_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "set_all
+        data_types_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular
+        prepper_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        cascade_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        sanitiser_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        validators_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        llm_handler_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        cache_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        workflows_levels (Optional[Tuple[int]]): (file_level, console_level) Used  if setting_type == "granular"
+        strings_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        time_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        file_importers_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
+        unhandled_errors_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
 
-    Setting_type:
-    ----------------
-    Can be "default", "set_all" or "granular"
-    - setting_type: Optional[str]
-
-    If "default":
-    -----------------------------
-    Uses the default values:
-    - file = 90 (no logs)
-    - console = 20 (info)
-    \n
-    For all loggers.
-
-    If "set_all":
-    -----------------------------
-    (file_level, console_level)
-    - set_all_levels: Optional[Tuple[int]]
-
-    If "Granular":
-    ------------------------------
-    (file_level, console_level)
-    - data_types_levels: Optional[Tuple[int]]
-    - prepper_levels: Optional[Tuple[int]]
-    - cascade_levels: Optional[Tuple[int]]
-    - sanitiser_levels: Optional[Tuple[int]]
-    - validators_levels: Optional[Tuple[int]]
-    - llm_handler_levels: Optional[Tuple[int]]
-    - cache_levels: Optional[Tuple[int]]
-    - workflows_levels: Optional[Tuple[int]]
-    - strings_levels: Optional[Tuple[int]]
-    - time_levels: Optional[Tuple[int]]
-    - file_importers_levels: Optional[Tuple[int]]
-    - unhandled_errors_levels: Optional[Tuple[int]]
     """
 
     def _set_levels(d: dict, key: str, levels: Tuple[int]):
