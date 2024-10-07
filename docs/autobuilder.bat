@@ -1,1 +1,2 @@
-sphinx-autobuild F:\Github\glyphdeck\docs F:\Github\glyphdeck\docs\_build\html && start http://127.0.0.1:8000
+sphinx-autobuild F:\Github\glyphdeck\docs F:\Github\glyphdeck\docs\_build\html
+:: http://127.0.0.1:8000
