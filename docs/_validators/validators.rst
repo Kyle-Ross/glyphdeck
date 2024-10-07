@@ -47,6 +47,6 @@ For a given text input the LLM will be instructed to return the:
 .. rubric:: Custom
     :heading-level: 2
 
-Any valid Pydantic ``BaseModel`` can be used for validation. 
+Any valid Pydantic ``BaseModel`` can be used for validation. You can also inherit from :doc:`.BaseValidatorModel` to make use of the logic used in the built-in validators.
 
 Refer to the Pydantic `documentation <https://docs.pydantic.dev/latest/concepts/models/#validation>`_ for more info.

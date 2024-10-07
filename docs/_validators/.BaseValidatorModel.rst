@@ -1,0 +1,10 @@
+:orphan:
+
+.BaseValidatorModel
+=====================================
+
+``gd.validators.BaseValidatorModel``
+
+.. autoclass:: glyphdeck.validators.BaseValidatorModel
+    :exclude-members: model_computed_fields, model_config, model_post_init
+    :show-inheritance:
