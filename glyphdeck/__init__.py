@@ -5,47 +5,36 @@ Common aspects of the LLM data workflow are handled end-to-end data validation, 
 Its also equiped with a configurable logging facility that makes complex asyncronous LLM workflows much easier to configure, understand and debug.
 """
 
-## Most scripting should occur in a Cascade instance, which interfaces with the other functions
+## Cascade class inherits most functionality
 from .processors.cascade import Cascade
 
-# These are for direct access to Data transformation outside of the chain
-from .processors.llm_handler import BaseLLMHandler
-from .processors.sanitiser import BaseSanitiser
+# Tools outside of the Cascade class
 from glyphdeck.validation import validators
 from .tools.prepper import prepare
+from .tools.time import LogBlock
 
-# Provide access to the set_logging_config
-from .config.logger_config import (
-    access_logging_config,
-    set_logging_config,
-    restore_logger_config,
-)
 
-# Enables logger access in the public interface like gylphdeck.loggers.cascade
-# Accesses or creates loggers only if they do not exist globally yet
+# Change and access global logging config
 from .tools.logger_interface import loggers
+from .config.logger_config import (
+    configure_logging,
+    reset_logging,
+)
 
 # Making common data_types available in the interface
 from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
 
-# Making the LogBlock context manager available
-from .tools.time import LogBlock
-
-# Explicitly defining __all__ for metadata and clarity
-# This makes it clear what the intended public interface is
+# Among other things, determines the display order in the docs
 __all__ = [
     "Cascade",
-    "BaseLLMHandler",
-    "BaseSanitiser",
     "validators",
-    "prepare",
-    "access_logging_config",
-    "set_logging_config",
-    "restore_logger_config",
+    "configure_logging",
+    "reset_logging",
     "loggers",
+    "LogBlock",
     "DataDict",
     "Optional_DataDict",
     "RecordDict",
     "RecordsDict",
-    "LogBlock",
+    "prepare",
 ]

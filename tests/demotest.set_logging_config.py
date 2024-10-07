@@ -7,7 +7,7 @@ print("\nChange the logging config")
 print("\nComment sections in and out to test changes")
 
 print("\nThis example turns on the defaults")
-ic(gd.set_logging_config(setting_type="default"))
+ic(gd.configure_logging(setting_type="default"))
 
 # print("\nThis example uses set_all to set global levels for all loggers")
 # ic(gd.set_logging_config(setting_type="set_all", set_all_levels=(10,10)))

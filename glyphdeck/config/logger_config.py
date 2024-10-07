@@ -55,7 +55,7 @@ class _LoggerConfig:
                 yaml.dump(self.data, f)
 
 
-def set_logging_config(
+def configure_logging(
     # Bool toggles for private data logging
     log_input_data: Optional[bool] = None,
     log_output_data: Optional[bool] = None,
@@ -217,11 +217,11 @@ def set_logging_config(
         # On exit, context manager exits and writes the changes to config back to the yaml file
 
 
-def restore_logger_config():
+def reset_logging():
     """Restore the logger configuration yaml file to its original state.
 
-    Useful if your changes have broken the file, but beware as this will overwrite any modifications
-    in the config.
+    Useful to reset to defaults or recover if your changes have broken the file,
+    but beware as this will overwrite any modifications in the config.
     """
     config = {
         "private_data": {"log_input": False, "log_output": False},
