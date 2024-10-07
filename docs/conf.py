@@ -68,3 +68,5 @@ html_show_sourcelink = False
 
 # Code blocks
 highlight_language = "python3"
+pygments_style = "borland"
+pygments_style_dark = "nord"
