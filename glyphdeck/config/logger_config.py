@@ -88,8 +88,8 @@ def configure_logging(
         log_input_data (Optional[bool]): Include input data in logs
         log_output_data (Optional[bool]): Include LLM output data in logs
         setting_type (Optional[str]): ("default", "set_all" or "granular") Controls status of other levels
-        set_all_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "set_all
-        data_types_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular
+        set_all_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "set_all"
+        data_types_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
         prepper_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
         cascade_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
         sanitiser_levels (Optional[Tuple[int]]): (file_level, console_level) Used if setting_type == "granular"
