@@ -17,7 +17,7 @@ Its also equiped with caching and a configurable logging facility that makes com
 - **Self validating**: The Cascade class automatically maintains dataset integrity 
 - **Pydantic models**: Use built-in or custom Pydantic data models for structured llm output
 - **Type enforcement**: Get your structured data in the correct format from the llm every time
-- **Private data**: ``Sanitiser`` class strips out common patterns of private data before making api calls
+- **Private data**: ``Sanitiser`` class strips out common private data patterns before making api calls
 - **Automatic caching**: Save on API costs and re-use results
 - **Logging**: Built-in logging facility helps to debug your set-ups & peer inside the event loop
 
