@@ -63,10 +63,10 @@ exclude_patterns = [
 
 # Set your HTML stuff here
 templates_path = ["_templates"]
-html_theme = "nltk_theme"
+html_theme = "furo"  # nltk_theme
 html_static_path = ["_static"]
 html_theme_options = {"navigation_depth": 2}
-html_logo = "_static/logo.png"
+# html_logo = "_static/logo.png"
 html_show_sourcelink = False
 
 # Code blocks

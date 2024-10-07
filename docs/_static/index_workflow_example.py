@@ -4,7 +4,7 @@ import glyphdeck as gd
 data_source = r"tests\testdata.pizzashopreviews.xlsx"
 
 # Intialise cascade instance and identify the unique id (required) and target data
-cascade = gd.Cascade(data_source, "Review Id", "Review Text")
+cascade = gd.Cascade(data_source, "Review", "Review Text")
 
 # Optionally remove private information
 cascade.sanitiser.run()
