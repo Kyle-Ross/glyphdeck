@@ -30,8 +30,6 @@ release = poetry_toml["tool"]["poetry"]["version"]
 extensions = [
     # Automatically document your Python code via docstrings
     "sphinx.ext.autodoc",
-    # Add links to the source code
-    "sphinx.ext.viewcode",
     # Support for Google and NumPy style docstrings
     # By default will ignore private objects with _leading underscore
     "sphinx.ext.napoleon",
