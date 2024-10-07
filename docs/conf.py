@@ -79,5 +79,8 @@ maximum_signature_line_length = 1
 # Ride the repeating parent paths from the toctree
 toc_object_entries_show_parents = "hide"
 
+# Removes appended module names in autodocs
+add_module_names = True
+
 # Ref
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
