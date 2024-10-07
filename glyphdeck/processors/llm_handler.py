@@ -33,6 +33,7 @@ import asyncio
 import copy
 import os
 
+from pydantic import BaseModel
 import instructor
 import openai
 from tenacity import (
