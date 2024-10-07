@@ -63,7 +63,7 @@ exclude_patterns = [
 
 # Set your HTML stuff here
 templates_path = ["_templates"]
-html_theme = "furo"  # nltk_theme
+html_theme = "sphinxawesome_theme"  # nltk_theme, furo, sphinxawesome_theme
 html_static_path = ["_static"]
 # html_logo = "_static/logo.png"
 html_show_sourcelink = False
