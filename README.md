@@ -14,7 +14,7 @@ Its also equiped with caching and a configurable logging facility that
 makes complex asyncronous LLM workflows much easier to configure,
 understand and debug.
 
-[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](https://glyphdeck.readthedocs.io/ "Go to project documentation") ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/:glyphdeck)
+[Read the documentation](https://glyphdeck.readthedocs.io/) - [PyPI Distribution](https://pypi.org/project/glyphdeck/)
 
 ## Features
 
