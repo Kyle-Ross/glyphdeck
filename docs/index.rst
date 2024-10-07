@@ -1,4 +1,4 @@
-Quickstart
+About
 =================================
 
 The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments.
@@ -85,24 +85,24 @@ create feedback loops |:repeat:| and more - all with blazing |:fire:| asynchrono
 
 .. toctree::
    :maxdepth: 3
-   :caption: INTERFACE API
+   :caption: INTERFACE
    :hidden:
 
-   glyphdeck
+   gd
 
 .. toctree::
    :maxdepth: 2
-   :caption: COMPONENT API
+   :caption: COMPONENTS
    :hidden:
 
-   glyphdeck.processors
-   glyphdeck.validation
-   glyphdeck.config
-   glyphdeck.tools
+   processors
+   validation
+   config
+   tools
 
 .. toctree::
    :maxdepth: 1
-   :caption: OTHER
+   :caption: SITE
    :hidden:
 
    gen_index

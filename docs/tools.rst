@@ -1,4 +1,4 @@
-gd.tools\\
+.tools
 =======================
 
 .. automodule:: glyphdeck.tools

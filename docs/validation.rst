@@ -1,4 +1,4 @@
-gd.validation\\
+.validation
 ============================
 
 .data\_types

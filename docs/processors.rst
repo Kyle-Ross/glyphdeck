@@ -1,4 +1,4 @@
-gd.processors\\
+.processors
 ============================
 
 .. automodule:: glyphdeck.processors

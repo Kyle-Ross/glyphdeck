@@ -1,4 +1,4 @@
-gd.\\
+gd
 ==============================
 
 .. automodule:: glyphdeck

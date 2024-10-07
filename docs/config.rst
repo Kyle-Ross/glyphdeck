@@ -1,4 +1,4 @@
-gd.config\\
+.config
 =================================
 
 .. automodule:: glyphdeck.config
