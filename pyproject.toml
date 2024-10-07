@@ -38,8 +38,9 @@ ignore = ["D100", "D101", "D102", "D409"]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
+toml = "^0.10.2"
 sphinx = "^8.0.2"
 sphinxawesome-theme = "^5.3.1"
 sphinxemoji = "^0.3.1"
 sphinx-autobuild = "^2024.10.3"
-toml = "^0.10.2"
+
