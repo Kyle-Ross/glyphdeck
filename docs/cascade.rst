@@ -21,12 +21,17 @@ Methods & Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: glyphdeck.Cascade
+    :members:
+    :inherited-members:
+
+    .. automethod:: __init__
 
 
-.sanitiser
+Inherited Classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sanitise
 ---------------------------------------------
-
-TODO running sanitiser inside cascade, link to BaseSanitiser notes
 
 .llm_handler
 ---------------------------------------------
