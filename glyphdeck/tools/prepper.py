@@ -1,7 +1,7 @@
 """Module for preparing dataframes and extracting data in a standardized format.
 
 Provides functions to transform and extract data from dataframes,
-CSV files, and XLSX files into the common Data dictionary format.
+CSV files, and XLSX files into the common DataDict format.
 """
 
 from typing import Union, List, Optional, Tuple
@@ -31,7 +31,7 @@ logger = PrepperLogger().setup()
 def prepare_df(
     source_table: pd.DataFrame, id_column: str, data_columns: Union[str, List[str]]
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Prepare a dataframe into the common data dictionary format.
+    """Prepare a dataframe into the common DataDict format.
 
     This function transforms a dataframe into a dictionary where keys are unique IDs
     from a specified column, and values are lists of selected data column values. It
@@ -119,7 +119,7 @@ def prepare_df(
 def prepare_xlsx(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Load data from an XLSX file and prepare it into the common data dictionary format.
+    """Load data from an XLSX file and prepare it into the common DataDict format.
 
     Args:
         file_path (str): The path to the XLSX file to be loaded.
@@ -152,7 +152,7 @@ def prepare_xlsx(
 def prepare_csv(
     file_path: str, id_column: str, data_columns: Union[str, List[str]], **kwargs
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Load data from a CSV file and prepare it into the common data dictionary format.
+    """Load data from a CSV file and prepare it into the common DataDict format.
 
     Args:
         file_path (str): The path to the CSV file to be loaded.
@@ -189,7 +189,7 @@ def prepare(
     encoding: str,
     sheet: Union[str, int],
 ) -> Tuple[pd.DataFrame, DataDict]:
-    """Conditionally prepares data from various formats into a common data dictionary format.
+    """Conditionally prepares data from various formats into a common DataDict format.
 
     Depending on the input format (dataframe, CSV file, or XLSX file), this function
     runs the appropriate preparation routine to convert the data into the common
