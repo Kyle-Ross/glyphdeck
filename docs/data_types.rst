@@ -64,7 +64,7 @@ Stores multiple individual records in order of addition, making them easily avai
 
 Each individual record only contains the current version of the data.
 
-For example, this would be the records (per data in the DataDicts example) when a ``Sentiment`` validator was run on it:
+For example, this would be the records (per previous example) when a ``Sentiment`` validator was run on it:
 
 .. code-block:: python
 
