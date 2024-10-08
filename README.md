@@ -1,4 +1,9 @@
 # GlyphDeck
+[![PyPI version](https://img.shields.io/pypi/v/glyphdeck)](https://pypi.org/project/glyphdeck/)
+![Python versions](https://img.shields.io/pypi/pyversions/glyphdeck)
+![License](https://img.shields.io/pypi/l/glyphdeck)
+[![Go to documentation](https://readthedocs.org/projects/glyphdeck/badge/)](https://glyphdeck.readthedocs.io/en/latest/)
+[![Read the Docs Badge](https://img.shields.io/badge/Read%20the%20Docs-8CA1AF?logo=readthedocs&logoColor=fff&style=flat)](https://glyphdeck.readthedocs.io/)
 
 The glyphdeck library is a comprehensive toolkit designed to streamline
 & simplify various aspects of asynchronous LLM data processing workflows
@@ -13,8 +18,6 @@ free LLM data workflows.
 Its also equiped with caching and a configurable logging facility that
 makes complex asyncronous LLM workflows much easier to configure,
 understand and debug.
-
-[Read the documentation](https://glyphdeck.readthedocs.io/) - [PyPI Distribution](https://pypi.org/project/glyphdeck/)
 
 ## Features
 
@@ -40,13 +43,13 @@ understand and debug.
 
 ## Set-up
 
-### Install
+### 🔧 Install
 
 ``` 
 pip install glyphdeck
 ```
 
-### Set API Key
+### 🔑 Set API Key
 
 Set your `OPENAI_API_KEY` with a
 [command](https://platform.openai.com/docs/quickstart?language-preference=python),
@@ -57,7 +60,7 @@ variables](https://en.wikipedia.org/wiki/Environment_variable).
 setx OPENAI_API_KEY "your_api_key_here"
 ```
 
-### Import
+### 📥 Import
 
 ``` python
 import glyphdeck as gd
@@ -65,7 +68,7 @@ import glyphdeck as gd
 
 ## Usage
 
-### Cascades
+### 🌊 Cascades
 
 The `Cascade` class is the primary interface for the glyphdeck library.
 It handles and processes data in a record-like structure, providing easy
@@ -77,7 +80,7 @@ remains consistent, regardless of other changes.
 
 This all combines to let you spin up LLM workflows in record time.
 
-### Example
+### 🏄 Example
 
 ``` python
 import glyphdeck as gd
@@ -108,7 +111,7 @@ cascade.llm_handler.run("llm_category_sentiment")
 
 ```
 
-### Output
+### ✨ Output
 
 | Review Id | Review                                                                                                                                  | Review_sub_categories                                                          | Review_sentiment_score |
 |-----------|-----------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|------------------------|
@@ -124,4 +127,4 @@ function, class & method. Use the Cascade and other tools to mix and
 match, create feedback loops and more - all with blazing asynchronous
 speed through the OpenAI API.
 
-See the full capabilities in the [documentation](https://glyphdeck.readthedocs.io/).
+See the full capabilities in the extensive [documentation](https://glyphdeck.readthedocs.io/).
