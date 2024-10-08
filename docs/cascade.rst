@@ -21,12 +21,45 @@ Methods & Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: glyphdeck.Cascade
+    :members:
+    :exclude-members: sanitiser, get_combined, 
+                      get_rebase, create_dataframes, 
+                      expected_len
 
 Inherited Classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sanitise
+sanitiser
 ---------------------------------------------
 
-.llm_handler
+.. autoattribute:: glyphdeck.Cascade.sanitiser
+
+.. autoclass:: glyphdeck.processors.sanitiser.BaseSanitiser
+    :members:
+    :exclude-members: patterns
+
+.. autoattribute:: glyphdeck.processors.sanitiser.BaseSanitiser.patterns
+    :no-value:
+
+    .. note:: 
+        >>> # Stores patterns, placeholders & groupings used to sanitise data
+        >>> # Adding patterns with Sanitiser methods will insert them here
+        >>> {
+        >>>     {
+        >>>         "group": "date",
+        >>>         "placeholder": "<DATE>",
+        >>>         "rank": 1,
+        >>>         "pattern": _date_pattern1,
+        >>>     },
+        >>>     ...
+        >>> }
+
+
+llm_handler
 ---------------------------------------------
+
+:class: Jeff
+
+.. .. autoclass:: glyphdeck.processors.llm_handler.BaseLLMHandler
+
+    
