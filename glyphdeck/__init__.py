@@ -22,7 +22,7 @@ from .config.logger_config import (
 )
 
 # Making common data_types available in the interface
-from .validation.data_types import DataDict, Optional_DataDict, RecordDict, RecordsDict
+from .validation.data_types import DataDict, RecordDict, RecordsDict
 
 # Among other things, determines the display order in the docs
 __all__ = [
