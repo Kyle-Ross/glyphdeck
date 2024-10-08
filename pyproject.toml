@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "glyphdeck"
-version = "1.1.0"
+version = "1.1.1"
 description = "The glyphdeck library is a comprehensive toolkit designed to streamline & simplify various aspects of asynchronous LLM data processing workflows over high-volume, dense semantic data - like customer feedback, reviews and comments."
 authors = ["Kyle Ross <107285758+Kyle-Ross@users.noreply.github.com>"]
 license = "Elastic License 2.0"
@@ -30,6 +30,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 select = ["D"]
 ignore = ["D100", "D101", "D102", "D409"]
+
 
 
 
