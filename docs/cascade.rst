@@ -34,8 +34,63 @@ Inherited Class Instances
 
 The ``Cascade`` is built with easily accessible instances of utility classes.
 
+llm_handler
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Handler for interacting with Large Language Models (LLMs) within the ``Cascade``.
+
+Usage
+"""""""""""""""""""""""""""""""""""""""""""""
+
+Each ``Cascade`` can create an associated ``llm_handler`` instance:
+
+.. code-block:: python
+
+    cascade = gd.Cascade(...)
+    cascade.set_llm_handler(...)
+
+Once ``set_llm_handler()`` has been run the ``llm_handler`` can be accessed and ran on the data in the cascade.
+
+.. code-block:: python
+
+    cascade.llm_handler.[...]
+
+.. attribute:: llm_handler
+
+   llm_handler description
+
+   :type: llm_handler
+
+Instance Behaviour
+"""""""""""""""""""""""""""""""""""""""""""""
+
+The ``.llm_handler`` available in the ``Cascade`` instance has some extra functionality.
+
+
+.. attribute:: something
+
+   Some description
+
+   :type: sometype
+
+
+BaseLLMHandler
+"""""""""""""""""""""""""""""""""""""""""""""
+
+The ``.llm_handler`` also inherits the features of the ``BaseLLMHandler``. 
+
+.. autoclass:: glyphdeck.processors.llm_handler.BaseLLMHandler
+    :members:
+    :exclude-members: BaseLLMHandler._raw_output_data, new_output_data, run_async
+
+
 Sanitiser
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Sanitiser is used to identify and replace pieces of private information
+within ``DataDicts`` using regular expression patterns. 
+It supports sanitisation of emails, URLs, file paths,
+folder paths, dates, numbers and any other regex you want to add in.
 
 Usage
 """""""""""""""""""""""""""""""""""""""""""""
@@ -92,6 +147,7 @@ The ``.sanitiser`` also inherits the features of the ``BaseSanitiser``.
 .. autoclass:: glyphdeck.processors.sanitiser.BaseSanitiser
     :members:
     :exclude-members: patterns, sanitise, values
+    :no-index:
 
 .. autoattribute:: glyphdeck.processors.sanitiser.BaseSanitiser.patterns
     :no-value:
@@ -108,13 +164,4 @@ The ``.sanitiser`` also inherits the features of the ``BaseSanitiser``.
         >>>     },
         >>>     ...
         >>> }
-
-
-llm_handler
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-:class: Jeff
-
-.. .. autoclass:: glyphdeck.processors.llm_handler.BaseLLMHandler
-
     
