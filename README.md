@@ -123,3 +123,5 @@ Glyphdeck is highly customisable with useful optional commands in every
 function, class & method. Use the Cascade and other tools to mix and
 match, create feedback loops and more - all with blazing asynchronous
 speed through the OpenAI API.
+
+See the full capabilities in the [documentation](https://glyphdeck.readthedocs.io/).
