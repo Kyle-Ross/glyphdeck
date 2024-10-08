@@ -15,7 +15,7 @@ logger = DataTypesLogger().setup()
 
 # Common types that will be used across the project
 # Types for which it will be clearly to hint them in this abbreviated format in function signatures
-DataDict = Dict[int, List]
+DataDict = Dict[Union[int, str], List]
 Optional_DataDict = Optional[DataDict]
 RecordDict = Dict[
     str, Union[str, None, List[str], datetime, timedelta, DataDict, pd.DataFrame]
