@@ -37,14 +37,9 @@ functionality.
 Internally, this is added by the ``CascadeLLMHandler`` super class which adds cascade functionality 
 to the base class.
 
-.. autoclass:: glyphdeck.Cascade.CascadeLLMHandler
+.. autoclass:: glyphdeck.processors.cascade.Cascade.CascadeLLMHandler
     :members: 
-    :exclude-members: input_data, provider, model, system_message,
-                      validation_model, cache_identifier, use_cache,
-                      temperature, max_validation_retries,
-                      max_preprepared_coroutines, max_awaiting_coroutines,
-                      _raw_output_data, new_output_data, new_column_names,
-                      available_providers
+    :exclude-members: outer_cascade
 
 BaseLLMHandler
 ----------------------------------------------

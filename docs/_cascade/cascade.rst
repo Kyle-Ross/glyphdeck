@@ -32,4 +32,7 @@ Methods & Properties
     :members:
     :exclude-members: sanitiser, get_combined, 
                       get_rebase, create_dataframes, 
-                      expected_len, llm_handler
+                      expected_len, llm_handler,
+                      CascadeLLMHandler, Sanitiser,
+                      BaseSanitiser
+            
