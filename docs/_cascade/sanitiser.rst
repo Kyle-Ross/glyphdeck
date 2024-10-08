@@ -1,6 +1,9 @@
 sanitiser
 =============================================
 
+About
+----------------------------------------------
+
 The ``sanitiser`` is used to identify and replace pieces of private information
 within ``DataDicts`` using regular expression patterns. 
 
