@@ -21,10 +21,11 @@ This can be accessed like so:
 
 .. autoattribute:: glyphdeck.Cascade.sanitiser
 
-Instance Behaviour
+Cascade Extension
 ----------------------------------------------
 
-The ``.sanitiser`` available in the ``Cascade`` instance has some extra functionality.
+The ``.sanitiser`` available in the ``Cascade`` instance has some extra 
+functionality add onto that provided by the `BaseSanitiser`` class.
 
 .. attribute:: defaults
 

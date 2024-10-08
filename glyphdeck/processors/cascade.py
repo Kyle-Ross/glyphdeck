@@ -204,7 +204,7 @@ class Cascade:
     # Inherit the BaseLLMHandler class and add new run method which writes records and uses the latest_data by default
     # Abstractions required intricate juggling of args and kwargs to pass the context of the current cascade instance...
     # ... as well as implement a reference to that instance's self.latest_data property
-    class _Handler(BaseLLMHandler):
+    class CascadeLLMHandler(BaseLLMHandler):
         """Inherits from BaseLLMHandler, handles the interaction with LLM providers and manages the processing of input data for asynchronous querying.
 
         Attributes:
@@ -376,9 +376,9 @@ class Cascade:
             suffix_message="Set cascade.llm_handler to use the latest record",
         )
         def use_latest(self):
-            """Set the _Handler to use the latest record in the Cascade.
+            """Set the CascadeLLMHandler to use the latest record in the Cascade.
 
-            When invoked, this method ensures that the _Handler will operate
+            When invoked, this method ensures that the CascadeLLMHandler will operate
             on the latest record in the Cascade rather than any manually selected data.
 
             Args:
@@ -468,16 +468,16 @@ class Cascade:
 
         @log_decorator(logger, "info", suffix_message="Use cascade.llm_handler.run()")
         def run(self, title):
-            """Run the _Handler and appends the results to the cascade.
+            """Run the CascadeLLMHandler and appends the results to the cascade.
 
-            The function will process the _Handler with the current settings and append
+            The function will process the CascadeLLMHandler with the current settings and append
             the resulting output data to the cascade as a new record with the specified title.
 
             Args:
                 title (str): The title to be assigned to the new record in the cascade.
 
             Returns:
-                _Handler: The _Handler object, allowing further cascadeed operations.
+                CascadeLLMHandler: The CascadeLLMHandler object, allowing further cascadeed operations.
 
             """
             # Check the new title is unique before proceeding
@@ -712,7 +712,7 @@ class Cascade:
         kwargs["outer_cascade"] = self  # noqa: E402
 
         # Set the llm_handler using the adapted arguments
-        self.llm_handler = self._Handler(*args, **kwargs)
+        self.llm_handler = self.CascadeLLMHandler(*args, **kwargs)
 
     @property
     @log_decorator(logger, is_property=True)
