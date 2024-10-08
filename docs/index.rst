@@ -85,23 +85,15 @@ create feedback loops |:repeat:| and more - all with blazing |:fire:| asynchrono
 
 .. toctree::
    :maxdepth: 3
-   :caption: INTERFACE
+   :caption: API
    :hidden:
 
-   cascade
+   _cascade/cascade
+   _cascade/llm_handler
+   _cascade/sanitiser
    _validators/validators
    data_types
    logs
-
-.. toctree::
-   :maxdepth: 2
-   :caption: COMPONENTS
-   :hidden:
-
-   processors
-   validation
-   config
-   tools
 
 .. toctree::
    :maxdepth: 1
