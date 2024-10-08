@@ -24,9 +24,13 @@ Once ``set_llm_handler()`` has been run the ``llm_handler`` can be accessed and 
 
 .. attribute:: llm_handler
 
-   llm_handler description
+   Returns the llm_handler instance once ``set_llm_handler()`` has been run.
+   
+   Handles interaction with LLM providers.
 
-   :type: llm_handler
+   Inherits all attributes, properties & methods from both ``CascadeLLMHandler`` and ``BaseLLMHandler`` classes.
+
+   :type: llm_handler (``Cascade`` attribute)
 
 Cascade Extension
 ----------------------------------------------
