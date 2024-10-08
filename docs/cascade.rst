@@ -21,11 +21,6 @@ Methods & Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: glyphdeck.Cascade
-    :members:
-    :inherited-members:
-
-    .. automethod:: __init__
-
 
 Inherited Classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
