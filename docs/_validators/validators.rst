@@ -1,17 +1,20 @@
 validators
 ==================================
 
+About
+----------------------------------------------
+
 Key to glyphdeck is the Pydantic validation model that is passed to the ``LLMHandler`` to direct its output.
 
-.. rubric:: Access
-    :heading-level: 2
+Access
+----------------------------------------------
 
 .. code-block:: python
 
     gd.validators.ModelName
 
-.. rubric:: Usage
-    :heading-level: 2
+Usage
+----------------------------------------------
 
 .. code-block:: python
     :emphasize-lines: 8
@@ -27,8 +30,8 @@ Key to glyphdeck is the Pydantic validation model that is passed to the ``LLMHan
         cache_identifier="pizzshop_sentiment",
     )
 
-.. rubric:: Built-in
-    :heading-level: 2
+Built-in
+----------------------------------------------
 
 For a given text input the LLM will be instructed to return the:
 
@@ -44,8 +47,8 @@ For a given text input the LLM will be instructed to return the:
 - :doc:`.TopCatsSentiment` - top categories and sentiment score
 - :doc:`.CatHierarchySentiment` - full hierarchy of categories and the overall sentiment score
 
-.. rubric:: Custom
-    :heading-level: 2
+Custom Validators
+----------------------------------------------
 
 Any valid Pydantic ``BaseModel`` can be used for validation. You can also inherit from :doc:`.BaseValidatorModel` to make use of the logic used in the built-in validators.
 
