@@ -6,7 +6,7 @@ authors = ["Kyle Ross <107285758+Kyle-Ross@users.noreply.github.com>"]
 license = "Elastic License 2.0"
 readme = "README.md"
 repository = "https://github.com/Kyle-Ross/glyphdeck"
-documentation = "https://github.com/Kyle-Ross/glyphdeck"
+documentation = "https://glyphdeck.readthedocs.io/en/latest/"
 keywords = ["llm", "openai", "nlp", "semantic", "langchain"]
 
 [tool.poetry.dependencies]
